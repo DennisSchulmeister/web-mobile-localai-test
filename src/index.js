@@ -1,5 +1,8 @@
-import "./index.css";
+/**
+ * Web/Mobile-Test für lokale KI
+ * © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
+ * Lizenziert unter CC0
+ */
 
-window.addEventListener("DOMContentLoaded", function() {
-    console.log("Application is ready!");
-});
+import "@picocss/pico/css/pico.css";
+import "./index.css";
