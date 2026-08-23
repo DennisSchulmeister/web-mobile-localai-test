@@ -1,0 +1,11 @@
+html {
+    font-family: sans-serif;
+
+    min-height: 100vh;
+    background-image: radial-gradient( circle 975px at 2.6% 48.3%,  rgba(0,8,120,1) 0%, rgba(95,184,224,1) 99.7%);
+    color: white;
+}
+
+h1 {
+    text-shadow: 1px 1px 2px rgba(0,0,0, 0.5);
+}

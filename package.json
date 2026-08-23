@@ -1,0 +1,20 @@
+{
+    "name": "@dschulmeis/web-mobile-localai-test",
+    "version": "1.0.0",
+    "description": "Web/Mobile-Test für lokale KI",
+    "author": "Dennis Schulmeister-Zimolong",
+    "private": "true",
+    "type": "module",
+    "scripts": {
+        "clean": "node bin/clean.js",
+        "build": "npm run clean && node bin/esbuild-bundle.js",
+        "start": "node bin/esbuild-serve.js"
+    },
+    "config": {
+        "clean_dirs": "static/_bundle"
+    },
+    "devDependencies": {
+        "esbuild": "^0.28.2",
+        "shelljs": "^0.10.0"
+    }
+}
