@@ -71,4 +71,6 @@ Copyright
 
 © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
 
-[Lizenziert unter CC0 1.0](.LICENCE), https://creativecommons.org/publicdomain/zero/1.0/ 
+[Quellcode Lizenziert unter CC0 1.0](.LICENCE), https://creativecommons.org/publicdomain/zero/1.0/ 
+
+Beispielinhalte lizenziert unter CC-BY 4.0, http://creativecommons.org/licenses/by/4.0/
