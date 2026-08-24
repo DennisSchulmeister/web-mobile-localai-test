@@ -32,20 +32,29 @@ Die Umsetzung ist bewusst so minimal wie möglich gehalten, um nicht vom eigentl
 Versuch abzulenken. Für die Weboberfläche kommen zum Einsatz:
 
 * **Bundler:** [Esbuild](https://picocss.com/)
-* **Styling:** [Pico CSS](https://picocss.com/)
 * **UI:** [Svelte](https://svelte.dev/)
+* **Styling:** [Pico CSS](https://picocss.com/)
+* **Icons:** [Bootstrap Icons](https://icons.getbootstrap.com/)
 
 Für die KI kommen folgende Bibliotheken und Modelle zum Einsatz:
 
 * **Runtime:** [transformers.js](https://huggingface.co/docs/transformers.js/index) (basiert auf [ONNX}(https://onnxruntime.ai/))
-* **Zusammenfassung:**
+* **Zusammenfassung (Summarization):**
     * [apbaxel/bigscience-mt0-small-int8-onnx](https://huggingface.co/apbaxel/bigscience-mt0-small-int8-onnx)
     * [Alternativen auf HuggingFace](https://huggingface.co/models?pipeline_tag=summarization&language=de&sort=downloads)
-* **Embedding:**
+* **Fragen beantworten (Question Answering):**
+    * [onnx-community/all-MiniLM-L12-v2-qa-all-ONNX](https://huggingface.co/onnx-community/all-MiniLM-L12-v2-qa-all-ONNX)
+    * [dewdev/mdeberta-v3-base-squad2-onnx](https://huggingface.co/dewdev/mdeberta-v3-base-squad2-onnx)
+    * [Alternativen auf HuggingFace](https://huggingface.co/models?pipeline_tag=question-answering&library=onnx&language=de&sort=downloads)
+* **Semantische Suche (Sentence Similarity):**
+    * [paraphrase-multilingual-MiniLM-L12-v2](https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2)
     * [onnx-community/multilingual-e5-base-ONNX](https://huggingface.co/onnx-community/multilingual-e5-base-ONNX)
     * [shannondata/multilingual-e5-small](https://huggingface.co/shannondata/multilingual-e5-small)
     * [Hisham480/multilingual-r2-ONNX](https://huggingface.co/Hisham480/multilingual-r2-ONNX)
     * [Alternativen auf HuggingFace](https://huggingface.co/models?pipeline_tag=sentence-similarity&library=onnx&language=de&sort=downloads)
+* **Vorlesen (Text to Speach):**
+    * [Supertone/supertonic-3](https://huggingface.co/Supertone/supertonic-3)
+    * [Alternativen auf HuggingFace](https://huggingface.co/models?pipeline_tag=text-to-speech&library=onnx&language=de&sort=downloads)
 
 Weitere Ideen
 -------------

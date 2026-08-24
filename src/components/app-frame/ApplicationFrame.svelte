@@ -53,6 +53,7 @@ SPA-Routing ermöglicht.
     :global(h1),
     :global(h2) {
         color: var(--color2);
+        text-shadow: 1px 1px 0px rgba(0,0,0, 0.25);
     }
 
     @media (min-width: 44em) {
