@@ -33,7 +33,7 @@ Versuch abzulenken. Für die Weboberfläche kommen zum Einsatz:
 
 * **Bundler:** [Esbuild](https://picocss.com/)
 * **Styling:** [Pico CSS](https://picocss.com/)
-* **UI:** Plain HTML, CSS, JavaScript
+* **UI:** [Svelte](https://svelte.dev/)
 
 Für die KI kommen folgende Bibliotheken und Modelle zum Einsatz:
 
