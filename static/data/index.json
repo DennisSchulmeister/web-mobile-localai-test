@@ -3,7 +3,7 @@
         "category": "Bitcoin",
         "pages": [
             {
-                "url": "bitcoin/crypto-begriffe.md",
+                "file": "bitcoin/crypto-begriffe.md",
                 "title": "Grundbegriffe der Kryptographie"
             }
         ]
@@ -12,19 +12,19 @@
         "category": "Internet of Things",
         "pages": [
             {
-                "url": "Grundbegriffe des Internet of Things",
+                "file": "Grundbegriffe des Internet of Things",
                 "title": "iot/grundbegriffe.md"
             },
             {
-                "url": "Aus was besteht ein Computer?",
+                "file": "Aus was besteht ein Computer?",
                 "title": "iot/rechnerarchitektur.md"
             },
             {
-                "url": "iot/architektur.md",
+                "file": "iot/architektur.md",
                 "title": "Herleitung der Systemarchitektur"
             },
             {
-                "url": "iot/firmware-erstellung.md",
+                "file": "iot/firmware-erstellung.md",
                 "title": "Erstellung der Firmware"
             }
         ]
@@ -33,10 +33,10 @@
         "category": "Webprogrammierung",
         "pages": [
             {
-                "url": "webprog/idee.md",
+                "file": "webprog/idee.md",
                 "title": "Die Idee hinter dem World Wide Web"
             },{
-                "url": "webprog/bestandteile.md",
+                "file": "webprog/bestandteile.md",
                 "title": "Die Bestandteile des World Wide Web"
             }
         ]

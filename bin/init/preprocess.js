@@ -15,7 +15,6 @@ console.log("Daten vorverarbeiten");
 console.log("====================");
 console.log("");
 
-
 // Konfiguration einlesen
 if (process.argv.length < 3) {
     utils.logError("Zu wenig Kommandozeilenparameter!");
@@ -25,5 +24,8 @@ if (process.argv.length < 3) {
 
 let config = utils.readConfig({
     configFile: process.argv[2],
-    withData: true,
+    withData:   true,
 });
+
+// https://naturalnode.github.io/natural/Tokenizers.html
+// https://github.com/remarkjs/remark

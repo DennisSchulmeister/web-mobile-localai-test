@@ -86,23 +86,7 @@ Versuch abzulenken. Für die Weboberfläche kommen zum Einsatz:
 Für die KI kommen folgende Bibliotheken und Modelle zum Einsatz:
 
 * **Runtime:** [transformers.js](https://huggingface.co/docs/transformers.js/index) (basiert auf [ONNX}(https://onnxruntime.ai/))
-* **Zusammenfassung (Summarization):**
-    * [onnx-community/text_summarization-ONNX](https://huggingface.co/onnx-community/text_summarization-ONNX)
-    * [Alternativen auf HuggingFace](https://huggingface.co/models?pipeline_tag=summarization&library=onnx&language=de&sort=downloads)
-* **Übersetzen (Translation):**
-    * [huggingworld/m2m100_418M](https://huggingface.co/huggingworld/m2m100_418M)
-    * [Alternativen auf HuggingFace](https://huggingface.co/models?pipeline_tag=translation&library=transformers.js&language=de&sort=downloads)
-* **Fragen beantworten (Question Answering):**
-    * [onnx-community/all-MiniLM-L12-v2-qa-all-ONNX](https://huggingface.co/onnx-community/all-MiniLM-L12-v2-qa-all-ONNX)
-    * [dewdev/mdeberta-v3-base-squad2-onnx](https://huggingface.co/dewdev/mdeberta-v3-base-squad2-onnx)
-    * [Alternativen auf HuggingFace](https://huggingface.co/models?pipeline_tag=question-answering&library=onxx&language=de&sort=downloads)
-* **Semantische Suche (Sentence Similarity):**
-    * [onnx-community/multilingual-e5-base-ONNX](https://huggingface.co/onnx-community/multilingual-e5-base-ONNX)
-    * [shannondata/multilingual-e5-small](https://huggingface.co/shannondata/multilingual-e5-small)
-    * [Alternativen auf HuggingFace](https://huggingface.co/models?pipeline_tag=sentence-similarity&library=transformers.js&language=de&sort=downloads)
-* **Vorlesen (Text to Speach):**
-    * [onnx-community/Supertonic-TTS-ONNX](https://huggingface.co/onnx-community/Supertonic-TTS-ONNX)
-    * [Alternativen auf HuggingFace](https://huggingface.co/models?pipeline_tag=text-to-speech&library=transformers.js&language=de&sort=downloads)
+* **KI-Modelle:** Siehe [./static/models/index.json](static/models/index.json)
 
 Künftige Web APIs
 -----------------
@@ -150,9 +134,7 @@ transformers.js und HuggingFace:
     - `onnx/model_{dtype}.onnx`
 
   Fehlt beispielsweise die `config.json`-Datei, wirft transformers.js beim Herunterladen
-  des Modells einen Fehler. Oft sind aber auch einfach die `*.onnx`-Dateien falsch benannt.
-  Im Download-Skript können hierfür Overrides eingetragen werden, um die falsch benannten
-  Dateien überhaupt herunterladen und unter dem richtigen Namen ablegen zu können.
+  des Modells einen Fehler.
 
 * Nicht immer sieht man am Dateinamen der Modelle, welche Datenformate (`dtype`) unterstützt
   werden. Das Skript `bin/init/download.js` ruft daher die Funktion `ModelRegistry.get_available_dtypes()`

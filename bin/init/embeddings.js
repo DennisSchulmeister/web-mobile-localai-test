@@ -15,7 +15,6 @@ console.log("Texteinbettungen berechnen");
 console.log("==========================");
 console.log("");
 
-
 // Konfiguration einlesen
 if (process.argv.length < 3) {
     utils.logError("Zu wenig Kommandozeilenparameter!");

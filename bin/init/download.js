@@ -65,7 +65,7 @@ for (let [modelId, modelDefinition] of modelsById.entries()) {
         let files = await ModelRegistry.get_files(modelId);
         files.forEach(file => downloadFiles.add(file));
     } else {
-        for (let dtype in modelDefinition.dtypes) {
+        for (let dtype of modelDefinition.dtypes) {
             let files = await ModelRegistry.get_files(modelId, {dtype});
             files.forEach(file => downloadFiles.add(file));
         }
@@ -85,11 +85,6 @@ for (let [modelId, modelDefinition] of modelsById.entries()) {
         let localPath = path.join(config.models.downloadDir, owner, modelName, ...downloadFile.split("/"));
         let localDir  = path.dirname(localPath);
         let fileName  = path.basename(localPath);
-
-        if (modelDefinition.fixFilenames?.[fileName]) {
-            // Datei im Hub falsch benannt!
-            downloadFile = path.join(path.dirname(downloadFile), modelDefinition.fixFilenames[fileName]);
-        }
 
         if (!shell.test("-e", localPath)) {
             // Diese URL sollte immer die Datei selbst liefern, egal ob sie direkt im Hub

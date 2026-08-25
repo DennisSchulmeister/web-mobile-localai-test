@@ -4,8 +4,8 @@ Die Bestandteile des World Wide Web
 Ursprüng des Web
 ----------------
 
-In den folgenden Jahren machte sich Tim Berners-Lee daran, seine Vision
-umzusetzen. Er ging also wirklich her und hat angefangen, sowohl einen Webserver
+In den Jahren ab 1989 machte sich Tim Berners-Lee daran, seine Vision
+umzusetzen. Er ging also her und hat angefangen, sowohl einen Webserver
 als auch einen Browser zu entwickeln. Als Entwicklungsmaschine nutzte er hierfür
 einen NeXTcube, der für sich genommen schon eine interessante Geschichte wert
 wäre. So viel sei an dieser Stelle aber zum NeXTcube und der Firma NeXT
@@ -28,12 +28,12 @@ Web ergeben (vom Internet einmal abgesehen):
   jener Dokumente im Web. Jedes Dokument sollte damit eine weltweit eindeutige
   Adresse bekommen, unter der aus gefunden und abgerufen werden kann.
 
-* **HTTP (HyperText Transfer Protocol)** als Übertragunsprotokoll, mit dem
-  Verbindung zu einem Server hergestellt werden konnte, um die gewünschten
-  Dokumente abzurufen. Im Vergleich zu heute war das Protokoll dabei fast schon
-  trivial einfach: Nach erfolgtem Verbindungsaufbau sollte einfach das Wort GET
-  gefolgt vom Namen der gewünschten Datei gesendet werden, woraufhin der Server
-  mit dem Inhalt der Datei antwortete und die Verbindung beendete.
+* **HTTP (HyperText Transfer Protocol)** als Übertragunsprotokoll, mit dem eine
+  Verbindung zu einem Server hergestellt werden kann, um gewünschten Dokumente
+  abzurufen. Im Vergleich zu heute war das Protokoll dabei fast schon trivial
+  einfach: Nach erfolgtem Verbindungsaufbau sollte einfach das Wort GET gefolgt
+  vom Namen der gewünschten Datei gesendet werden, woraufhin der Server mit dem
+  Inhalt der Datei antwortete und die Verbindung beendete.
 
 1991 war es endlich soweit. Eine erste lauffähige Version der Software war
 vorhanden und Tom Berners-Lee setzte den ersten Webserver mit der ersten

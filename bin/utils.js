@@ -62,7 +62,16 @@ export function readConfig({configFile, withModels, withData} = {}) {
     }
 
     if (withData) {
-        config.data.config = readJsonFile(path.join(dirname, config.data.config));
+        let dataFile = path.join(dirname, config.data.config);
+        let dataPath = path.dirname(dataFile);
+
+        config.data.config = readJsonFile(dataFile);
+
+        for (let category of config.data.config || []) {
+            for (let page of category.pages || []) {
+                page.file = path.join(dataPath, page.file);
+            }
+        }
     }
 
     return config;
