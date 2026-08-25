@@ -1,7 +1,9 @@
 <!--
 Web/Mobile-Test für lokale KI
 © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
-Lizenziert unter CC0
+
+This source code is licensed under the BSD 3-Clause License found in the
+LICENSE file in the root directory of this source tree.
 -->
 
 <!--
@@ -14,11 +16,15 @@ Startseite mit einer Auswahl des startenden Testfalls.
 </script>
 
 <div id="page">
-    <h1>Testfall auswählen</h1>
+    <h1>Anwendungsfall auswählen</h1>
 
     <div id="menu">
         <ImageCard img="img/Summary.jpg" href="#/summary">
             Text zusammenfassen
+        </ImageCard>
+
+        <ImageCard img="img/Translation.jpg" href="#/translation">
+            Text übersetzen
         </ImageCard>
 
         <ImageCard img="img/QuestionAnswering.jpg" href="#/question-answering">

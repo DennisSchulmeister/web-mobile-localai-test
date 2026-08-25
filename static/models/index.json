@@ -1,0 +1,58 @@
+{
+    "summarization": [
+        {
+            "repo": "onnx-community/text_summarization-ONNX",
+            "dtypes": ["int8"]
+        }
+    ],
+    "translation": [
+        {
+            "repo": "huggingworld/m2m100_418M",
+            "dtypes": ["q8"],
+            "languages": ["de", "en", "fr"]
+        }
+    ],
+    "questionAnswering": [
+        {
+            "repo": "onnx-community/all-MiniLM-L12-v2-qa-all-ONNX",
+            "dtypes": ["int8"],
+            "prefix": {
+                "question": "",
+                "context": ""
+            }
+        },
+        {
+            "repo": "dewdev/mdeberta-v3-base-squad2-onnx",
+            "dtypes": ["int8"],
+            "prefix": {
+                "question": "",
+                "context": ""
+            }
+        }
+
+    ],
+    "sentenceSimilarity": [
+        {
+            "repo": "onnx-community/multilingual-e5-base-ONNX",
+            "dtypes": ["int8"],
+            "prefix": {
+                "query": "query: ",
+                "context": "passage: "
+            }
+        },
+        {
+            "repo": "shannondata/multilingual-e5-small",
+            "dtypes": [],
+            "prefix": {
+                "query": "query: ",
+                "context": "passage: "
+            }
+        }
+    ],
+    "textToSpeach": [
+        {
+            "repo": "onnx-community/Supertonic-TTS-ONNX",
+            "dtypes": ["fp32"]
+        }
+    ]
+}

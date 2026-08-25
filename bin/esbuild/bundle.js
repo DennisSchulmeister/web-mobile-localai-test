@@ -1,19 +1,21 @@
 /**
  * Web/Mobile-Test für lokale KI
  * © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
- * Lizenziert unter CC0
+ *
+ * This source code is licensed under the BSD 3-Clause License found in the
+ * LICENSE file in the root directory of this source tree.
  */
 
 import * as esbuild  from "esbuild";
 import esbuildSvelte from "esbuild-svelte";
 
-let ctx = await esbuild.context({
+esbuild.build({
     entryPoints: [`src/index.js`],
-    outdir: "static/_bundle/",
+    outdir: "static/_bundle/",    
 
     bundle:    true,
     splitting: true,
-    minify:    false,
+    minify:    true,
     sourcemap: true,
     format:    "esm",
 
@@ -44,12 +46,5 @@ let ctx = await esbuild.context({
         ".jpg": "dataurl",
         ".png": "dataurl",
         ".gif": "dataurl",
-    }
+    },
 });
-
-let { host, port } = await ctx.serve({
-    servedir: "static",
-    port: 8888,
-});
-
-console.log(`Listening on ${host}:${port}`);

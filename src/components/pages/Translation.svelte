@@ -8,7 +8,7 @@ LICENSE file in the root directory of this source tree.
 
 <!--
 @component
-Anwendungsfall: Semantische Suche
+Anwendungsfall: Übersetzung
 -->
 
 <script>
@@ -16,7 +16,7 @@ Anwendungsfall: Semantische Suche
 </script>
 
 <div id="page">
-    Semantische Suche
+    Text übersetzen
 </div>
 
 <Footer>
