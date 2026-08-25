@@ -1,0 +1,11 @@
+{
+    "models": {
+        "config": "models/index.json",
+        "downloadDir": "_generated/models"
+    },
+    "data": {
+        "config": "data/index.json",
+        "preprocessDir": "_generated/preprocessed",
+        "embeddingsDir": "_generated/embeddings"
+    }
+}

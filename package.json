@@ -11,9 +11,9 @@
         "start": "node bin/esbuild/serve.js",
         "watch": "node bin/esbuild/serve.js",
         "init": "npm run prepare:download && npm run prepare:preprocess && npm run prepare:embeddings",
-        "init:download": "node bin/init/download.js static/models/index.json static/_generated/models",
-        "init:preprocess": "node bin/init/preprocess.js static/data/index.json static/_generated/preprocessed",
-        "init:embeddings": "node bin/init/embeddings.js static/data/index.json static/_generated/embeddings"
+        "init:download": "node bin/init/download.js static/config.json",
+        "init:preprocess": "node bin/init/preprocess.js static/config.json",
+        "init:embeddings": "node bin/init/embeddings.js static/config.json"
     },
     "config": {
         "clean_dirs": "static/_bundle:static/_generated"

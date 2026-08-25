@@ -1,46 +1,44 @@
-{
-    "categories": [
-        {
-            "title": "Bitcoin",
-            "pages": [
-                {
-                    "url": "bitcoin/crypto-begriffe.md",
-                    "title": "Grundbegriffe der Kryptographie"
-                }
-            ]
-        },
-        {
-            "title": "Internet of Things",
-            "pages": [
-                {
-                    "url": "Grundbegriffe des Internet of Things",
-                    "title": "iot/grundbegriffe.md"
-                },
-                {
-                    "url": "Aus was besteht ein Computer?",
-                    "title": "iot/rechnerarchitektur.md"
-                },
-                {
-                    "url": "iot/architektur.md",
-                    "title": "Herleitung der Systemarchitektur"
-                },
-                {
-                    "url": "iot/firmware-erstellung.md",
-                    "title": "Erstellung der Firmware"
-                }
-            ]
-        },
-        {
-            "title": "Webprogrammierung",
-            "pages": [
-                {
-                    "url": "webprog/idee.md",
-                    "title": "Die Idee hinter dem World Wide Web"
-                },{
-                    "url": "webprog/bestandteile.md",
-                    "title": "Die Bestandteile des World Wide Web"
-                }
-            ]
-        }
-    ]
-}
+[
+    {
+        "category": "Bitcoin",
+        "pages": [
+            {
+                "url": "bitcoin/crypto-begriffe.md",
+                "title": "Grundbegriffe der Kryptographie"
+            }
+        ]
+    },
+    {
+        "category": "Internet of Things",
+        "pages": [
+            {
+                "url": "Grundbegriffe des Internet of Things",
+                "title": "iot/grundbegriffe.md"
+            },
+            {
+                "url": "Aus was besteht ein Computer?",
+                "title": "iot/rechnerarchitektur.md"
+            },
+            {
+                "url": "iot/architektur.md",
+                "title": "Herleitung der Systemarchitektur"
+            },
+            {
+                "url": "iot/firmware-erstellung.md",
+                "title": "Erstellung der Firmware"
+            }
+        ]
+    },
+    {
+        "category": "Webprogrammierung",
+        "pages": [
+            {
+                "url": "webprog/idee.md",
+                "title": "Die Idee hinter dem World Wide Web"
+            },{
+                "url": "webprog/bestandteile.md",
+                "title": "Die Bestandteile des World Wide Web"
+            }
+        ]
+    }
+]

@@ -17,20 +17,23 @@ console.log("Modelle Herunterladen");
 console.log("=====================");
 console.log("");
 
-// Komoandozeilenparamter prüfen
-if (process.argv.length < 4) {
+// Konfiguration einlesen
+if (process.argv.length < 3) {
     utils.logError("Zu wenig Kommandozeilenparameter!");
-    utils.logError(`Aufruf: ${process.argv[0]} ${process.argv[1]} <models.json> <download_dir>`);
+    utils.logError(`Aufruf: ${process.argv[0]} ${process.argv[1]} <config.json>`);
     process.exit(1);
 }
 
-// Jedes Modell nur einmal herunterladen
-let models      = JSON.parse(shell.cat(process.argv[2]));
-let downloadDir = process.argv[3];
+let config = utils.readConfig({
+    configFile: process.argv[2],
+    withModels: true,
+});
+
+// Jedes Modell einmal herunterladen
 let modelsById  = new Map();
 
-for (let modelType in models) {
-    for (let modelDefinition of models[modelType]) {
+for (let modelType in config.models.config) {
+    for (let modelDefinition of config.models.config[modelType]) {
         let prevModelDefinition = modelsById.get(modelDefinition.repo);
 
         if (!Array.isArray(modelDefinition.dtypes)) {
@@ -79,7 +82,7 @@ for (let [modelId, modelDefinition] of modelsById.entries()) {
     // Fehlende Dateien herunterladen
     for (let downloadFile of downloadFiles) {
         let [owner, modelName] = modelId.split("/");
-        let localPath = path.join(downloadDir, owner, modelName, ...downloadFile.split("/"));
+        let localPath = path.join(config.models.downloadDir, owner, modelName, ...downloadFile.split("/"));
         let localDir  = path.dirname(localPath);
         let fileName  = path.basename(localPath);
 
