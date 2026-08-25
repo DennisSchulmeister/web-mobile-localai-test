@@ -25,6 +25,7 @@
         "chalk": "^6.0.0",
         "esbuild": "^0.28.2",
         "markdown-it": "^15.0.0",
+        "nodejs-file-downloader": "^4.13.0",
         "shelljs": "^0.10.0",
         "svelte": "^5.56.10",
         "svelte-check": "^4.7.6",

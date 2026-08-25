@@ -6,9 +6,11 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+import path            from "node:path";
 import process         from "node:process";
 import shell           from "shelljs";
 import {ModelRegistry} from "@huggingface/transformers";
+import {Downloader}    from "nodejs-file-downloader";
 import * as utils      from "../utils.js";
 
 console.log("Modelle Herunterladen");
@@ -23,9 +25,9 @@ if (process.argv.length < 4) {
 }
 
 // Jedes Modell nur einmal herunterladen
-let models     = JSON.parse(shell.cat(process.argv[2]));
-let cacheDir   = process.argv[3];
-let modelsById = new Map();
+let models      = JSON.parse(shell.cat(process.argv[2]));
+let downloadDir = process.argv[3];
+let modelsById  = new Map();
 
 for (let modelType in models) {
     for (let modelDefinition of models[modelType]) {
@@ -72,7 +74,34 @@ for (let [modelId, modelDefinition] of modelsById.entries()) {
         console.log(` - ${downloadFile}`);
     }
 
+    console.log();
+
     // Fehlende Dateien herunterladen
+    for (let downloadFile of downloadFiles) {
+        let [owner, modelName] = modelId.split("/");
+        let localPath = path.join(downloadDir, owner, modelName, ...downloadFile.split("/"));
+        let localDir  = path.dirname(localPath);
+        let fileName  = path.basename(localPath);
+
+        if (modelDefinition.fixFilenames?.[fileName]) {
+            // Datei im Hub falsch benannt!
+            downloadFile = path.join(path.dirname(downloadFile), modelDefinition.fixFilenames[fileName]);
+        }
+
+        if (!shell.test("-e", localPath)) {
+            // Diese URL sollte immer die Datei selbst liefern, egal ob sie direkt im Hub
+            // liegt oder aufgrund der Größe auf einem externen Speicher
+            let remoteUrl = `https://huggingface.co/${modelId}/resolve/main/${downloadFile}?download=true`;
+            console.log(`Download ${remoteUrl}`);
+
+            try {
+                let downloader = new Downloader({url: remoteUrl, directory: localDir, fileName});
+                await downloader.download();
+            } catch (error) {
+                utils.logError(error.toString());
+            }
+        }
+    }
 
     console.log();
 }

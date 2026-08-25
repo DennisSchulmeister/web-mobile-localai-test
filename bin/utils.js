@@ -10,16 +10,16 @@ import chalk from "chalk";
 
 /**
  * Fehlermeldung auf der Konsole ausgeben.
- * @param {string} message Meldungstext
+ * @param ...args Meldungstext und zu loggende Elemente
  */
-export function logError(message) {
-    console.error(`${chalk.bold.red("FEHLER: ")} ${message}`);
+export function logError(...args) {
+    console.error(chalk.bold.red("FEHLER:"), ...args);
 }
 
 /**
  * Warnmeldung auf der Konsole ausgeben.
- * @param {string} message Meldungstext
+ * @param ...args Meldungstext und zu loggende Elemente
  */
-export function logWarning(message) {
-    console.log(`${chalk.bold.blue("WARNUNG: ")} ${message}`);
+export function logWarning(...args) {
+    console.log(chalk.bold.blue("WARNUNG:"), ...args);
 }

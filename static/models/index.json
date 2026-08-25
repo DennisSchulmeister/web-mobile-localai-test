@@ -9,6 +9,10 @@
         {
             "repo": "huggingworld/m2m100_418M",
             "dtypes": ["q8"],
+            "fixFilenames": {
+                "encoder_model.onnx": "encoder_model_quantized.onnx",
+                "decoder_model_merged.onnx": "decoder_model_merged_quantized.onnx"
+            },
             "languages": ["de", "en", "fr"]
         }
     ],
@@ -42,7 +46,10 @@
         },
         {
             "repo": "shannondata/multilingual-e5-small",
-            "dtypes": [],
+            "dtypes": ["O4"],
+            "fixFilenames": {
+                "model.onnx": "model_O4.onnx"
+            },
             "prefix": {
                 "query": "query: ",
                 "context": "passage: "

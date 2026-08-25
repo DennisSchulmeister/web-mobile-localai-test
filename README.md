@@ -146,14 +146,27 @@ transformers.js und HuggingFace:
 * Die Modelle müssen eine feste Verzeichnisstruktur besitzen, um genutzt werden zu können:
 
     - `/config.json`
-    - `onxx/*.onnx`
+    - `onnx/model.onnx`
+    - `onnx/model_{dtype}.onnx`
 
   Fehlt beispielsweise die `config.json`-Datei, wirft transformers.js beim Herunterladen
-  des Modells einen Fehler.
+  des Modells einen Fehler. Oft sind aber auch einfach die `*.onnx`-Dateien falsch benannt.
+  Im Download-Skript können hierfür Overrides eingetragen werden, um die falsch benannten
+  Dateien überhaupt herunterladen und unter dem richtigen Namen ablegen zu können.
 
 * Nicht immer sieht man am Dateinamen der Modelle, welche Datenformate (`dtype`) unterstützt
   werden. Das Skript `bin/init/download.js` ruft daher die Funktion `ModelRegistry.get_available_dtypes()`
   auf, um die verfügbaren Datentypen abzurufen und zeigt diese auf der Konsole an.
+
+* Manchmal unterstützen die Modell die deutsche Sprache, auch wenn dies in den Metadaten
+  nicht explizit angegeben ist. Zum Beispiel [onnx-community/text_summarization-ONNX](https://huggingface.co/onnx-community/text_summarization-ONNX).
+
+* Die Dokumentation von transformers.js ist unvollständig und teilweise fehlerhaft. Manche
+  Funktionen wie Text2Audio werden nur im Code in Form von Kommentaren dokumentiert. Andere
+  Module wie `utils/hub` sind zwar dokumentiert, werden aber nicht exportiert.
+
+* transformers.js besitzt für viele Modelle, in der Dokumentation nicht erwähnte, feste
+  Konfigurationen im Code. Es bleibt abzuwarten, ob andere Modelle überhaupt nutzbar sind.
 
 Copyright
 ---------
