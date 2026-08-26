@@ -1,20 +1,20 @@
 {
     "summarization": [
         {
-            "repo": "onnx-community/text_summarization-ONNX",
+            "modelId": "onnx-community/text_summarization-ONNX",
             "dtypes": ["int8"]
         }
     ],
     "translation": [
         {
-            "repo": "huggingworld/m2m100_418M",
+            "modelId": "huggingworld/m2m100_418M",
             "dtypes": ["q8"],
             "languages": ["de", "en", "fr"]
         }
     ],
     "questionAnswering": [
         {
-            "repo": "onnx-community/all-MiniLM-L12-v2-qa-all-ONNX",
+            "modelId": "onnx-community/all-MiniLM-L12-v2-qa-all-ONNX",
             "dtypes": ["int8"],
             "prefix": {
                 "question": "",
@@ -22,7 +22,7 @@
             }
         },
         {
-            "repo": "dewdev/mdeberta-v3-base-squad2-onnx",
+            "modelId": "dewdev/mdeberta-v3-base-squad2-onnx",
             "dtypes": ["int8"],
             "prefix": {
                 "question": "",
@@ -31,15 +31,15 @@
         }
 
     ],
-    "featureExtraction": [
+    "sentenceEmbedding": [
         {
-            "repo": "sentence-transformers/all-MiniLM-L6-v2",
+            "modelId": "sentence-transformers/all-MiniLM-L6-v2",
             "dtypes": ["fp32"]
         }
     ],
     "textToSpeach": [
         {
-            "repo": "onnx-community/Supertonic-TTS-ONNX",
+            "modelId": "onnx-community/Supertonic-TTS-ONNX",
             "dtypes": ["fp32"]
         }
     ]

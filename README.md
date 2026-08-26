@@ -143,12 +143,60 @@ transformers.js und HuggingFace:
 * Manchmal unterstützen die Modell die deutsche Sprache, auch wenn dies in den Metadaten
   nicht explizit angegeben ist. Zum Beispiel [onnx-community/text_summarization-ONNX](https://huggingface.co/onnx-community/text_summarization-ONNX).
 
-* Die Dokumentation von transformers.js ist unvollständig und teilweise fehlerhaft. Manche
+* Die Dokumentation von transformers.js ist teilweise unvollständig und fehlerhaft. Manche
   Funktionen wie Text2Audio werden nur im Code in Form von Kommentaren dokumentiert. Andere
   Module wie `utils/hub` sind zwar dokumentiert, werden aber nicht exportiert.
 
 * transformers.js besitzt für viele Modelle, in der Dokumentation nicht erwähnte, feste
-  Konfigurationen im Code. Es bleibt abzuwarten, ob andere Modelle überhaupt nutzbar sind.
+  Konfigurationen im Code. Die Hoffnung ist, dass andere Modelle trotzdem nutzbar sind.
+
+Semantische Suche:
+
+* Viele moderne Sprachmodelle besitzen einen Transformer-Encoder, der aus
+  einem Eingabetext kontextabhängige Token-Repräsentationen erzeugt. Das wird z.
+  B. über eine Feature-Extraction-Pipeline zugänglich gemacht. Allerdings
+  eignen sich nicht alle Sprachmodelle bzw. deren Repräsentationen gleichermaßen
+  für semantische Suche. Insbesondere sind die erzeugten Token-Repräsentationen
+  nicht automatisch so trainiert, dass sich daraus durch einen einfachen
+  Vektorenvergleich sinnvolle semantische Ähnlichkeiten ergeben.
+
+* Sentence Transformer Modelle eignen sich besonders gut für semantische
+  Suche, da sie speziell darauf trainiert wurden, semantisch ähnliche Texte im
+  Embedding-Raum nahe beieinander abzubilden. Dazu werden entsprechende
+  Trainingsverfahren und ein für den Vergleich geeigneter Embedding-Output
+  verwendet.
+
+* Füttert man einem Modell wie `sentence-transformers/all-MiniLM-L6-v2` einen
+  einzelnen String, erhält man bei der Feature Extraction beispielsweise einen
+  Tensor mit der Dimensionalität `(1, 15, 384)`. Dies bedeutet:
+
+  * `1` Eingabestring
+  * `15` Tokens (abhängig vom Eingabetext)
+  * `384` Werte je Token (abhängig vom Modell)
+
+* Im Beispiel besteht die Ausgabe also aus `1 × 15 × 384 = 5760` Werten. Um aus
+  den unterschiedlich langen Sequenzen eine einheitliche Repräsentation des
+  gesamten Strings zu erhalten, werden die Token-Embeddings mittels Mean
+  Pooling zu einem Vektor mit 384 Werten zusammengefasst. Bei `all-MiniLM-L6-v2`
+  ist dies die vorgesehene Vorgehensweise.
+
+* Der eigentliche Vergleich zweier Embeddings kann über die Kosinus-Ähnlichkeit
+  erfolgen. Sie entspricht geometrisch dem Kosinus des Winkels zwischen den beiden
+  Vektoren und liegt im Wertebereich `[-1, 1]`:
+
+  * `-1` → entgegengesetzte Richtungen (`180°`)
+  * `0` → orthogonale Vektoren (`90°`)
+  * `1` → gleiche Richtung (`0°`)
+
+  Vgl. [Wikipedia: Kosinus-Ähnlichkeit](https://de.wikipedia.org/wiki/Kosinus-%C3%84hnlichkeit) <br>
+  Vgl. [transformers.js: maths.cos_sim()](https://huggingface.co/docs/transformers.js/api/utils/maths#utilsmathscossimarr1-arr2--number)
+
+
+* Werden die Vektoren zusätzlich auf Einheitslänge normalisiert, reduziert sich die Berechnung
+  der Kosinus-Ähnlichkeit auf das Skalarprodukt der beiden Vektoren.
+
+  Vgl. [transformers.js: maths.dot()](https://huggingface.co/docs/transformers.js/api/utils/maths#module_utils/maths.dot)
+
 
 Copyright
 ---------

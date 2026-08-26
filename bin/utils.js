@@ -85,3 +85,53 @@ export function readConfig({configFile, withModels, withData} = {}) {
 
     return config;
 }
+
+/**
+ * Verzeichnispfad für KI-Modell ermitteln.
+ * 
+ * @param {object} config Deserialisierte Konfiguration
+ * @param {string} modelId ID des KI-Modells
+ * @returns {string} Verzeichnispfad
+ */
+export function modelPath(config, modelId) {
+    return path.join(config.models.downloadDir, ...modelId.split("/"));
+}
+
+/**
+ * Verzeichnispfade für die vorverarbeiteten Daten einer Seite ermitteln.
+ * Liefert ein Objekt mit den Attributen `dir`, `keywords` und `sentences`.
+ * `dir` ist das  Verzeichnis, die anderen Dateien darin.
+ * 
+ * @param {object} config Deserialisierte Konfiguration
+ * @param {string} dataFile Pfad der Datendatei
+ * @returns {object} Verzeichnispfade
+ */
+export function preprocessPaths(config, dataFile) {
+    let dir = path.join(config.data.preprocessDir, ...dataFile.split("/"));
+
+    return {
+        dir:       dir,
+        keywords:  path.join(dir, "keywords.json"),
+        sentences: path.join(dir, "sentences.json"),
+    };
+}
+
+/**
+ * Verzeichnispfade für die Texteinbettungen aller Seiten eines spezifischen
+ * KI-Modells ermitteln. Liefert ein Objekt mit den Attributen `dir`, `keywords`
+ * und `sentences`. `dir` ist das  Verzeichnis, die anderen Dateien darin.
+ * 
+ * @param {object} config Deserialisierte Konfiguration
+ * @param {string} modelId ID des KI-Modells
+ * @param {ſtring} dtype Datentype des KI-Modells (z.B. fp32, int8)
+ * @returns {object} Verzeichnispfade
+ */
+export function embeddingsPaths(config, modelId, dtype) {
+    let dir = path.join(config.data.embeddingsDir, ...modelId.split("/"), dtype);
+
+    return {
+        dir:       dir,
+        keywords:  path.join(dir, "keywords.json"),
+        sentences: path.join(dir, "sentences.json"),
+    };
+}

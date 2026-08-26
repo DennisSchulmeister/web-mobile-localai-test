@@ -34,7 +34,7 @@ let modelsById  = new Map();
 
 for (let modelType in config.models.config) {
     for (let modelDefinition of config.models.config[modelType]) {
-        let prevModelDefinition = modelsById.get(modelDefinition.repo);
+        let prevModelDefinition = modelsById.get(modelDefinition.modelId);
 
         if (!Array.isArray(modelDefinition.dtypes)) {
             modelDefinition.dtypes = [];
@@ -46,7 +46,7 @@ for (let modelType in config.models.config) {
             modelDefinition.dtypes = [...dtypes.values()];
         }
 
-        modelsById.set(modelDefinition.repo, modelDefinition);
+        modelsById.set(modelDefinition.modelId, modelDefinition);
     }
 }
 
@@ -81,8 +81,8 @@ for (let [modelId, modelDefinition] of modelsById.entries()) {
 
     // Fehlende Dateien herunterladen
     for (let downloadFile of downloadFiles) {
-        let [owner, modelName] = modelId.split("/");
-        let localPath = path.join(config.models.downloadDir, owner, modelName, ...downloadFile.split("/"));
+        let modelPath = utils.modelPath(config, modelId);
+        let localPath = path.join(modelPath, ...downloadFile.split("/"));
         let localDir  = path.dirname(localPath);
         let fileName  = path.basename(localPath);
 

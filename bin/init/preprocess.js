@@ -42,11 +42,11 @@ for (let category of config.data.config) {
             let keywords  = md.replaceLineBreaks(extractKeywords(mdAst, [page.title]));
             let sentences = md.replaceLineBreaks(extractSentences(md.simplifyMarkdown(mdAst), []));
 
-            let dirname = path.join(config.data.preprocessDir, page._file);
-            shell.mkdir("-p", dirname);
+            let paths = utils.preprocessPaths(config, page._file);
+            shell.mkdir("-p", paths.dir);
 
-            await fs.writeFile(path.join(dirname, "keywords.json"),  JSON.stringify([...new Set(keywords).values()], null, 4));
-            await fs.writeFile(path.join(dirname, "sentences.json"), JSON.stringify(sentences, null, 4));
+            await fs.writeFile(paths.keywords,  JSON.stringify([...new Set(keywords).values()], null, 4));
+            await fs.writeFile(paths.sentences, JSON.stringify(sentences, null, 4));
         } catch (error) {
             utils.logError(error.toString());
         }
