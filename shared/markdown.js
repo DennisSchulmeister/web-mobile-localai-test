@@ -8,9 +8,11 @@
 
 import {fromMarkdown} from "mdast-util-from-markdown";
 import {toMarkdown}   from "mdast-util-to-markdown";
+import {toString}     from "mdast-util-to-string";
+import {remove}       from "unist-util-remove";
 
 /**
- * Markdown-Text parsen und mit Hilfe von `remark` einen Syntaxbaum
+ * Markdown-Text parsen und mit Hilfe von `mdast` einen Syntaxbaum
  * daraus erstellen. Dies dient als Grundlage für die nachfolgenden
  * Funktionen zur Arbeit mit den Markdown-Inhalten.
  * 
@@ -35,16 +37,46 @@ export function parseMarkdown(mdText) {
  * @returns {object} Dieselbe Syntaxbaum-Instanz
  */
 export function simplifyMarkdown(mdAst) {
-    // TODO
+    remove(mdAst, ["code", "definition", "html", "image", "imageReference", "thematicBreack"]);
+
+    if (["strong", "emphasis", "link", "linkReference"].includes(mdAst.type)) {
+        mdAst.value    = toString(mdAst);
+        mdAst.type     = "text";
+        mdAst.children = [];
+
+        delete mdAst.title;
+        delete mdAst.url;
+        delete mdAst.identifier;
+        delete mdAst.label;
+        delete mdAst.referenceType;
+    }
+
     return mdAst;
 }
 
 /**
- * Markdown-Syntaxbaum zurück in einen String umwandeln.
+ * Markdown-Syntaxbaum in einen String zurück wandeln.
  * 
  * @param {object} mdAst Syntaxbaum des Dokuments
  * @returns {string} Text im Markdown-Format
  */
 export function stringifyMarkdown(mdAst) {
     return toMarkdown(mdAst);
+}
+
+/**
+ * In einem Array mit Strings alle Zeilenumbrücke durch
+ * Leerzeichen ersetzen.
+ * 
+ * @param {Array} strings Array mit Strings
+ * @returns Modifiziertes Array mit Strings
+ */
+export function replaceLineBreaks(strings) {
+    for (let i in strings) {
+        strings[i] = strings[i].replaceAll("\r\n", "\n");
+        strings[i] = strings[i].replaceAll("\r",   "\n");
+        strings[i] = strings[i].replaceAll("\n",   " ");
+    }
+
+    return strings;
 }

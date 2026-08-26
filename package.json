@@ -34,7 +34,8 @@
         "svelte": "^5.56.10",
         "svelte-check": "^4.7.6",
         "svelte-preprocess": "^6.0.5",
-        "svelte-spa-router": "^5.1.1"
+        "svelte-spa-router": "^5.1.1",
+        "unist-util-remove": "^4.0.0"
     },
     "dependencies": {
         "esbuild-svelte": "^0.9.5"

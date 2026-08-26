@@ -39,8 +39,8 @@ for (let category of config.data.config) {
 
             let mdText    = shell.cat(page.file).toString();
             let mdAst     = md.parseMarkdown(mdText);
-            let keywords  = replaceLineBreaks(extractKeywords(mdAst, [page.title]));
-            let sentences = replaceLineBreaks(extractSentences(md.simplifyMarkdown(mdAst), []));
+            let keywords  = md.replaceLineBreaks(extractKeywords(mdAst, [page.title]));
+            let sentences = md.replaceLineBreaks(extractSentences(md.simplifyMarkdown(mdAst), []));
 
             let dirname = path.join(config.data.preprocessDir, page._file);
             shell.mkdir("-p", dirname);
@@ -95,21 +95,4 @@ function extractSentences(mdAst, sentences) {
     }
 
     return sentences;
-}
-
-/**
- * In einem Array mit Strings alle Zeilenumbrücke durch
- * Leerzeichen ersetzen.
- * 
- * @param {Array} strings Array mit Strings
- * @returns Modifiziertes Array mit Strings
- */
-function replaceLineBreaks(strings) {
-    for (let i in strings) {
-        strings[i] = strings[i].replaceAll("\r\n", "\n");
-        strings[i] = strings[i].replaceAll("\r",   "\n");
-        strings[i] = strings[i].replaceAll("\n",   " ");
-    }
-
-    return strings;
 }
