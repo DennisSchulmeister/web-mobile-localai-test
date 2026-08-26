@@ -42,7 +42,8 @@ export function readJsonFile(filename) {
  * Attribut mit dem Namen `config` durch den Inhalt der jeweiligen Datei ersetzt.
  * 
  * Die Dateipfade sind relativ zur Konfigurationsdatei angegeben. Sie werden beim Einlesen relativ
- * zum Arbeitsverzeichnis gesetzt.
+ * zum Arbeitsverzeichnis gesetzt. Der Originalpfad wird unter demselben Namen mit vorangestelltem
+ * Unterstrich gespeichert.
  * 
  * @param {string} configFile Dateipfad der Hauptkonfiguration
  * @param {boolean} withModels Modellkonfiguration einschließen
@@ -53,23 +54,31 @@ export function readConfig({configFile, withModels, withData} = {}) {
     let config  = readJsonFile(configFile);
     let dirname = path.dirname(configFile);
 
-    config.models.downloadDir = path.join(dirname, config.models.downloadDir);
-    config.data.preprocessDir = path.join(dirname, config.data.preprocessDir);
-    config.data.embeddingsDir = path.join(dirname, config.data.embeddingsDir);
+    config.models._downloadDir = config.models.downloadDir;
+    config.models.downloadDir  = path.join(dirname, config.models.downloadDir);
+
+    config.data._preprocessDir = config.data.preprocessDir;
+    config.data.preprocessDir  = path.join(dirname, config.data.preprocessDir);
+
+    config.data._embeddingsDir = config.data.embeddingsDir;
+    config.data.embeddingsDir  = path.join(dirname, config.data.embeddingsDir);
 
     if (withModels) {
-        config.models.config = readJsonFile(path.join(dirname, config.models.config));
+        config.models._config = config.models.config;
+        config.models.config  = readJsonFile(path.join(dirname, config.models.config));
     }
 
     if (withData) {
         let dataFile = path.join(dirname, config.data.config);
         let dataPath = path.dirname(dataFile);
 
+        config.data._config = config.data.config;
         config.data.config = readJsonFile(dataFile);
 
         for (let category of config.data.config || []) {
             for (let page of category.pages || []) {
-                page.file = path.join(dataPath, page.file);
+                page._file = page.file;
+                page.file  = path.join(dataPath, page.file);
             }
         }
     }

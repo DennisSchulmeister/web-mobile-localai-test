@@ -6,10 +6,15 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import path       from "node:path";
-import process    from "node:process";
-import shell      from "shelljs";
-import * as utils from "../utils.js";
+import fs                  from "node:fs/promises";
+import path                from "node:path";
+import process             from "node:process";
+import {SentenceTokenizer} from "natural/lib/natural/tokenizers/index.js";
+import {toString}          from "mdast-util-to-string";
+import shell               from "shelljs";
+
+import * as utils          from "../utils.js";
+import * as md             from "../../shared/markdown.js";
 
 console.log("Daten vorverarbeiten");
 console.log("====================");
@@ -27,5 +32,84 @@ let config = utils.readConfig({
     withData:   true,
 });
 
-// https://naturalnode.github.io/natural/Tokenizers.html
-// https://github.com/remarkjs/remark
+for (let category of config.data.config) {
+    for (let page of category.pages) {
+        try {
+            console.log(`» ${page.file}`);
+
+            let mdText    = shell.cat(page.file).toString();
+            let mdAst     = md.parseMarkdown(mdText);
+            let keywords  = replaceLineBreaks(extractKeywords(mdAst, [page.title]));
+            let sentences = replaceLineBreaks(extractSentences(md.simplifyMarkdown(mdAst), []));
+
+            let dirname = path.join(config.data.preprocessDir, page._file);
+            shell.mkdir("-p", dirname);
+
+            await fs.writeFile(path.join(dirname, "keywords.json"),  JSON.stringify([...new Set(keywords).values()], null, 4));
+            await fs.writeFile(path.join(dirname, "sentences.json"), JSON.stringify(sentences, null, 4));
+        } catch (error) {
+            utils.logError(error.toString());
+        }
+    }
+}
+
+/**
+ * Schlüsselwörter für die semantische Suche aus dem übergebenen
+ * Markdown-Syntaxbaum extrahieren. Der Einfachheit halber werden
+ * hier einfach alle Überschriften und direkt formatierten Texte
+ * (Fett, Kursiv) verwendet.
+ * 
+ * @param {object} mdAst Teil-Syntaxbaum des Dokuments
+ * @param {Array} keywords Schon vorhandene Schlüsselwörter
+ * @returns {Array} Erweiterte Schlüsselwörter
+ */
+function extractKeywords(mdAst, keywords) {
+    if (["strong", "emphasis", "heading"].includes(mdAst.type)) {
+        keywords = [...keywords, toString(mdAst)];
+    } else {
+        for (let child of mdAst.children || []) {
+            keywords = extractKeywords(child, keywords);
+        }
+    }
+
+    return keywords;
+}
+
+/**
+ * Formatierung entferne und den Text in Sätze für das Question
+ * Answering und die Volltextsuche splitten.
+ * 
+ * @param {object} mdAst Teil-Syntaxbaum des Dokuments
+ * @param {Array} sentences Schon vorhandene Sätze
+ * @returns {Array} Erweiterte Sätze
+ */
+function extractSentences(mdAst, sentences) {
+    if (mdAst.type === "paragraph") {
+        let text = toString(mdAst);
+        let tokenizer = new SentenceTokenizer();
+        sentences = [...sentences, ...tokenizer.tokenize(text)];
+    } else {
+        for (let child of mdAst.children || []) {
+            sentences = extractSentences(child, sentences);
+        }
+    }
+
+    return sentences;
+}
+
+/**
+ * In einem Array mit Strings alle Zeilenumbrücke durch
+ * Leerzeichen ersetzen.
+ * 
+ * @param {Array} strings Array mit Strings
+ * @returns Modifiziertes Array mit Strings
+ */
+function replaceLineBreaks(strings) {
+    for (let i in strings) {
+        strings[i] = strings[i].replaceAll("\r\n", "\n");
+        strings[i] = strings[i].replaceAll("\r",   "\n");
+        strings[i] = strings[i].replaceAll("\n",   " ");
+    }
+
+    return strings;
+}
