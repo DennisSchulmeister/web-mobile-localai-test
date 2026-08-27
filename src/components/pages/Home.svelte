@@ -55,7 +55,6 @@ Startseite mit Auswahl und Suche von Textseiten.
 <style>
     #page {
         flex: 1;
-        padding: var(--content-padding);
         overflow: auto;
     }
 </style>
