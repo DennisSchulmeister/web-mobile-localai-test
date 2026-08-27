@@ -37,12 +37,12 @@ Bevor die Anwendung gestartet werden kann, müssen folgende Schritte ausgeführt
    die Modelle als Teil der Webanwendung gehostet. Hierfür müssen sie auf dem Webserver
    einmalig lokal heruntergeladen werden.
 
-2. **Testdaten aufbereiten:** Hier kommen verschiedene regelbasierte Natural Language
-   Processing (NLP) Algorithmen zum Einsatz, um die Testdaten zu filtern und in kleinere
-   Teile zu zerlegen. Dies ist wichtig für die Question Answering Modelle, die aus
-   mehreren kleinen Textpassagen (z.B. einzelne Sätze) die zur Beantwortung einer Frage
-   passenden Passagen heraussuchen. Aber auch für die semantische Suche ist dies relevant,
-   um die Worteinbettungen auf einzelne Kontextblöcke anstatt ganzer Dokumente zu berechnen.
+2. **Testdaten aufbereiten:** In Vorbereitung auf den nächsten Schritt werden hier
+   Schlüsselwörter aus den Beispielseiten extrahiert und die Seiten in einzelne Sätze
+   zerlegt. Als Schlüsselwörter werden der Einfachheit halber einfach alle Überschriften
+   und mit Fettdruck oder Kursivschrift ausgezeichnete Textstellen verwendet. Dies
+   ermöglicht es, im nächsten Schritt die Texteinbettungen für beides zu berechnen,
+   um somit einen Index für die semantische Suche aufzubauen.
 
 3. **Worteinbettungen berechnen:** Die semantische Suche basiert auf der klassischen
    Kosinus-Ähnlichkeit von Worteinbettungen. Während der Suche wird die Einbettung
