@@ -49,6 +49,8 @@ Container für die Fußzeile einer Seite
         align-items: center;
         gap: 0.25em;
 
+        text-align: center;
+
         width: 5em;
         padding: calc(var(--content-padding) / 2);
         overflow: hidden;

@@ -12,6 +12,12 @@ KI-Anwendungsfall: Summarization
 -->
 
 <script>
+    import {onMount}         from "svelte";
+    import {navigationState} from "../../../state/Navigation.svelte.js";
+
+    onMount(() => {
+        navigationState.pageTitle = "Text zusammenfassen";
+    });
 </script>
 
 <h1>KI-Zusammenfassung</h1>

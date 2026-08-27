@@ -12,6 +12,12 @@ KI-Anwendungsfall: Translation
 -->
 
 <script>
+    import {onMount}         from "svelte";
+    import {navigationState} from "../../../state/Navigation.svelte.js";
+
+    onMount(() => {
+        navigationState.pageTitle = "Text übersetzen";
+    });
 </script>
 
 <h1>KI-Übersetzung</h1>

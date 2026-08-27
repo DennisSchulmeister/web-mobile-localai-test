@@ -11,6 +11,18 @@ LICENSE file in the root directory of this source tree.
 Fehlerseite für ungültige URLs
 -->
 
+<script>
+    import {onMount}         from "svelte";
+    import {navigationState} from "../../state/Navigation.svelte.js";
+
+    onMount(() => {
+        navigationState.pageTitle      = "Nicht gefunden";
+        navigationState.backLink       = "#/";
+        navigationState.currentSubPage = "";
+        navigationState.subPages       = [];
+    });
+</script>
+
 <div id="page">
     <h2>Seite nicht gefunden</h2>
     <p>

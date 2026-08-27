@@ -12,6 +12,12 @@ Einfaches Auswahlmenü für die anzuzeigende Textseite.
 -->
 
 <script>
+    import {onMount}         from "svelte";
+    import {navigationState} from "../../../state/Navigation.svelte.js";
+
+    onMount(() => {
+        navigationState.pageTitle = "Textseite auswählen";
+    });
 </script>
 
 <h1>Textseite auswählen</h1>

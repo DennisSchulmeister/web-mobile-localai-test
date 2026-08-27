@@ -12,10 +12,44 @@ Startseite mit Auswahl und Suche von Textseiten.
 -->
 
 <script>
+    import {onMount}         from "svelte";
+    import ChoosePage        from "./home/ChoosePage.svelte";
+    import SemanticSearch    from "./home/SemanticSearch.svelte";
+    import {navigationState} from "../../state/Navigation.svelte.js";
+
+    let {params = []} = $props()
+    let subPageId = $derived(params[1] || "overview");
+
+    $effect(() => {
+        navigationState.currentSubPage = subPageId;
+    });
+
+    onMount(() => {
+        navigationState.backLink = "";
+
+        navigationState.subPages = [
+            {
+                id:     "overview",
+                icon:   "bi-card-list",
+                label:  "Übersicht",
+                url:    "#/",
+            },
+            {
+                id:     "search",
+                icon:   "bi-search",
+                label:  "Suche",
+                url:    "#/search",
+            },
+        ];
+    });
 </script>
 
 <div id="page">
-    Seiteninhalt
+    {#if subPageId === "overview"}
+        <ChoosePage/>
+    {:else if subPageId === "search"}
+        <SemanticSearch/>
+    {/if}
 </div>
 
 <style>

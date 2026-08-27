@@ -6,91 +6,24 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+import {router}          from "svelte-spa-router";
 import {wrap}            from "svelte-spa-router/wrap";
 import {navigationState} from "../state/Navigation.svelte.js";
 
-export default {
-    "/": wrap({
-        asyncComponent: () => import("./pages/Home.svelte"),
-        conditions: [() => {
-            navigationState.backLink       = "";
-            navigationState.pageTitle      = "Home";
-            navigationState.subPages       = getHomeSubPages("overview");
-            navigationState.currentSubPage = "overview";
-            return true;
-        }],
-    }),
+const routes = new Map();
+export default routes;
 
-    "*": wrap({
-        asyncComponent: () => import("./pages/NotFound.svelte"),
-        conditions: [() => {
-            navigationState.backLink       = "#/";
-            navigationState.pageTitle      = "Nicht gefunden";
-            navigationState.subPages       = [];
-            navigationState.currentSubPage = "";
-            return true;
-        }],
-    }),
-};
+// Home mit Unterseiten
+routes.set(/^\/(search)?$/, wrap({
+    asyncComponent: () => import("./pages/Home.svelte"),
+}));
 
-/**
- * Footer-Menü für die Home-Seite.
- * @returns {Array} Array mit Unterseiten
- */
-function getHomeSubPages() {
-    return [
-        {
-            id:     "overview",
-            icon:   "bi-card-list",
-            label:  "Übersicht",
-            url:    "#/",
-        },
-        {
-            id:     "search",
-            icon:   "bi-search",
-            label:  "Suche",
-            url:    "#/search",
-        },
-    ];
-}
+// Textseite mit Unterseiten
+routes.set(/^\/page\/(.*)\/(content|summary|qa|translation|tts)$/, wrap({
+    asyncComponent: () => import("./pages/TextPage.svelte"),
+}));
 
-/**
- * Footer-Menü für die TextPage-Seite.
- * 
- * @param {string} textPageId Sichtbare Textseite
- * @returns {Array} Array mit Unterseiten
- */
-function getTextPageSubPages(textPageId) {
-    return [
-        {
-            id:     "content",
-            icon:   "bi-text-left",
-            label:  "Inhalt",
-            url:    `#/page/${textPageId}`,
-        },
-        {
-            id:     "summary",
-            icon:   "bi-list-ol",
-            label:  "Zusammenfassen",
-            url:    `#/page/${textPageId}/summary`,
-        },
-        {
-            id:     "qa",
-            icon:   "bi-chat",
-            label:  "Fragen beantworten",
-            url:    `#/page/${textPageId}/qa`,
-        },
-        {
-            id:     "translation",
-            icon:   "bi-translate",
-            label:  "Übersetzen",
-            url:    `#/page/${textPageId}/translation`,
-        },
-        {
-            id:     "tts",
-            icon:   "bi-speaker",
-            label:  "Vorlesen",
-            url:    `#/page/${textPageId}/tts`,
-        },
-    ];
-}
+// Fehler 404
+routes.set("*", wrap({
+    asyncComponent: () => import("./pages/NotFound.svelte"),
+}));

@@ -12,6 +12,12 @@ Inhalt einer Textseite
 -->
 
 <script>
+    import {onMount}         from "svelte";
+    import {navigationState} from "../../../state/Navigation.svelte.js";
+
+    onMount(() => {
+        navigationState.pageTitle = "Text anzeigen";
+    });
 </script>
 
 <h1>Inhalt der Textseite</h1>

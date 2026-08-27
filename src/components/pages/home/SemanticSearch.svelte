@@ -12,6 +12,12 @@ KI-Anwendungsfall: Semantische Suche von Textseiten
 -->
 
 <script>
+    import {onMount}         from "svelte";
+    import {navigationState} from "../../../state/Navigation.svelte.js";
+
+    onMount(() => {
+        navigationState.pageTitle = "Textseite suchen";
+    });
 </script>
 
 <h1>Semantische Suche</h1>
