@@ -45,10 +45,11 @@ Bevor die Anwendung gestartet werden kann, müssen folgende Schritte ausgeführt
    um die Worteinbettungen auf einzelne Kontextblöcke anstatt ganzer Dokumente zu berechnen.
 
 3. **Worteinbettungen berechnen:** Die semantische Suche basiert auf der klassischen
-   Cosinus-Ähnlichkeit von Worteinbettungen. Während der Suche wird die Worteinbettung
-   des Suchbegriffs berechnet und mit den Worteinbettungen der aus den Testdokumenten
-   erzeugten Kontextblöcke verglichen. Da sich letztere nur ändern, wenn sich die Testdaten
-   ändern, müssne sie vor Ausführung der App einmalig vorberechnet werden.
+   Kosinus-Ähnlichkeit von Worteinbettungen. Während der Suche wird die Einbettung
+   des Suchbegriffs berechnet und mit den Einbettungen der aus den Testdokumenten
+   erzeugten Kontextblöcke verglichen. Siehe [Lessons Learned](#semantische-suche)
+   unten. Da sich letztere nur ändern, wenn sich die Testdaten ändern, müssne sie
+   vor Ausführung der App einmalig vorberechnet werden.
 
 Alle drei Schritte können mit `npm run init` hintereinander ausgeführt werden.
 Alterantiv können die Schritte einzeln ausgeführt werden:
@@ -118,7 +119,7 @@ für Sentency Similarity und Question Answering verwendet werden.
 Lessons Learned
 ---------------
 
-transformers.js und HuggingFace:
+### transformers.js und HuggingFace
 
 * transformers.js benötigt die Modelle im ONNX-Format, da es sich um Grunde genommen um
   einen Wrapper um ONXX handelt.
@@ -150,7 +151,7 @@ transformers.js und HuggingFace:
 * transformers.js besitzt für viele Modelle, in der Dokumentation nicht erwähnte, feste
   Konfigurationen im Code. Die Hoffnung ist, dass andere Modelle trotzdem nutzbar sind.
 
-Semantische Suche:
+### Semantische Suche
 
 * Viele moderne Sprachmodelle besitzen einen Transformer-Encoder, der aus
   einem Eingabetext kontextabhängige Token-Repräsentationen erzeugt. Das wird z.

@@ -12,6 +12,7 @@ import process           from "node:process";
 import shell             from "shelljs";
 import * as transformers from '@huggingface/transformers';
 import * as utils        from "../utils.js";
+import {encodeEmbedding} from "../../shared/embedding.js";
 
 console.log("Texteinbettungen berechnen");
 console.log("==========================");
@@ -55,12 +56,12 @@ for (let embeddingModel of embeddingModels) {
 
                     for (let keyword of utils.readJsonFile(pagePaths.keywords)) {
                         let embedding = await encoder(keyword, {pooling: "mean", normalize: true});
-                        pageKeywords.push({text: keyword, embedding: [...embedding.data]});
+                        pageKeywords.push({text: keyword, embedding: encodeEmbedding(embedding.data, dtype)});
                     }
 
                     for (let sentence of utils.readJsonFile(pagePaths.sentences)) {
                         let embedding = await encoder(sentence, {pooling: "mean", normalize: true});
-                        pageSentences.push({text: sentence, embedding: [...embedding.data]});
+                        pageSentences.push({text: sentence, embedding: encodeEmbedding(embedding.data, dtype)});
                     }
                         
                     keywords[page._file] = pageKeywords;
@@ -68,11 +69,9 @@ for (let embeddingModel of embeddingModels) {
                 }
             }
     
-            // Hier bewusst keine Formatierung der JSON-Daten, um die Dateigröße
-            // kleiner zu halten. Spart hier rund 50%!
             shell.mkdir("-p", paths.dir);
-            await fs.writeFile(paths.keywords,  JSON.stringify(keywords));
-            await fs.writeFile(paths.sentences, JSON.stringify(sentences));
+            await fs.writeFile(paths.keywords,  JSON.stringify(keywords, null, 4));
+            await fs.writeFile(paths.sentences, JSON.stringify(sentences, null, 4));
 
             console.log();
         } catch (error) {
