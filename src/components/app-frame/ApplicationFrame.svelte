@@ -15,6 +15,7 @@ SPA-Routing ermöglicht.
 <script>
     import Router from "svelte-spa-router";
 
+    import Footer from "./Footer.svelte";
     import NavBar from "./NavBar.svelte";
     import routes from "../routes.js";
 </script>
@@ -26,6 +27,9 @@ SPA-Routing ermöglicht.
     <main>
         <Router {routes} />
     </main>
+    <footer>
+        <Footer/>
+    </footer>
 </div>
 
 <style>
@@ -58,7 +62,7 @@ SPA-Routing ermöglicht.
         text-shadow: 1px 1px 0px rgba(0,0,0, 0.25);
     }
 
-    @media (min-width: 44em) {
+    @media (min-width: 38em) {
         :global(body) {
             padding: 2em;
         }
@@ -71,7 +75,7 @@ SPA-Routing ermöglicht.
     #app-container {
         flex: 1;
         min-height: 0;
-        width: 40em;
+        width: 34em;
         max-width: 100%;
 
         background: white;

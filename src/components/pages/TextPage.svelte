@@ -12,16 +12,11 @@ Auswgeählte Textseite
 -->
 
 <script>
-    import Footer from "../basic/Footer.svelte";
 </script>
 
 <div id="page">
     Subapges: Textinhalt + eine je KI-Anwendungsfall
 </div>
-
-<Footer>
-    Footer
-</Footer>
 
 <style>
     #page {

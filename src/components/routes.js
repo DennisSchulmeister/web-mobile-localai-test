@@ -16,7 +16,7 @@ export default {
             navigationState.backLink       = "";
             navigationState.pageTitle      = "Home";
             navigationState.subPages       = getHomeSubPages("overview");
-            navigationState.currentSubPage = "";
+            navigationState.currentSubPage = "overview";
             return true;
         }],
     }),

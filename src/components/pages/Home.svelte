@@ -12,15 +12,11 @@ Startseite mit Auswahl und Suche von Textseiten.
 -->
 
 <script>
-    import Footer from "../basic/Footer.svelte";
 </script>
 
 <div id="page">
     Seiteninhalt
 </div>
-<Footer>
-    Footer
-</Footer>
 
 <style>
     #page {
