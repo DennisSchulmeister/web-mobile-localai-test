@@ -8,25 +8,13 @@ LICENSE file in the root directory of this source tree.
 
 <!--
 @component
-Anwendungsfall: Semantische Suche
+Einfaches Auswahlmenü für die anzuzeigende Textseite.
 -->
 
 <script>
-    import Footer from "../basic/Footer.svelte";
 </script>
 
-<div id="page">
-    Semantische Suche
-</div>
-
-<Footer>
-    Footer
-</Footer>
+<h1>Textseite auswählen</h1>
 
 <style>
-    #page {
-        flex: 1;
-        padding: var(--content-padding);
-        overflow: auto;
-    }
 </style>

@@ -8,7 +8,7 @@ LICENSE file in the root directory of this source tree.
 
 <!--
 @component
-Anwendungsfall: Sprachausgabe
+Auswgeählte Textseite
 -->
 
 <script>
@@ -16,7 +16,7 @@ Anwendungsfall: Sprachausgabe
 </script>
 
 <div id="page">
-    Sprachausgabe
+    Subapges: Textinhalt + eine je KI-Anwendungsfall
 </div>
 
 <Footer>

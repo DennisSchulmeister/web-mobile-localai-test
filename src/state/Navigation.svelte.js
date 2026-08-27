@@ -7,10 +7,10 @@
  */
 
 /**
- * Sichtbarer Inhalt in der Navigationsleiste. Wird in der Datei `router.js`
- * beim Wechsel der Seite mit neuen Werten aktualisiert.
+ * Inhalte der Navigationsleiste und des Page Footers. Wird in der Datei
+ * `router.js` beim Wechsel der Seite mit neuen Werten aktualisiert.
  */
-export const navBarState = $state({
+export const navigationState = $state({
     /**
      * Link-URL für den Zurück-Pfeil. Wenn leer, wird der Pfeil ausgeblendet.
      */
@@ -20,4 +20,10 @@ export const navBarState = $state({
      * Überschrift der Seite.
      */
     pageTitle: "",
+
+    /**
+     * Auswählbare Unterseiten im Page Footer. Jeder Eintrag ist ein Objekt mit
+     * den Attributen `id`, `icon`, `label`, `url`, `active`.
+     */
+    subPages: [],
 });

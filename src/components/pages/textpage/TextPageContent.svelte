@@ -8,25 +8,13 @@ LICENSE file in the root directory of this source tree.
 
 <!--
 @component
-Anwendungsfall: Fragen beantworten
+Inhalt einer Textseite
 -->
 
 <script>
-    import Footer from "../basic/Footer.svelte";
 </script>
 
-<div id="page">
-    Fragen beantworten
-</div>
-
-<Footer>
-    Footer
-</Footer>
+<h1>Inhalt der Textseite</h1>
 
 <style>
-    #page {
-        flex: 1;
-        padding: var(--content-padding);
-        overflow: auto;
-    }
 </style>

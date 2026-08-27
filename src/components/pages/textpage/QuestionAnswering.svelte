@@ -8,24 +8,13 @@ LICENSE file in the root directory of this source tree.
 
 <!--
 @component
-Startseite mit Auswahl und Suche von Textseiten.
+KI-Anwendungsfall: Question Answering
 -->
 
 <script>
-    import Footer from "../basic/Footer.svelte";
 </script>
 
-<div id="page">
-    Seiteninhalt
-</div>
-<Footer>
-    Footer
-</Footer>
+<h1>KI-Antworten</h1>
 
 <style>
-    #page {
-        flex: 1;
-        padding: var(--content-padding);
-        overflow: auto;
-    }
 </style>

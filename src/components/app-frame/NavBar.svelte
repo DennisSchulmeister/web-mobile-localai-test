@@ -12,18 +12,18 @@ Obere Navigationsleiste
 -->
 
 <script>
-    import {navBarState} from "../../state/NavBar.svelte"
+    import {navigationState} from "../../state/Navigation.svelte.js"
 </script>
 
 <div id="navbar">
-    {#if navBarState.backLink}
-        <a href={navBarState.backLink} title="Zurück">
+    {#if navigationState.backLink}
+        <a href={navigationState.backLink} title="Zurück">
             <i class="bi bi-arrow-left-square"></i>
         </a>
     {/if}
 
     <h1>
-        {navBarState.pageTitle}
+        {navigationState.pageTitle}
     </h1>
 </div>
 

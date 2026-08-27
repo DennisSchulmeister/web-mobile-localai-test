@@ -6,60 +6,16 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { wrap }        from "svelte-spa-router/wrap";
-import { navBarState } from "../state/NavBar.svelte.js";
+import {wrap}            from "svelte-spa-router/wrap";
+import {navigationState} from "../state/Navigation.svelte.js";
 
 export default {
     "/": wrap({
         asyncComponent: () => import("./pages/Home.svelte"),
         conditions: [() => {
-            navBarState.backLink  = "";
-            navBarState.pageTitle = "Home";
-            return true;
-        }],
-    }),
-
-    "/question-answering": wrap({
-        asyncComponent: () => import("./pages/QuestionAnswering.svelte"),
-        conditions: [() => {
-            navBarState.backLink  = "#/";
-            navBarState.pageTitle = "Fragen beantworten";
-            return true;
-        }],
-    }),
-
-    "/semantic-search": wrap({
-        asyncComponent: () => import("./pages/SemanticSearch.svelte"),
-        conditions: [() => {
-            navBarState.backLink  = "#/";
-            navBarState.pageTitle = "Semantische Suche";
-            return true;
-        }],
-    }),
-
-    "/summary": wrap({
-        asyncComponent: () => import("./pages/Summary.svelte"),
-        conditions: [() => {
-            navBarState.backLink  = "#/";
-            navBarState.pageTitle = "Zusammenfassung";
-            return true;
-        }],
-    }),
-
-    "/text-to-speach": wrap({
-        asyncComponent: () => import("./pages/TextToSpeach.svelte"),
-        conditions: [() => {
-            navBarState.backLink  = "#/";
-            navBarState.pageTitle = "Sprachausgabe";
-            return true;
-        }],
-    }),
-
-    "/translation": wrap({
-        asyncComponent: () => import("./pages/Translation.svelte"),
-        conditions: [() => {
-            navBarState.backLink  = "#/";
-            navBarState.pageTitle = "Übersetzung";
+            navigationState.backLink  = "";
+            navigationState.pageTitle = "Home";
+            navigationState.subPages   = getHomeSubPages("overview");
             return true;
         }],
     }),
@@ -67,9 +23,81 @@ export default {
     "*": wrap({
         asyncComponent: () => import("./pages/NotFound.svelte"),
         conditions: [() => {
-            navBarState.backLink  = "#/";
-            navBarState.pageTitle = "Nicht gefunden";
+            navigationState.backLink  = "#/";
+            navigationState.pageTitle = "Nicht gefunden";
+            navigationState.subPages   = [];
             return true;
         }],
     }),
 };
+
+/**
+ * Footer-Menü für die Home-Seite.
+ * @param {string} currentSubPage Aktive Unterseite
+ * @returns {Array} Array mit Unterseiten
+ */
+function getHomeSubPages(currentSubPage) {
+    return [
+        {
+            id:     "overview",
+            icon:   "bi-card-list",
+            label:  "Übersicht",
+            url:    "#/",
+            active: currentSubPage === "overview",
+        },
+        {
+            id:     "search",
+            icon:   "bi-search",
+            label:  "Suche",
+            url:    "#/search",
+            active: currentSubPage === "search",
+        },
+    ];
+}
+
+/**
+ * Footer-Menü für die TextPage-Seite.
+ * 
+ * @param {string} currentSubPage Aktive Unterseite
+ * @param {string} textPageId Sichtbare Textseite
+ * @returns {Array} Array mit Unterseiten
+ */
+function getTextPageSubPages(currentSubPage, textPageId) {
+    return [
+        {
+            id:     "content",
+            icon:   "bi-text-left",
+            label:  "Inhalt",
+            url:    `#/page/${textPageId}`,
+            active: currentSubPage === "content",
+        },
+        {
+            id:     "summary",
+            icon:   "bi-list-ol",
+            label:  "Zusammenfassen",
+            url:    `#/page/${textPageId}/summary`,
+            active: currentSubPage === "summary",
+        },
+        {
+            id:     "qa",
+            icon:   "bi-chat",
+            label:  "Fragen beantworten",
+            url:    `#/page/${textPageId}/qa`,
+            active: currentSubPage === "qa",
+        },
+        {
+            id:     "translation",
+            icon:   "bi-translate",
+            label:  "Übersetzen",
+            url:    `#/page/${textPageId}/translation`,
+            active: currentSubPage === "translation",
+        },
+        {
+            id:     "tts",
+            icon:   "bi-speaker",
+            label:  "Vorlesen",
+            url:    `#/page/${textPageId}/tts`,
+            active: currentSubPage === "tts",
+        },
+    ];
+}

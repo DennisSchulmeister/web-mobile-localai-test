@@ -8,25 +8,13 @@ LICENSE file in the root directory of this source tree.
 
 <!--
 @component
-Anwendungsfall: Text zusammenfassen
+KI-Anwendungsfall: Semantische Suche von Textseiten
 -->
 
 <script>
-    import Footer from "../basic/Footer.svelte";
 </script>
 
-<div id="page">
-    Text zusammenfassen
-</div>
-
-<Footer>
-    Footer
-</Footer>
+<h1>Semantische Suche</h1>
 
 <style>
-    #page {
-        flex: 1;
-        padding: var(--content-padding);
-        overflow: auto;
-    }
 </style>
