@@ -13,9 +13,10 @@ export default {
     "/": wrap({
         asyncComponent: () => import("./pages/Home.svelte"),
         conditions: [() => {
-            navigationState.backLink  = "";
-            navigationState.pageTitle = "Home";
-            navigationState.subPages   = getHomeSubPages("overview");
+            navigationState.backLink       = "";
+            navigationState.pageTitle      = "Home";
+            navigationState.subPages       = getHomeSubPages("overview");
+            navigationState.currentSubPage = "";
             return true;
         }],
     }),
@@ -23,9 +24,10 @@ export default {
     "*": wrap({
         asyncComponent: () => import("./pages/NotFound.svelte"),
         conditions: [() => {
-            navigationState.backLink  = "#/";
-            navigationState.pageTitle = "Nicht gefunden";
-            navigationState.subPages   = [];
+            navigationState.backLink       = "#/";
+            navigationState.pageTitle      = "Nicht gefunden";
+            navigationState.subPages       = [];
+            navigationState.currentSubPage = "";
             return true;
         }],
     }),
@@ -33,24 +35,21 @@ export default {
 
 /**
  * Footer-Menü für die Home-Seite.
- * @param {string} currentSubPage Aktive Unterseite
  * @returns {Array} Array mit Unterseiten
  */
-function getHomeSubPages(currentSubPage) {
+function getHomeSubPages() {
     return [
         {
             id:     "overview",
             icon:   "bi-card-list",
             label:  "Übersicht",
             url:    "#/",
-            active: currentSubPage === "overview",
         },
         {
             id:     "search",
             icon:   "bi-search",
             label:  "Suche",
             url:    "#/search",
-            active: currentSubPage === "search",
         },
     ];
 }
@@ -58,46 +57,40 @@ function getHomeSubPages(currentSubPage) {
 /**
  * Footer-Menü für die TextPage-Seite.
  * 
- * @param {string} currentSubPage Aktive Unterseite
  * @param {string} textPageId Sichtbare Textseite
  * @returns {Array} Array mit Unterseiten
  */
-function getTextPageSubPages(currentSubPage, textPageId) {
+function getTextPageSubPages(textPageId) {
     return [
         {
             id:     "content",
             icon:   "bi-text-left",
             label:  "Inhalt",
             url:    `#/page/${textPageId}`,
-            active: currentSubPage === "content",
         },
         {
             id:     "summary",
             icon:   "bi-list-ol",
             label:  "Zusammenfassen",
             url:    `#/page/${textPageId}/summary`,
-            active: currentSubPage === "summary",
         },
         {
             id:     "qa",
             icon:   "bi-chat",
             label:  "Fragen beantworten",
             url:    `#/page/${textPageId}/qa`,
-            active: currentSubPage === "qa",
         },
         {
             id:     "translation",
             icon:   "bi-translate",
             label:  "Übersetzen",
             url:    `#/page/${textPageId}/translation`,
-            active: currentSubPage === "translation",
         },
         {
             id:     "tts",
             icon:   "bi-speaker",
             label:  "Vorlesen",
             url:    `#/page/${textPageId}/tts`,
-            active: currentSubPage === "tts",
         },
     ];
 }

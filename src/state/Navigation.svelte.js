@@ -26,4 +26,9 @@ export const navigationState = $state({
      * den Attributen `id`, `icon`, `label`, `url`, `active`.
      */
     subPages: [],
+
+    /**
+     * ID der aktiven Unterseite (oder leer, wenn es keine Unterseiten gibt).
+     */
+    currentSubPage: "",
 });
