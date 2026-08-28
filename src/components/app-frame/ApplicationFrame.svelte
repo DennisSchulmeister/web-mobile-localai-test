@@ -40,7 +40,7 @@ SPA-Routing ermöglicht.
 
         --color1: #0089ba;
         --color2: #845ec2;
-        --color3: #008f7a;
+        --color3: #d65db1;
         --color4: white;
         --color5: #f6f6f6;
         --content-padding: 1rem;
@@ -58,8 +58,23 @@ SPA-Routing ermöglicht.
 
     :global(h1),
     :global(h2) {
-        color: var(--color2);
         text-shadow: 1px 1px 0px rgba(0,0,0, 0.25);
+    }
+    
+    :global(h1) {
+        color: var(--color2);
+        font-size: 130%;
+    }
+
+    :global(h2) {
+        color: var(--color3);
+        font-size: 110%;
+    }
+
+    :global(p) {
+        text-align: justify;
+        hyphens: auto;
+        word-wrap: break-word;
     }
 
     @media (min-width: 38em) {

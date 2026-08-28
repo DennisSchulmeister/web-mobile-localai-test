@@ -80,3 +80,23 @@ export function replaceLineBreaks(strings) {
 
     return strings;
 }
+
+/**
+ * Relative URLs im Dokument anpassen, damit sie auch innerhalb der Webanwendung
+ * funktionieren, wo die Markdown-Dokumente in einem Unterverzeichnis der SPA liegen.
+ * 
+ * @param {object} mdAst Syntaxbaum des Objekts
+ * @param {string} urlPrefix Prefix für relative URLs
+ * @returns {object} Dieselbe Syntaxbaum-Instanz
+ */
+export function fixRelativeUrls(mdAst, urlPrefix) {
+    if (mdAst.url && !mdAst.url.includes("://") && !mdAst.url.startsWith("/")) {
+        mdAst.url = `${urlPrefix}${mdAst.url}`;
+    }
+
+    for (let child of mdAst.children || []) {
+        fixRelativeUrls(child, urlPrefix);
+    }
+
+    return mdAst;
+}

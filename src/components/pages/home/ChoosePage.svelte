@@ -15,16 +15,15 @@ Einfaches Auswahlmenü für die anzuzeigende Textseite.
     import {onMount}         from "svelte";
     import SelectionList     from "../../basic/SelectionList.svelte"
     import {navigationState} from "../../../state/Navigation.svelte.js";
-    import {loadCategories}  from "../../../state/TextPage.svelte.js";
-    import {textPages}       from "../../../state/TextPage.svelte.js";
+    import textPageState     from "../../../state/TextPage.svelte.js";
 
     onMount(async () => {
         navigationState.pageTitle = "Textseite auswählen";
-        await loadCategories();
+        await textPageState.reloadCategories();
     });
 
     let items = $derived.by(() => {
-        if (!textPages.categories) {
+        if (!textPageState.categories) {
             return [{
                 type: "section",
                 text: "Liste wird geladen ...",
@@ -34,7 +33,7 @@ Einfaches Auswahlmenü für die anzuzeigende Textseite.
 
         let newItems = [];
 
-        for (let category of textPages.categories || []) {
+        for (let category of textPageState.categories || []) {
             newItems.push({
                 type: "section",
                 text: category.category || "",

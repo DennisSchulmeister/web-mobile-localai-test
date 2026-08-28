@@ -6,47 +6,44 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-export const textPages = $state({
-    /**
-     * Inhalt der Datei `data/index.json`.
-     */
-    categories: [],
-
-    /**
-     * Dateiname der aktuellen Textseite. Kann von außen gesetzt werden, um
-     * eine neue Seite zu laden.
-     */
-    currentPageFile: "",
-
-    /**
-     * Markdown-Inhalt der aktuellen Seite.
-     */
-    currentPageContent: "",
-});
+import * as md from "../../shared/markdown.js";
 
 /**
- * Datei `data/index.json` mit der Liste der Textseiten je Kategorie laden.
+ * Kategorien, verfügbare Seiten und Inhalt der aktuellen Seite.
  */
-export async function loadCategories() {
-    textPages.categories = await (await fetch("data/index.json")).json();
-    // TODO: Bild-URLs prefixen
+class TextPageState {
+    categories  = $state([]);
+    currentPage = $state({file: "", content: ""});
+
+    /**
+     * Datei `data/index.json` mit der Liste der Textseiten je Kategorie laden.
+     * Dies verändert das reaktive Attribut `categories`.
+     */
+    async reloadCategories() {
+        this.categories = await (await fetch("data/index.json")).json();
+    }
+
+    /**
+     * Markdown-Datei mit dem darzustellenden Inhalt der aktuellen Seite laden.
+     * Dies verändert das reaktive Attribute `currentPage`.
+     * 
+     * @param {string} pageFile Markdown-Pfad
+     */
+    async setCurrentPage(pageFile) {
+        this.currentPage.content = "";
+        this.currentPage.file    = pageFile;
+
+        try {
+            let pageDir = `data/${pageFile.split("/").slice(0, -1).join("/")}/`;
+            let content = await (await fetch(`data/${pageFile}`)).text();
+            let mdAst   = md.fixRelativeUrls(md.parseMarkdown(content), pageDir);
+            
+            this.currentPage.content = md.stringifyMarkdown(mdAst);
+        } catch (error) {
+            console.error(error);
+            this.currentPage.content = error.toString();
+        }
+    }
 }
 
-/**
- * Markdown-Inhalt der aktuellen Seite. Wird in Abhängigkeit von `currentPageFile`
- * automatisch versorgt. => TODO: Funktioniert so nicht.
- */
-$derived.by(async () => {
-    try {
-        if (textPages.currentPageFile.file) {
-            let content = await (await fetch(`data/${textPages.currentPageFile.file}`)).text();
-            textPages.currentPageContent = content;
-        } else {
-            textPages.currentPageContent = "";
-        }
-    } catch (error) {
-        console.error(error);
-        textPages.currentPageContent = error.toString();
-    }
-});
-
+export default new TextPageState();

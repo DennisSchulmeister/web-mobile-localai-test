@@ -10,7 +10,7 @@
         "build": "npm run clean && node bin/esbuild/bundle.js",
         "start": "node bin/esbuild/serve.js",
         "watch": "node bin/esbuild/serve.js",
-        "init": "npm run prepare:download && npm run prepare:preprocess && npm run prepare:embeddings",
+        "init": "npm run init:download && npm run init:preprocess && npm run init:embeddings",
         "init:download": "node bin/init/download.js static/config.json",
         "init:preprocess": "node bin/init/preprocess.js static/config.json",
         "init:embeddings": "node bin/init/embeddings.js static/config.json"

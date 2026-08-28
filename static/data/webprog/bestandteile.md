@@ -1,8 +1,8 @@
 Die Bestandteile des World Wide Web
 ===================================
 
-Ursprüng des Web
-----------------
+Ursprünge des Web
+-----------------
 
 In den Jahren ab 1989 machte sich Tim Berners-Lee daran, seine Vision
 umzusetzen. Er ging also her und hat angefangen, sowohl einen Webserver

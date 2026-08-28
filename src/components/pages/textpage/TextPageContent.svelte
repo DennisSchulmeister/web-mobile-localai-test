@@ -15,14 +15,14 @@ Inhalt einer Textseite
     import MarkdownIt        from 'markdown-it'
     import {onMount}         from "svelte";
     import {navigationState} from "../../../state/Navigation.svelte.js";
-    import {textPages}       from "../../../state/TextPage.svelte.js";
+    import textPageState     from "../../../state/TextPage.svelte.js";
 
     onMount(() => {
         navigationState.pageTitle = "Text anzeigen";
     });
 
     let md = new MarkdownIt();
-    let htmlContent = $derived(md.render(textPages.currentPageContent));
+    let htmlContent = $derived(md.render(textPageState.currentPage.content));
 </script>
 
 <div class="textpage">

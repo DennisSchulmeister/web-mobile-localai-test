@@ -19,15 +19,15 @@ Auswgeählte Textseite
     import TextToSpeach      from "./textpage/TextToSpeach.svelte";
     import Translation       from "./textpage/Translation.svelte";
     import {navigationState} from "../../state/Navigation.svelte.js";
-    import {textPages}       from "../../state/TextPage.svelte.js";
+    import textPageState     from "../../state/TextPage.svelte.js";
 
     let {params = []} = $props()
     let textPageId = $derived(params[1]);
     let subPageId  = $derived(params[2]);
 
-    $effect(() => {
+    $effect(async () => {
         navigationState.currentSubPage = subPageId;
-        textPages.currentPageFile = textPageId;
+        await textPageState.setCurrentPage(textPageId)
     });
     
     onMount(() => {
