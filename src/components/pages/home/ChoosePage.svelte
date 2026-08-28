@@ -15,28 +15,34 @@ Einfaches Auswahlmenü für die anzuzeigende Textseite.
     import {onMount}         from "svelte";
     import SelectionList     from "../../basic/SelectionList.svelte"
     import {navigationState} from "../../../state/Navigation.svelte.js";
-
-    let items = [{
-        type: "section",
-        text: "Liste wird geladen ...",
-        href: "",
-    }];
+    import {loadCategories}  from "../../../state/TextPage.svelte.js";
+    import {textPages}       from "../../../state/TextPage.svelte.js";
 
     onMount(async () => {
         navigationState.pageTitle = "Textseite auswählen";
+        await loadCategories();
+    });
 
-        let categories = await (await fetch("data/index.json")).json();
-        items = [];
-        
-        for (let category of categories || []) {
-            items.push({
+    let items = $derived.by(() => {
+        if (!textPages.categories) {
+            return [{
+                type: "section",
+                text: "Liste wird geladen ...",
+                href: "",
+            }];
+        }
+
+        let newItems = [];
+
+        for (let category of textPages.categories || []) {
+            newItems.push({
                 type: "section",
                 text: category.category || "",
                 href: "",
             });
 
             for (let page of category.pages || []) {
-                items.push({
+                newItems.push({
                     type: "link",
                     text: page.title || page.file || "",
                     href: `#/page/${page.file}/content`,
@@ -44,11 +50,8 @@ Einfaches Auswahlmenü für die anzuzeigende Textseite.
             }
         }
 
-        console.log(items);
+        return newItems;
     });
-
-    // $effect(async () => {
-    // });
 </script>
 
 <SelectionList {items}/>
