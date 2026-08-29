@@ -13,14 +13,36 @@ KI-Anwendungsfall: Semantische Suche von Textseiten
 
 <script>
     import {onMount}         from "svelte";
+
+    import ModelSelector     from "../../basic/ModelSelector.svelte"
+    import Section           from "../../basic/Section.svelte";
     import {navigationState} from "../../../state/Navigation.svelte.js";
 
     onMount(() => {
         navigationState.pageTitle = "Textseite suchen";
     });
+
+    let loadedModel  = $state({modelId: "", dtype: "", device: ""});
+    let loadModel    = $state({modelId: "", dtype: "", device: ""});
+    let status       = $state("ready");
+    let errorMessage = "";
 </script>
 
-<h1>Semantische Suche</h1>
+<Section>
+    <ModelSelector
+        task           = "sentenceEmbedding"
+        status         = {status}
+        errorMessage   = {errorMessage}
+        loadedModel    = {loadedModel}
+        bind:loadModel = {loadModel}
+    />
+</Section>
+
+<div id="subpage">
+</div>
 
 <style>
+    #subpage {
+        padding: var(--content-padding);
+    }
 </style>

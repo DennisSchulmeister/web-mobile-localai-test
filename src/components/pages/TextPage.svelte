@@ -13,6 +13,7 @@ Auswgeählte Textseite
 
 <script>
     import {onMount}         from "svelte";
+    
     import QuestionAnswering from "./textpage/QuestionAnswering.svelte";
     import Summary           from "./textpage/Summary.svelte";
     import TextPageContent   from "./textpage/TextPageContent.svelte";
