@@ -7,5 +7,8 @@
         "config": "data/index.json",
         "preprocessDir": "_generated/preprocessed",
         "embeddingsDir": "_generated/embeddings"
+    },
+    "semanticSearch": {
+        "fitThreshold": 0.75
     }
 }

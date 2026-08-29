@@ -47,8 +47,8 @@ class ModelState {
     
         return {
             dir:       dir,
-            keywords:  path.join(dir, "keywords.json"),
-            sentences: path.join(dir, "sentences.json"),
+            keywords:  `${dir}/keywords.json`,
+            sentences: `${dir}/sentences.json`,
         };
     }
 }
