@@ -36,7 +36,7 @@ SPA-Routing ermöglicht.
     :global(html) {
         height: 100%;
         margin: 0;
-        background-image: radial-gradient( circle 975px at 2.6% 48.3%,  rgba(0,8,120,1) 0%, rgba(95,184,224,1) 99.7%);
+        background-image: linear-gradient(to right top, #6bb2d1, #6bb1d7, #6eafdc, #73ade0, #7aabe4, #77aae4, #73a9e4, #70a8e4, #5ea8e1, #4aa8dd, #34a8d7, #13a7d1);
 
         --color1: #0089ba;
         --color2: #845ec2;
