@@ -13,17 +13,11 @@ SPA-Routing ermöglicht.
 -->
 
 <script>
-    import {onMount}  from "svelte";
     import Router     from "svelte-spa-router";
 
     import Footer     from "./Footer.svelte";
     import NavBar     from "./NavBar.svelte";
     import routes     from "../routes.js";
-    import ModelState from "../../state/Model.svelte.js";
-
-    onMount(async () => {
-        await ModelState.reloadModelConfiguration();
-    });
 </script>
 
 <div id="app-container">

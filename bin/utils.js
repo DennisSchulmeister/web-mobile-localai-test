@@ -117,13 +117,15 @@ export function preprocessPaths(config, dataFile) {
 }
 
 /**
+ * Vgl. `/src/state/Model.svelte.js → ModelState::embeddingPaths()`
+ * 
  * Verzeichnispfade für die Texteinbettungen aller Seiten eines spezifischen
  * KI-Modells ermitteln. Liefert ein Objekt mit den Attributen `dir`, `keywords`
  * und `sentences`. `dir` ist das  Verzeichnis, die anderen Dateien darin.
  * 
  * @param {object} config Deserialisierte Konfiguration
  * @param {string} modelId ID des KI-Modells
- * @param {ſtring} dtype Datentype des KI-Modells (z.B. fp32, int8)
+ * @param {string} dtype Datentype des KI-Modells (z.B. fp32, int8)
  * @returns {object} Verzeichnispfade
  */
 export function embeddingsPaths(config, modelId, dtype) {

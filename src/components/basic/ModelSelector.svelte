@@ -18,7 +18,7 @@ Auswahl eines KI-Modells
 
     let {
         task         = "",               // Schlüsselwert aus `models/index.json`
-        status       = "ready",          // ready, loading, working, error
+        status       = "ready",          // initial, loading, ready, working, error
         errorMessage = "",
         loadedModel  = {modelId: "", dtype: "", device: ""},
         loadModel    = $bindable({modelId: "", dtype: "", device: ""}),
@@ -37,7 +37,7 @@ Auswahl eines KI-Modells
     let selected_device     = $state(navigator.ml ? "webnn" : navigator.gpu ? "webgpu" : "");
     let loaded_device_text  = $derived(text_device[loadedModel.device])
     let loaded_device_color = $derived(loadedModel.device === "" ? "darkred" : "darkgreen");
-    let loadingEnabled      = $derived(status === "ready");
+    let loadingEnabled      = $derived(!["loading", "working"].includes(status));
 
     function onLoadClicked() {
         loadModel = {
@@ -121,7 +121,7 @@ Auswahl eines KI-Modells
             </div>
         </fieldset>
 
-        <button click={onLoadClicked} disabled={!loadingEnabled || !selected_modelId}>Laden</button>
+        <button onclick={onLoadClicked} disabled={!loadingEnabled || !selected_modelId}>Laden</button>
     </article>
 </details>
 

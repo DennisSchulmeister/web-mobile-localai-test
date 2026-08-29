@@ -6,10 +6,13 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import ApplicationFrame from "./components/app-frame/ApplicationFrame.svelte";
-import {mount}          from 'svelte';
+import {mount}           from "svelte";
+
+import ApplicationFrame  from "./components/app-frame/ApplicationFrame.svelte";
+import ModelState        from "./state/Model.svelte.js";
 
 import "@picocss/pico/css/pico.css";
 import "bootstrap-icons/font/bootstrap-icons.min.css";
 
+await ModelState.reloadModelConfiguration();
 mount(ApplicationFrame, {target: document.body});

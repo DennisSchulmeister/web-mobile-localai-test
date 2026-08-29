@@ -7,7 +7,6 @@
  */
 
 import fs                from "node:fs/promises";
-import path              from "node:path";
 import process           from "node:process";
 import shell             from "shelljs";
 import * as transformers from '@huggingface/transformers';
@@ -32,6 +31,7 @@ let config = utils.readConfig({
 });
 
 transformers.env.localModelPath    = config.models.downloadDir;
+transformers.env.allowLocalModels  = true;
 transformers.env.allowRemoteModels = false;
 
 let embeddingModels = config.models.config.sentenceEmbedding || [];

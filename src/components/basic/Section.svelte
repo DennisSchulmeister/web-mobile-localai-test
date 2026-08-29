@@ -12,10 +12,10 @@ Abschnitt mit Trennlinie unten
 -->
 
 <script>
-    let {children} = $props();
+    let {line = true, children} = $props();
 </script>
 
-<div class="section">
+<div class="section {line ? 'line' : ''}">
     {@render children()}
 </div>
 
@@ -23,7 +23,9 @@ Abschnitt mit Trennlinie unten
     .section {
         padding: var(--content-padding);
         
-        border: 0px solid color-mix(in srgb, var(--color5) 100%, black 5%);
-        border-bottom-width: 1.5px;
+        &.line {
+            border: 0px solid color-mix(in srgb, var(--color5) 100%, black 5%);
+            border-bottom-width: 1.5px;
+        }
     }
 </style>
