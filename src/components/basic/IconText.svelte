@@ -20,7 +20,15 @@ Icon mit Text
     } = $props();
 </script>
 
-<span>
+<span class="iconText">
     <span style:color={iconColor} class="bi {icon}"></span>
     <span style:color={textColor}>{text}</span>
 </span>
+
+<style>
+    .iconText {
+        display: inline-flex;
+        align-items: top;
+        gap: 0.25em;
+    }
+</style>

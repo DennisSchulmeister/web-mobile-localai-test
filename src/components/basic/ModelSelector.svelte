@@ -25,17 +25,18 @@ Auswahl eines KI-Modells
     } = $props();
 
     let text_device = {
-        "cpu": "CPU",
-        "gpu": "GPU"
+        "":       "WASM",
+        "webgpu": "WebGPU",
+        "webnn":  "WebNN"
     };
 
     let selected_modelId    = $derived(modelState.models[task]?.[0]?.modelId || "");
     let selected_index      = $derived(modelState.models[task]?.findIndex(e => e.modelId === selected_modelId));
     let selected_dtypes     = $derived(modelState.models[task]?.[selected_index]?.dtypes || []);
     let selected_dtype      = $derived(modelState.models[task]?.[selected_index]?.dtypes?.[0] || "");
-    let selected_device     = $state(navigator.gpu ? "gpu" : "cpu");
+    let selected_device     = $state(navigator.ml ? "webnn" : navigator.gpu ? "webgpu" : "");
     let loaded_device_text  = $derived(text_device[loadedModel.device])
-    let loaded_device_color = $derived(loadedModel.device === "gpu" ? "darkgreen" : "darkred");
+    let loaded_device_color = $derived(loadedModel.device === "" ? "darkred" : "darkgreen");
     let loadingEnabled      = $derived(status === "ready");
 
     function onLoadClicked() {
@@ -105,10 +106,16 @@ Auswahl eines KI-Modells
                 </label>
 
                 <label>
-                    <span>Ausführung auf</span>
-                    <select bind:value={selected_device} disabled={!loadingEnabled || !navigator.gpu}>
-                        <option value="cpu">{text_device["cpu"]}</option>
-                        <option value="gpu">{text_device["gpu"]}</option>
+                    <span>Ausführumgebung</span>
+                    <select bind:value={selected_device} disabled={!loadingEnabled}>
+                        <option value="">{text_device[""]}</option>
+
+                        {#if navigator.gpu}
+                            <option value="webgpu">{text_device["webgpu"]}</option>
+                        {/if}
+                        {#if navigator.ml}
+                            <option value="webnn">{text_device["webnn"]}</option>
+                        {/if}
                     </select>
                 </label>
             </div>
@@ -134,10 +141,6 @@ Auswahl eines KI-Modells
 
         .modelId {
             flex: 1;
-        }
-
-        .param {
-            flex-basis: 4em;
         }
     }
 </style>
