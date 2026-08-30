@@ -17,9 +17,12 @@ KI-Anwendungsfall: Semantische Suche von Textseiten
 
     import ModelSelector     from "../../basic/ModelSelector.svelte"
     import Section           from "../../basic/Section.svelte";
+    import SelectionList     from "../../basic/SelectionList.svelte";
     import StopWatch         from "../../basic/StopWatch.svelte";
     import modelState        from "../../../state/ModelState.svelte";
     import navigationState   from "../../../state/NavigationState.svelte.js";
+    import StopWatchState    from "../../../state/StopWatchState.svelte.js";
+    import textPageState     from "../../../state/TextPageState.svelte.js";
     import {decodeEmbedding} from "../../../../shared/embedding.js";
 
     onMount(() => {
@@ -36,14 +39,11 @@ KI-Anwendungsfall: Semantische Suche von Textseiten
 
     let query           = $state("");
     let searchAll       = $state(false);
-    let searchResults   = $state([]);
+    let matchText       = $state(false);
     let progressValue   = $state(0);
     let progressMax     = $state(0);
-
-    let showStopWatches = $state(false);
-    let stopDownload    = $state("stopped");
-    let stopEmbedding   = $state("stopped");
-    let stopSearch      = $state("stopped");
+    let stopWatchState  = new StopWatchState();
+    let items           = $state([]);
 
     $effect(async () => {
         try {
@@ -74,70 +74,100 @@ KI-Anwendungsfall: Semantische Suche von Textseiten
         event.preventDefault();
         if (!query) return;
 
-        status          = "working";
-        showStopWatches = true;
-
-        stopDownload    = "rest";
-        stopEmbedding   = "rest";
-        stopSearch      = "reset";
+        status = "working";
 
         let indexes        = [];
         let queryEmbedding = [];
-        let searchResults_ = [];
+        let searchResults  = [];
 
         // Indexdateien herunterladen
-        stopDownload = "running";
-        indexes      = [await(await fetch(embeddingPaths.keywords)).json()];
+        stopWatchState.start("Download", "bi-download");
+
+        indexes.push(await(await fetch(embeddingPaths.keywords)).json());
 
         if (searchAll) {
             indexes.push(await(await fetch(embeddingPaths.sentences)).json());
         }
 
-        stopDownload = "stopped";
-
         // Einbettung des Suchbegriffs berechnen
-        stopEmbedding  = "running";
+        stopWatchState.start("Embedding", "bi-text-center");
+
+        let queryLower = query.toLowerCase();
         queryEmbedding = (await encoder(query, {pooling: "mean", normalize: true})).data;
-        stopEmbedding  = "stopped";
 
         // Index durchsuchen
-        // TODO: Debuggen
-        stopSearch  = "running";
+        stopWatchState.start("Suche", "bi-serch");
+
         progressMax = 0;
 
-        for (let index of indexes) {
-            for (let pageId in index) {
-                progressMax += index[pageId].length;
+        for (let index of indexes) {            
+            for (let file in index) {
+                progressMax += index[file].length;
             }
         }
 
         for (let index of indexes) {
-            for (let pageId in index) {
-                let searchResult = {
-                    pageId: pageId,
-                    maxFit: 0,
-                    texts:  [],
-                };
+            for (let file in index) {
+                let existingResult = true;
+                let searchResult   = searchResults.find(e => e.file === file);
 
-                for (let entry of index[pageId]) {
+                if (!searchResult) {
+                    existingResult = false;
+                    searchResult   = {file, title: "", fit: 0, texts: []};
+                }
+
+                for (let entry of index[file]) {
                     progressValue += 1;
+                    let fit = 0;
 
-                    let fit = transformers.dot(queryEmbedding, decodeEmbedding(entry.embedding, loadedModel.dtype));
+                    if (matchText && entry.text.toLowerCase().includes(queryLower)) {
+                        fit = 1;
+                    } else {
+                        fit = transformers.dot(queryEmbedding, decodeEmbedding(entry.embedding, loadedModel.dtype));
+                    }
+
                     if (fit < modelState.config.semanticSearch.fitThreshold) continue;
 
                     searchResult.fit = Math.max(searchResult.fit, fit);
                     searchResult.texts.push({text: entry.text, fit});
                 }
 
-                if (searchResult.fit >= modelState.config.semanticSearch.fitThreshold) {
-                    searchResults_.push(searchResult);
+                searchResult.texts.sort((a, b) => a.fit - b.fit).reverse();
+
+                if (searchResult.fit > 0 && !existingResult) {
+                    let textPage = textPageState.findTextPage(file);
+                    searchResult.title = textPage.title || file;
+
+                    searchResults.push(searchResult);
                 }
             }
         }
 
-        searchResults = searchResults_.sort((a, b) => a.fit - b.fit);
-        stopSearch    = "stopped";
-        status        = "ready";
+        searchResults.sort((a, b) => a.fit - b.fit).reverse();
+        status = "ready";
+        stopWatchState.stop();
+
+        // Aufbereitung für die Anzeige
+        items = [];
+
+        for (let searchResult of searchResults) {
+            let item = {
+                type:  "link",
+                text:  searchResult.title,
+                extra: `${Math.round(searchResult.fit * 100)}%`,
+                href:  textPageState.getTextPageUrl(searchResult.file),
+                lines: [],
+            }
+
+            for (let text of searchResult.texts) {
+                item.lines.push({
+                    text:  text.text,
+                    extra: `${Math.round(text.fit * 100)}%`,
+                });
+            }
+
+            items.push(item);
+        }
     }
 </script>
 
@@ -157,48 +187,40 @@ KI-Anwendungsfall: Semantische Suche von Textseiten
         <input type="submit" value="Suchen" disabled={disabled || !query}/>
     </form>
 
-    <label>
-        <input type="checkbox" role="switch" bind:checked={searchAll} {disabled}/>
-        Volltextsuche
-  </label>
+    <div class="options">
+        <label>
+            <input type="checkbox" role="switch" bind:checked={searchAll} {disabled}/>
+            Volltextsuche
+        </label>
+    
+        <label>
+            <input type="checkbox" role="switch" bind:checked={matchText} {disabled}/>
+            Direkter Textvergleich
+        </label>
+    </div>
 </Section>
 
-<Section line={false}>
-    {#if status === "working"}
+{#if status === "working"}
+    <Section line={false}>
         <progress value={progressValue} max={progressMax}></progress>
-    {:else}
-        <!-- TODO: Schöner darstellen! -->
-        <div>
-            Anzahl Ergebnisse: {searchResults.length}
-        </div>
-        
-        {#each searchResults as searchResult}
-            <div class="searchResult">
-                {searchResult.pageId} ({searchResult.fit} %)
-            </div>
-        {/each}
-    {/if}
+    </Section>
+{:else}
+    <div class="margin-bottom">
+        <SelectionList {items} />
+    </div>
+{/if}
 
-    {#if showStopWatches}
-        <div class="stopWatches">
-            <StopWatch icon="bi-download" text="Download:" status={stopDownload}/>
-            <StopWatch icon="bi-text-center" text="Einbettung:" status={stopEmbedding}/>
-            <StopWatch icon="bi-search" text="Suche:" status={stopSearch}/>
-        </div>
-    {/if}
+<Section line={false}>
+    <StopWatch measurements={stopWatchState.measurements}/>
 </Section>
 
 <style>
-    label {
-        margin: 0;
+    .options {
+        display: flex;
+        gap: calc(2 * var(--content-padding));
     }
 
-    .stopWatches {
-        font-size: 75%;
-
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: var(--content-padding);
+    label {
+        margin: 0;
     }
 </style>

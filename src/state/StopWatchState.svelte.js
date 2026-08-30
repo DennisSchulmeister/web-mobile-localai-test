@@ -65,6 +65,7 @@ export default class StopWatchState {
     start(name, icon) {
         if (!this.running) {
             this.measurements = [];
+            this.running = true;
         } else {
             this.#updateCurrentMeasurment();
         }
@@ -120,6 +121,6 @@ export default class StopWatchState {
      */
     #format(time) {
         let seconds = Math.round(time / 10) / 100.0;
-        return this.#formatter.format(seconds);
+        return `${this.#formatter.format(seconds)}s`;
     }
 }

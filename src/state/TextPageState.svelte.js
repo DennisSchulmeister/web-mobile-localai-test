@@ -44,6 +44,30 @@ class TextPageState {
             this.currentPage.content = error.toString();
         }
     }
+
+    /**
+     * Indexeintrag eienr Seite finden.
+     * 
+     * @param {string} file Dateiname der Seite
+     * @returns Indexeintrag mit Seitentitel
+     */
+    findTextPage(file) {
+        for (let category of this.categories || []) {
+            for (let page of category.pages || []) {
+                if (page.file === file) return page;
+            }
+        }
+    }
+
+    /**
+     * URL zur Anzeige einer Textseite ermitteln.
+     * 
+     * @param {string} file Dateiname der Seite
+     * @returns URL zur Anzeige
+     */
+    getTextPageUrl(file) {
+        return `#/page/${file}/content`;
+    }
 }
 
 export default new TextPageState();

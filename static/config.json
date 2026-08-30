@@ -9,6 +9,6 @@
         "embeddingsDir": "_generated/embeddings"
     },
     "semanticSearch": {
-        "fitThreshold": 0.75
+        "fitThreshold": 0.5
     }
 }

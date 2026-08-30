@@ -43,7 +43,7 @@ Einfaches Auswahlmenü für die anzuzeigende Textseite.
                 newItems.push({
                     type: "link",
                     text: page.title || page.file || "",
-                    href: `#/page/${page.file}/content`,
+                    href: textPageState.getTextPageUrl(page.file),
                 });
             }
         }

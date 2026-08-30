@@ -8,7 +8,13 @@ LICENSE file in the root directory of this source tree.
 
 <!--
 @component
-Eine einfache Auswahlliste im Android-Style
+Eine einfache Auswahlliste im Android-Style. Items sind Objekte mit folgenden Attributen:
+
+ - `type`:  Art des Listeneintrags: "section" oder "link"
+ - `text`:  Haupttext des Listeneintrags
+ - `extra`: Randtext des Listeneintrags (optional)
+ - `href`:  Linkziel (nur für Typ Link)
+ - `lines`: Untergeordnete Zeilen, jeweils mit `text` und `extra`
 -->
 
 <script>
@@ -22,7 +28,23 @@ Eine einfache Auswahlliste im Android-Style
                 <a href={item.href} aria-label={item.text}></a>
             {/if}
 
-            {item.text}
+            <div class="line">
+                <div class="text">{item.text}</div>
+    
+                {#if item.extra}
+                    <div class="extra">{item.extra}</div>
+                {/if}
+            </div>
+
+            {#each item.lines as line}
+                <div class="line small">
+                    <div class="text">{line.text}</div>
+        
+                    {#if line.extra}
+                        <div class="extra">{line.extra}</div>
+                    {/if}
+                </div>
+            {/each}
         </div>
     {/each}
 </div>
@@ -36,6 +58,10 @@ Eine einfache Auswahlliste im Android-Style
 
     .listItem {
         position: relative;
+
+        display: flex;
+        flex-direction: column;
+        gap: 0.25em;
 
         padding: var(--content-padding);
         border: 0px solid color-mix(in srgb, var(--color5) 100%, black 5%);
@@ -65,6 +91,20 @@ Eine einfache Auswahlliste im Android-Style
             left: 0;
             width: 100%;
             height: 100%;
+        }
+
+        .line {
+            display: flex;
+            gap: var(--content-padding);
+        }
+
+        .text {
+            flex: 1;
+        }
+
+        .small {
+            font-size: 80%;
+            color: darkgrey;
         }
     }
 </style>
