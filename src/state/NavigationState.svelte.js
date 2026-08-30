@@ -12,9 +12,9 @@
  */
 const navigationState = $state({
     /**
-     * Link-URL für den Zurück-Pfeil. Wenn leer, wird der Pfeil ausgeblendet.
+     * Zurück-Pfeil in der Navigationsleiste anzeigen
      */
-    backLink: "",
+    backLink: false,
 
     /**
      * Überschrift der Seite.

@@ -32,7 +32,7 @@ Auswgeählte Textseite
     });
     
     onMount(() => {
-        navigationState.backLink = "#/";
+        navigationState.backLink = true;
         
         navigationState.subPages = [
             {

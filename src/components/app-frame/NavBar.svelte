@@ -13,11 +13,16 @@ Obere Navigationsleiste
 
 <script>
     import navigationState from "../../state/NavigationState.svelte.js"
+
+    function onBackClicked(event) {
+        event.preventDefault();
+        history.back();
+    }
 </script>
 
 <div id="navbar">
     {#if navigationState.backLink}
-        <a href={navigationState.backLink} title="Zurück">
+        <a href="#back" title="Zurück" onclick={onBackClicked}>
             <i class="bi bi-arrow-left-square"></i>
         </a>
     {/if}

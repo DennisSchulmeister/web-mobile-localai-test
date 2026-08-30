@@ -17,7 +17,7 @@ Fehlerseite für ungültige URLs
 
     onMount(() => {
         navigationState.pageTitle      = "Nicht gefunden";
-        navigationState.backLink       = "#/";
+        navigationState.backLink       = true;
         navigationState.currentSubPage = "";
         navigationState.subPages       = [];
     });

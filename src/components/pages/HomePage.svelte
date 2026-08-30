@@ -25,7 +25,7 @@ Startseite mit Auswahl und Suche von Textseiten.
     });
 
     onMount(() => {
-        navigationState.backLink = "";
+        navigationState.backLink = false;
 
         navigationState.subPages = [
             {
