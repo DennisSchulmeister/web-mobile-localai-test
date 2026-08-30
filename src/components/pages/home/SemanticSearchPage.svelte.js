@@ -21,16 +21,16 @@ import {decodeEmbedding} from "../../../../shared/embedding.js";
 class SemanticSearchPageState {
     working         = $state(false);
     disabled        = $derived(this.working || modelState.loadedModel.status !== "ready")
-    errorMessage    = $state("");
     embeddingPaths  = $derived(modelState.embeddingsPaths(modelState.loadedModel.modelId, modelState.loadedModel.dtype));
-
+    errorMessage    = $state("");
+    stopWatchState  = new StopWatchState();
+    
     query           = $state("");
     searchAll       = $state(false);
     matchText       = $state(false);
-
+    
     progressValue   = $state(0);
     progressMax     = $state(0);
-    stopWatchState  = new StopWatchState();
     items           = $state([]);
 
     /**

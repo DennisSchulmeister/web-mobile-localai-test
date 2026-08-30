@@ -14,6 +14,7 @@ Inhalt einer Textseite
 <script>
     import MarkdownIt      from 'markdown-it'
     import {onMount}       from "svelte";
+    
     import navigationState from "../../../state/NavigationState.svelte.js";
     import textPageState   from "../../../state/TextPageState.svelte.js";
 

@@ -12,13 +12,14 @@ Auswgeählte Textseite
 -->
 
 <script>
-    import {onMount}         from "svelte";
+    import {onMount}             from "svelte";
     
     import QuestionAnsweringPage from "./textpage/QuestionAnsweringPage.svelte";
     import SummaryPage           from "./textpage/SummaryPage.svelte";
     import TextContentPage       from "./textpage/TextContentPage.svelte";
-    import TextToSpeachPage      from "./textpage/TextToSpeachPage.svelte";
+    import TextToSpeechPage      from "./textpage/TextToSpeechPage.svelte";
     import TranslationPage       from "./textpage/TranslationPage.svelte";
+
     import navigationState       from "../../state/NavigationState.svelte.js";
     import textPageState         from "../../state/TextPageState.svelte.js";
 
@@ -79,7 +80,7 @@ Auswgeählte Textseite
     {:else if subPageId === "translation"}
         <TranslationPage/>
     {:else if subPageId === "tts"}
-        <TextToSpeachPage/>
+        <TextToSpeechPage/>
     {/if}
 </div>
 

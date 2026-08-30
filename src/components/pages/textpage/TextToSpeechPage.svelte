@@ -13,7 +13,9 @@ KI-Anwendungsfall: Text to Speach
 
 <script>
     import {onMount}       from "svelte";
+
     import navigationState from "../../../state/NavigationState.svelte.js";
+    import state           from "./TextToSpeechPage.svelte.js";
 
     onMount(() => {
         navigationState.pageTitle = "Text vorlesen";
