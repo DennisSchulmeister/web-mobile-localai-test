@@ -33,7 +33,6 @@ KI-Anwendungsfall: Semantische Suche von Textseiten
     });
 
     let loadedModel     = $state({modelId: "", dtype: "", device: ""});
-    let loadModel       = $state({modelId: "", dtype: "", device: ""});
     let status          = $state("initial");
     let disabled        = $derived(status !== "ready")
     let errorMessage    = $state("");
@@ -48,30 +47,35 @@ KI-Anwendungsfall: Semantische Suche von Textseiten
     let stopWatchState  = new StopWatchState();
     let items           = $state([]);
 
-    $effect(async () => {
+    /**
+     * KI-Modell laden. Da die Modelle sehr groß sind, wird immer nur das zuletzt
+     * geladene Modell im Speicher behalten.
+     * 
+     * @param {string} task Art des Modells
+     * @param {string} modelId Model ID
+     * @param {string} dtype Datentype
+     * @param {string} device Ausführumgebung
+     */
+    async function loadModel({task, modelId, dtype, device} = {}) {
         try {
-            if (loadModel.modelId) {
+            if (modelId) {
                 status = "loading";
     
-                encoder = await transformers.pipeline("feature-extraction", loadModel.modelId, {
-                    dtype:  loadModel.dtype,
-                    device: loadModel.device,
+                encoder = await transformers.pipeline("feature-extraction", modelId, {
+                    dtype:  dtype,
+                    device: device,
                 });
     
-                loadedModel    = loadModel;
-                embeddingPaths = modelState.embeddingsPaths(loadModel.modelId, loadModel.dtype);
+                loadedModel    = {task, modelId, dtype, device};
+                embeddingPaths = modelState.embeddingsPaths(modelId, dtype);
                 status         = "ready";
-
-                return;
             }    
         } catch (error) {
             console.error(error);
             status = "error";
             errorMessage = error.toString();
         }
-
-        loadedModel = {modelId: "", dtype: "", device: ""};
-    });
+    }
 
     async function onSubmit(event) {
         try {
@@ -187,7 +191,7 @@ KI-Anwendungsfall: Semantische Suche von Textseiten
         status         = {status}
         errorMessage   = {errorMessage}
         loadedModel    = {loadedModel}
-        bind:loadModel = {loadModel}
+        loadModel      = {loadModel}
     />
 </Section>
 

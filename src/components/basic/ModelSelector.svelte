@@ -21,7 +21,7 @@ Auswahl eines KI-Modells
         status       = "ready",          // initial, loading, ready, working, error
         errorMessage = "",
         loadedModel  = {modelId: "", dtype: "", device: ""},
-        loadModel    = $bindable({modelId: "", dtype: "", device: ""}),
+        loadModel    = ({task, modelId, dtype, device}) => {},
     } = $props();
 
     let text_device = {
@@ -39,12 +39,13 @@ Auswahl eines KI-Modells
     let loaded_device_color = $derived(loadedModel.device === "" ? "darkred" : "darkgreen");
     let loadingEnabled      = $derived(!["loading", "working"].includes(status));
 
-    function onLoadClicked() {
-        loadModel = {
+    async function onLoadClicked() {
+        await loadModel({
+            task:    task,
             modelId: selected_modelId,
             dtype:   selected_dtype,
             device:  selected_device,
-        };
+        });
     }
 </script>
 
