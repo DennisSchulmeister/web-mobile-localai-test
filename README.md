@@ -27,6 +27,26 @@ Folgende Anwendungsfälle sollen hier getestet werden:
 1. Semantische Suche (Sentence Similarity)
 1. Text vorlesen (Text to Speach)
 
+<table>
+    <tr>
+        <td>
+            <a href="./doc/screenshot1.png">
+                <img src="./doc/screenshot1.png" width="200">
+            </a>
+        </td>
+        <td>
+            <a href="./doc/screenshot2.png">
+                <img src="./doc/screenshot2.png" width="200">
+            </a>
+        </td>
+        <td>
+            <a href="./doc/screenshot3.png">
+                <img src="./doc/screenshot3.png" width="200">
+            </a>
+        </td>
+    </tr>
+</table>
+
 Vorbereitungen
 --------------
 
@@ -205,6 +225,12 @@ Lessons Learned
 
   Vgl. [transformers.js: maths.dot()](https://huggingface.co/docs/transformers.js/api/utils/maths#module_utils/maths.dot)
 
+* Die Qualität der semantischen Suche hängt, wie zu erwarten, vom verwendeten Embedding
+  Modell ab und ob dieses Synonyme für die verwendeten Begriffe kennt. Das kleine Modell
+  `sentence-transformers/all-MiniLM-L6-v2` scheint zum Beispiel `WWW` und `World Wide Web`
+  als Synonyme zu kennen, `IoT` und `Internet of Things` aber nicht. Dennoch sinkt die
+  Trefferwahrscheinlichkeit deutlich, wenn man `WWW` sucht, im Text aber `World Wide Web`
+  steht.
 
 Copyright
 ---------
