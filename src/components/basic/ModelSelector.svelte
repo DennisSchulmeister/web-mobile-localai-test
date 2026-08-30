@@ -17,11 +17,8 @@ Auswahl eines KI-Modells
     import modelState from "../../state/ModelState.svelte.js";
 
     let {
-        task         = "",               // Schlüsselwert aus `models/index.json`
-        status       = "ready",          // initial, loading, ready, working, error
-        errorMessage = "",
-        loadedModel  = {modelId: "", dtype: "", device: ""},
-        loadModel    = ({task, modelId, dtype, device}) => {},
+        task = "",               // Erster Parameter für `transformers.pipeline()`
+        disabled = false,        // Keine Auswahl zulassen, z.B. weil das geladene Modell gerade genutzt wird
     } = $props();
 
     let text_device = {
@@ -35,12 +32,11 @@ Auswahl eines KI-Modells
     let selected_dtypes     = $derived(modelState.models[task]?.[selected_index]?.dtypes || []);
     let selected_dtype      = $derived(modelState.models[task]?.[selected_index]?.dtypes?.[0] || "");
     let selected_device     = $state(navigator.ml ? "webnn" : navigator.gpu ? "webgpu" : "");
-    let loaded_device_text  = $derived(text_device[loadedModel.device])
-    let loaded_device_color = $derived(loadedModel.device === "" ? "darkred" : "darkgreen");
-    let loadingEnabled      = $derived(!["loading", "working"].includes(status));
+    let loaded_device_text  = $derived(text_device[modelState.loadedModel.device])
+    let loaded_device_color = $derived(modelState.loadedModel.device === "" ? "darkred" : "darkgreen");
 
     async function onLoadClicked() {
-        await loadModel({
+        await modelState.loadModel({
             task:    task,
             modelId: selected_modelId,
             dtype:   selected_dtype,
@@ -58,19 +54,19 @@ Auswahl eines KI-Modells
             Aktuell verwendet
         </header>
 
-        {#if status === "loading"}
+        {#if modelState.loadedModel.status === "loading"}
             <Loading text="Modell wird geladen"/>
-        {:else if status === "error"}
-            <IconText type="error" text={errorMessage}/>
-        {:else if !loadedModel.modelId}
+        {:else if modelState.loadedModel.status === "error"}
+            <IconText type="error" text={modelState.loadedModel.message}/>
+        {:else if !modelState.loadedModel.modelId || modelState.loadedModel.task !== task}
             <IconText text="Es wurde noch kein Modell geladen." textColor="darkgrey"/>
         {:else}
             <div class="loadedModel">
                 <div class="modelId">
-                    <IconText icon="bi-stars" text={loadedModel.modelId}/>
+                    <IconText icon="bi-stars" text={modelState.loadedModel.modelId}/>
                 </div>
                 <div class="param">
-                    <IconText icon="bi-calculator" text={loadedModel.dtype}/>
+                    <IconText icon="bi-calculator" text={modelState.loadedModel.dtype}/>
                 </div>
                 <div class="param">
                     <IconText icon="bi-cpu" text={loaded_device_text} textColor={loaded_device_color}/>
@@ -87,7 +83,7 @@ Auswahl eines KI-Modells
         <fieldset>
             <label>
                 <span>Sprachmodell</span>
-                <select bind:value={selected_modelId} disabled={!loadingEnabled}>
+                <select bind:value={selected_modelId} {disabled}>
                     {#each modelState.models[task] as model}
                         <option value="{model.modelId}">
                             {model.modelId}
@@ -99,7 +95,7 @@ Auswahl eines KI-Modells
             <div class="grid">
                 <label>
                     <span>Datentyp</span>
-                    <select bind:value={selected_dtype} disabled={!loadingEnabled}>
+                    <select bind:value={selected_dtype} {disabled}>
                         {#each selected_dtypes as dtype}
                             <option value={dtype}>{dtype}</option>
                         {/each}
@@ -108,7 +104,7 @@ Auswahl eines KI-Modells
 
                 <label>
                     <span>Ausführumgebung</span>
-                    <select bind:value={selected_device} disabled={!loadingEnabled}>
+                    <select bind:value={selected_device} {disabled}>
                         <option value="">{text_device[""]}</option>
 
                         {#if navigator.gpu}
@@ -122,7 +118,7 @@ Auswahl eines KI-Modells
             </div>
         </fieldset>
 
-        <button onclick={onLoadClicked} disabled={!loadingEnabled || !selected_modelId}>Laden</button>
+        <button onclick={onLoadClicked} disabled={disabled || !selected_modelId}>Laden</button>
     </article>
 </details>
 

@@ -34,7 +34,7 @@ transformers.env.localModelPath    = config.models.downloadDir;
 transformers.env.allowLocalModels  = true;
 transformers.env.allowRemoteModels = false;
 
-let embeddingModels = config.models.config.sentenceEmbedding || [];
+let embeddingModels = config.models.config["feature-extraction"] || [];
 
 for (let embeddingModel of embeddingModels) {
     for (let dtype of embeddingModel.dtypes) {

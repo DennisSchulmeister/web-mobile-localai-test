@@ -12,7 +12,7 @@
             "languages": ["de", "en", "fr"]
         }
     ],
-    "questionAnswering": [
+    "question-answering": [
         {
             "modelId": "onnx-community/all-MiniLM-L12-v2-qa-all-ONNX",
             "dtypes": ["int8"],
@@ -30,13 +30,13 @@
             }
         }
     ],
-    "sentenceEmbedding": [
+    "feature-extraction": [
         {
             "modelId": "sentence-transformers/all-MiniLM-L6-v2",
             "dtypes": ["fp32"]
         }
     ],
-    "textToSpeach": [
+    "text-to-speech": [
         {
             "modelId": "onnx-community/Supertonic-TTS-ONNX",
             "dtypes": ["fp32"]

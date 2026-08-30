@@ -40,8 +40,8 @@ class TextPageState {
             
             this.currentPage.content = md.stringifyMarkdown(mdAst);
         } catch (error) {
-            console.error(error);
             this.currentPage.content = error.toString();
+            throw error;
         }
     }
 

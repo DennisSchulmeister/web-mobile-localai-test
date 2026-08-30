@@ -32,12 +32,10 @@ KI-Anwendungsfall: Semantische Suche von Textseiten
         navigationState.pageTitle = "Textseite suchen";
     });
 
-    let loadedModel     = $state({modelId: "", dtype: "", device: ""});
-    let status          = $state("initial");
-    let disabled        = $derived(status !== "ready")
+    let working         = $state(false);
+    let disabled        = $derived(working || modelState.loadedModel.status !== "ready")
     let errorMessage    = $state("");
-    let encoder         = undefined;
-    let embeddingPaths  = undefined;
+    let embeddingPaths  = $derived(modelState.embeddingsPaths(modelState.loadedModel.modelId, modelState.loadedModel.dtype));
 
     let query           = $state("");
     let searchAll       = $state(false);
@@ -47,44 +45,15 @@ KI-Anwendungsfall: Semantische Suche von Textseiten
     let stopWatchState  = new StopWatchState();
     let items           = $state([]);
 
-    /**
-     * KI-Modell laden. Da die Modelle sehr groß sind, wird immer nur das zuletzt
-     * geladene Modell im Speicher behalten.
-     * 
-     * @param {string} task Art des Modells
-     * @param {string} modelId Model ID
-     * @param {string} dtype Datentype
-     * @param {string} device Ausführumgebung
-     */
-    async function loadModel({task, modelId, dtype, device} = {}) {
-        try {
-            if (modelId) {
-                status = "loading";
-    
-                encoder = await transformers.pipeline("feature-extraction", modelId, {
-                    dtype:  dtype,
-                    device: device,
-                });
-    
-                loadedModel    = {task, modelId, dtype, device};
-                embeddingPaths = modelState.embeddingsPaths(modelId, dtype);
-                status         = "ready";
-            }    
-        } catch (error) {
-            console.error(error);
-            status = "error";
-            errorMessage = error.toString();
-        }
-    }
-
     async function onSubmit(event) {
         try {
-
             event.preventDefault();
+
             if (!query) return;
+            if (!modelState.loadedModel.status === "ready") return;
+            if (!modelState.loadedModel.task === "feature-extraction") return;
     
-            status = "working";
-    
+            working            = true;
             let indexes        = [];
             let queryEmbedding = [];
             let searchResults  = [];
@@ -102,7 +71,7 @@ KI-Anwendungsfall: Semantische Suche von Textseiten
             stopWatchState.start("Embedding", "bi-text-center");
     
             let queryLower = query.toLowerCase();
-            queryEmbedding = (await encoder(query, {pooling: "mean", normalize: true})).data;
+            queryEmbedding = (await modelState.model(query, {pooling: "mean", normalize: true})).data;
     
             // Index durchsuchen
             stopWatchState.start("Suche", "bi-serch");
@@ -132,7 +101,7 @@ KI-Anwendungsfall: Semantische Suche von Textseiten
                         if (matchText && entry.text.toLowerCase().includes(queryLower)) {
                             fit = 1;
                         } else {
-                            fit = transformers.dot(queryEmbedding, decodeEmbedding(entry.embedding, loadedModel.dtype));
+                            fit = transformers.dot(queryEmbedding, decodeEmbedding(entry.embedding, modelState.loadedModel.dtype));
                         }
     
                         if (fit < modelState.config.semanticSearch.fitThreshold) continue;
@@ -153,8 +122,9 @@ KI-Anwendungsfall: Semantische Suche von Textseiten
             }
     
             searchResults.sort((a, b) => a.fit - b.fit).reverse();
-            status = "ready";
             stopWatchState.stop();
+            
+            working = false;
     
             // Aufbereitung für die Anzeige
             items = [];
@@ -178,21 +148,17 @@ KI-Anwendungsfall: Semantische Suche von Textseiten
                 items.push(item);
             }
         } catch (error) {
-            console.error(error);
             errorMessage = error.toString();
+            working      = false;
+
             stopWatchState.stop();
+            throw error;
         }
     }
 </script>
 
 <Section>
-    <ModelSelector
-        task           = "sentenceEmbedding"
-        status         = {status}
-        errorMessage   = {errorMessage}
-        loadedModel    = {loadedModel}
-        loadModel      = {loadModel}
-    />
+    <ModelSelector task="feature-extraction" disabled={working}/>
 </Section>
 
 <Section>
@@ -214,7 +180,7 @@ KI-Anwendungsfall: Semantische Suche von Textseiten
     </div>
 </Section>
 
-{#if status === "working"}
+{#if working}
     <Section line={false}>
         <progress value={progressValue} max={progressMax}></progress>
     </Section>
