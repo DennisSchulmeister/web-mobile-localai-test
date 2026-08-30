@@ -8,19 +8,19 @@ LICENSE file in the root directory of this source tree.
 
 <!--
 @component
-KI-Anwendungsfall: Translation
+KI-Anwendungsfall: Text to Speach
 -->
 
 <script>
-    import {onMount}         from "svelte";
-    import {navigationState} from "../../../state/Navigation.svelte.js";
+    import {onMount}       from "svelte";
+    import navigationState from "../../../state/NavigationState.svelte.js";
 
     onMount(() => {
-        navigationState.pageTitle = "Text übersetzen";
+        navigationState.pageTitle = "Text vorlesen";
     });
 </script>
 
-<h1>KI-Übersetzung</h1>
+<h1>KI-Sprachausgabe</h1>
 
 <style>
 </style>

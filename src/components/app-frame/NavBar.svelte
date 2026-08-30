@@ -12,7 +12,7 @@ Obere Navigationsleiste
 -->
 
 <script>
-    import {navigationState} from "../../state/Navigation.svelte.js"
+    import navigationState from "../../state/NavigationState.svelte.js"
 </script>
 
 <div id="navbar">

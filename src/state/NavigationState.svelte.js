@@ -10,7 +10,7 @@
  * Inhalte der Navigationsleiste und des Page Footers. Wird in der Datei
  * `router.js` beim Wechsel der Seite mit neuen Werten aktualisiert.
  */
-export const navigationState = $state({
+const navigationState = $state({
     /**
      * Link-URL für den Zurück-Pfeil. Wenn leer, wird der Pfeil ausgeblendet.
      */
@@ -32,3 +32,5 @@ export const navigationState = $state({
      */
     currentSubPage: "",
 });
+
+export default navigationState;

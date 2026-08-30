@@ -12,14 +12,13 @@ Einfaches Auswahlmenü für die anzuzeigende Textseite.
 -->
 
 <script>
-    import {onMount}         from "svelte";
-    import SelectionList     from "../../basic/SelectionList.svelte"
-    import {navigationState} from "../../../state/Navigation.svelte.js";
-    import textPageState     from "../../../state/TextPage.svelte.js";
+    import {onMount}       from "svelte";
+    import SelectionList   from "../../basic/SelectionList.svelte"
+    import navigationState from "../../../state/NavigationState.svelte.js";
+    import textPageState   from "../../../state/TextPageState.svelte.js";
 
     onMount(async () => {
         navigationState.pageTitle = "Textseite auswählen";
-        await textPageState.reloadCategories();
     });
 
     let items = $derived.by(() => {

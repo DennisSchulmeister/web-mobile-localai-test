@@ -12,7 +12,7 @@ Container für die Fußzeile einer Seite
 -->
 
 <script>
-    import {navigationState} from "../../state/Navigation.svelte.js";
+    import navigationState from "../../state/NavigationState.svelte.js";
 </script>
 
 <footer>

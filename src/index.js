@@ -9,10 +9,13 @@
 import {mount}           from "svelte";
 
 import ApplicationFrame  from "./components/app-frame/ApplicationFrame.svelte";
-import ModelState        from "./state/Model.svelte.js";
+import modelState        from "./state/ModelState.svelte.js";
+import textPageState     from "./state/TextPageState.svelte.js";
 
 import "@picocss/pico/css/pico.css";
 import "bootstrap-icons/font/bootstrap-icons.min.css";
 
-await ModelState.reloadModelConfiguration();
+await modelState.reloadModelConfiguration();
+await textPageState.reloadCategories();
+
 mount(ApplicationFrame, {target: document.body});

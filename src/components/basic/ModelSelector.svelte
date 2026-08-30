@@ -14,7 +14,7 @@ Auswahl eines KI-Modells
 <script>
     import IconText   from "../basic/IconText.svelte";
     import Loading    from "../basic/Loading.svelte";
-    import modelState from "../../state/Model.svelte.js";
+    import modelState from "../../state/ModelState.svelte.js";
 
     let {
         task         = "",               // Schlüsselwert aus `models/index.json`

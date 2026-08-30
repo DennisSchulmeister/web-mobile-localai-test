@@ -12,8 +12,8 @@ KI-Anwendungsfall: Question Answering
 -->
 
 <script>
-    import {onMount}         from "svelte";
-    import {navigationState} from "../../../state/Navigation.svelte.js";
+    import {onMount}       from "svelte";
+    import navigationState from "../../../state/NavigationState.svelte.js";
 
     onMount(() => {
         navigationState.pageTitle = "Fragen beantworten";

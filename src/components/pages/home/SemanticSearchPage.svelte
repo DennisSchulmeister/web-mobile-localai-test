@@ -18,8 +18,8 @@ KI-Anwendungsfall: Semantische Suche von Textseiten
     import ModelSelector     from "../../basic/ModelSelector.svelte"
     import Section           from "../../basic/Section.svelte";
     import StopWatch         from "../../basic/StopWatch.svelte";
-    import modelState        from "../../../state/Model.svelte";
-    import {navigationState} from "../../../state/Navigation.svelte.js";
+    import modelState        from "../../../state/ModelState.svelte";
+    import navigationState   from "../../../state/NavigationState.svelte.js";
     import {decodeEmbedding} from "../../../../shared/embedding.js";
 
     onMount(() => {

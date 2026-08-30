@@ -12,10 +12,10 @@ Inhalt einer Textseite
 -->
 
 <script>
-    import MarkdownIt        from 'markdown-it'
-    import {onMount}         from "svelte";
-    import {navigationState} from "../../../state/Navigation.svelte.js";
-    import textPageState     from "../../../state/TextPage.svelte.js";
+    import MarkdownIt      from 'markdown-it'
+    import {onMount}       from "svelte";
+    import navigationState from "../../../state/NavigationState.svelte.js";
+    import textPageState   from "../../../state/TextPageState.svelte.js";
 
     onMount(() => {
         navigationState.pageTitle = "Text anzeigen";

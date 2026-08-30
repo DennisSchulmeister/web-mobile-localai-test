@@ -14,13 +14,13 @@ Auswgeählte Textseite
 <script>
     import {onMount}         from "svelte";
     
-    import QuestionAnswering from "./textpage/QuestionAnswering.svelte";
-    import Summary           from "./textpage/Summary.svelte";
-    import TextPageContent   from "./textpage/TextPageContent.svelte";
-    import TextToSpeach      from "./textpage/TextToSpeach.svelte";
-    import Translation       from "./textpage/Translation.svelte";
-    import {navigationState} from "../../state/Navigation.svelte.js";
-    import textPageState     from "../../state/TextPage.svelte.js";
+    import QuestionAnsweringPage from "./textpage/QuestionAnsweringPage.svelte";
+    import SummaryPage           from "./textpage/SummaryPage.svelte";
+    import TextContentPage       from "./textpage/TextContentPage.svelte";
+    import TextToSpeachPage      from "./textpage/TextToSpeachPage.svelte";
+    import TranslationPage       from "./textpage/TranslationPage.svelte";
+    import navigationState       from "../../state/NavigationState.svelte.js";
+    import textPageState         from "../../state/TextPageState.svelte.js";
 
     let {params = []} = $props()
     let textPageId = $derived(params[1]);
@@ -71,15 +71,15 @@ Auswgeählte Textseite
 
 <div id="page">
     {#if subPageId === "content"}
-        <TextPageContent/>
+        <TextContentPage/>
     {:else if subPageId === "summary"}
-        <Summary/>
+        <SummaryPage/>
     {:else if subPageId === "qa"}
-        <QuestionAnswering/>
+        <QuestionAnsweringPage/>
     {:else if subPageId === "translation"}
-        <Translation/>
+        <TranslationPage/>
     {:else if subPageId === "tts"}
-        <TextToSpeach/>
+        <TextToSpeachPage/>
     {/if}
 </div>
 

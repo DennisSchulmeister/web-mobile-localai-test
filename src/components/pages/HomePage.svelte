@@ -12,10 +12,10 @@ Startseite mit Auswahl und Suche von Textseiten.
 -->
 
 <script>
-    import {onMount}         from "svelte";
-    import ChoosePage        from "./home/ChoosePage.svelte";
-    import SemanticSearch    from "./home/SemanticSearch.svelte";
-    import {navigationState} from "../../state/Navigation.svelte.js";
+    import {onMount}          from "svelte";
+    import ChoosePage         from "./home/ChoosePage.svelte";
+    import SemanticSearchPage from "./home/SemanticSearchPage.svelte";
+    import navigationState    from "../../state/NavigationState.svelte.js";
 
     let {params = []} = $props()
     let subPageId = $derived(params[1] || "overview");
@@ -48,7 +48,7 @@ Startseite mit Auswahl und Suche von Textseiten.
     {#if subPageId === "overview"}
         <ChoosePage/>
     {:else if subPageId === "search"}
-        <SemanticSearch/>
+        <SemanticSearchPage/>
     {/if}
 </div>
 

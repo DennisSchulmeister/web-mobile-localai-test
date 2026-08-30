@@ -6,16 +6,14 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import {router}          from "svelte-spa-router";
-import {wrap}            from "svelte-spa-router/wrap";
-import {navigationState} from "../state/Navigation.svelte.js";
+import {wrap} from "svelte-spa-router/wrap";
 
 const routes = new Map();
 export default routes;
 
 // Home mit Unterseiten
 routes.set(/^\/(search)?$/, wrap({
-    asyncComponent: () => import("./pages/Home.svelte"),
+    asyncComponent: () => import("./pages/HomePage.svelte"),
 }));
 
 // Textseite mit Unterseiten
@@ -25,5 +23,5 @@ routes.set(/^\/page\/(.*)\/(content|summary|qa|translation|tts)$/, wrap({
 
 // Fehler 404
 routes.set("*", wrap({
-    asyncComponent: () => import("./pages/NotFound.svelte"),
+    asyncComponent: () => import("./pages/NotFoundPage.svelte"),
 }));
