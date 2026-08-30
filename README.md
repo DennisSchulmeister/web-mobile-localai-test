@@ -235,7 +235,7 @@ Lessons Learned
 Copyright
 ---------
 
-**Web/Mobile-Test für lokale KI**
-**© 2026 Dennis Schulmeister-Zimolong <[dennis@wpvs.de](mailto:dennis@wpvs.de)>** <br>
+**Web/Mobile-Test für lokale KI** <br>
+© 2026 Dennis Schulmeister-Zimolong <[dennis@wpvs.de](mailto:dennis@wpvs.de)> <br>
 [Quellcode Lizenziert unter BSD 3-Clause](.LICENCE) <br>
 Beispieldaten lizenziert unter CC-BY 4.0, http://creativecommons.org/licenses/by/4.0/
