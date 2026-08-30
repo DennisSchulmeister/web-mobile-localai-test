@@ -38,20 +38,46 @@ export function encodeEmbedding(embedding, dtype) {
  * @returns {TypedArray} Embeddings im plattform-spezifischen Format
  */
 export function decodeEmbedding(base64, dtype) {
-    let bytes = Uint8Array.fromBase64(base64);
-    let view  = new DataView(bytes.buffer);
-
-    switch (dtype) {
-        case "fp32": {
-            let embedding = new Float32Array(bytes.length / 4);
-        
-            for (let i = 0; i < embedding.length; i++) {
-                embedding[i] = view.getFloat32(i * 4, true);
+    if (Uint8Array.fromBase64) {
+        // Neuere Browser
+        let bytes = Uint8Array.fromBase64(base64);
+        let view  = new DataView(bytes.buffer);
+    
+        switch (dtype) {
+            case "fp32": {
+                let embedding = new Float32Array(bytes.length / 4);
+            
+                for (let i = 0; i < embedding.length; i++) {
+                    embedding[i] = view.getFloat32(i * 4, true);
+                }
+            
+                return embedding;
             }
-        
-            return embedding;
+            default:
+                throw new Error(`Einbettung mit Datentyp ${dtype} kann nicht decodiert werden.`);
         }
-        default:
-            throw new Error(`Einbettung mit Datentyp ${dtype} kann nicht decodiert werden.`);
+    } else {
+        // Android Webview auf Geräten vor 2026
+        let binary = atob(base64);
+        let bytes  = new Uint8Array(binary.length);
+        let view   = new DataView(bytes.buffer);
+
+        for (let i = 0; i < bytes.length; i++) {
+            bytes[i] = binary.charCodeAt(i);
+        }
+
+        switch (dtype) {
+            case "fp32": {
+                let embedding = new Float32Array(bytes.length / 4);
+
+                for (let i = 0; i < embedding.length; i++) {
+                    embedding[i] = view.getFloat32(i * 4, true);
+                }
+
+                return embedding;
+            }
+            default:
+                throw new Error(`Einbettung mit Datentyp ${dtype} kann nicht decodiert werden.`);
+        }
     }
 }

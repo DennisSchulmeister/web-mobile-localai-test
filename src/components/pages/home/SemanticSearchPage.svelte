@@ -15,14 +15,17 @@ KI-Anwendungsfall: Semantische Suche von Textseiten
     import * as transformers from '@huggingface/transformers';
     import {onMount}         from "svelte";
 
+    import IconText          from "../../basic/IconText.svelte";
     import ModelSelector     from "../../basic/ModelSelector.svelte"
     import Section           from "../../basic/Section.svelte";
     import SelectionList     from "../../basic/SelectionList.svelte";
     import StopWatch         from "../../basic/StopWatch.svelte";
+
     import modelState        from "../../../state/ModelState.svelte";
     import navigationState   from "../../../state/NavigationState.svelte.js";
     import StopWatchState    from "../../../state/StopWatchState.svelte.js";
     import textPageState     from "../../../state/TextPageState.svelte.js";
+
     import {decodeEmbedding} from "../../../../shared/embedding.js";
 
     onMount(() => {
@@ -71,102 +74,109 @@ KI-Anwendungsfall: Semantische Suche von Textseiten
     });
 
     async function onSubmit(event) {
-        event.preventDefault();
-        if (!query) return;
+        try {
 
-        status = "working";
-
-        let indexes        = [];
-        let queryEmbedding = [];
-        let searchResults  = [];
-
-        // Indexdateien herunterladen
-        stopWatchState.start("Download", "bi-download");
-
-        indexes.push(await(await fetch(embeddingPaths.keywords)).json());
-
-        if (searchAll) {
-            indexes.push(await(await fetch(embeddingPaths.sentences)).json());
-        }
-
-        // Einbettung des Suchbegriffs berechnen
-        stopWatchState.start("Embedding", "bi-text-center");
-
-        let queryLower = query.toLowerCase();
-        queryEmbedding = (await encoder(query, {pooling: "mean", normalize: true})).data;
-
-        // Index durchsuchen
-        stopWatchState.start("Suche", "bi-serch");
-
-        progressMax = 0;
-
-        for (let index of indexes) {            
-            for (let file in index) {
-                progressMax += index[file].length;
+            event.preventDefault();
+            if (!query) return;
+    
+            status = "working";
+    
+            let indexes        = [];
+            let queryEmbedding = [];
+            let searchResults  = [];
+    
+            // Indexdateien herunterladen
+            stopWatchState.start("Download", "bi-download");
+    
+            indexes.push(await(await fetch(embeddingPaths.keywords)).json());
+    
+            if (searchAll) {
+                indexes.push(await(await fetch(embeddingPaths.sentences)).json());
             }
-        }
-
-        for (let index of indexes) {
-            for (let file in index) {
-                let existingResult = true;
-                let searchResult   = searchResults.find(e => e.file === file);
-
-                if (!searchResult) {
-                    existingResult = false;
-                    searchResult   = {file, title: "", fit: 0, texts: []};
+    
+            // Einbettung des Suchbegriffs berechnen
+            stopWatchState.start("Embedding", "bi-text-center");
+    
+            let queryLower = query.toLowerCase();
+            queryEmbedding = (await encoder(query, {pooling: "mean", normalize: true})).data;
+    
+            // Index durchsuchen
+            stopWatchState.start("Suche", "bi-serch");
+    
+            progressMax = 0;
+    
+            for (let index of indexes) {            
+                for (let file in index) {
+                    progressMax += index[file].length;
                 }
-
-                for (let entry of index[file]) {
-                    progressValue += 1;
-                    let fit = 0;
-
-                    if (matchText && entry.text.toLowerCase().includes(queryLower)) {
-                        fit = 1;
-                    } else {
-                        fit = transformers.dot(queryEmbedding, decodeEmbedding(entry.embedding, loadedModel.dtype));
+            }
+    
+            for (let index of indexes) {
+                for (let file in index) {
+                    let existingResult = true;
+                    let searchResult   = searchResults.find(e => e.file === file);
+    
+                    if (!searchResult) {
+                        existingResult = false;
+                        searchResult   = {file, title: "", fit: 0, texts: []};
                     }
-
-                    if (fit < modelState.config.semanticSearch.fitThreshold) continue;
-
-                    searchResult.fit = Math.max(searchResult.fit, fit);
-                    searchResult.texts.push({text: entry.text, fit});
+    
+                    for (let entry of index[file]) {
+                        progressValue += 1;
+                        let fit = 0;
+    
+                        if (matchText && entry.text.toLowerCase().includes(queryLower)) {
+                            fit = 1;
+                        } else {
+                            fit = transformers.dot(queryEmbedding, decodeEmbedding(entry.embedding, loadedModel.dtype));
+                        }
+    
+                        if (fit < modelState.config.semanticSearch.fitThreshold) continue;
+    
+                        searchResult.fit = Math.max(searchResult.fit, fit);
+                        searchResult.texts.push({text: entry.text, fit});
+                    }
+    
+                    searchResult.texts.sort((a, b) => a.fit - b.fit).reverse();
+    
+                    if (searchResult.fit > 0 && !existingResult) {
+                        let textPage = textPageState.findTextPage(file);
+                        searchResult.title = textPage.title || file;
+    
+                        searchResults.push(searchResult);
+                    }
                 }
-
-                searchResult.texts.sort((a, b) => a.fit - b.fit).reverse();
-
-                if (searchResult.fit > 0 && !existingResult) {
-                    let textPage = textPageState.findTextPage(file);
-                    searchResult.title = textPage.title || file;
-
-                    searchResults.push(searchResult);
+            }
+    
+            searchResults.sort((a, b) => a.fit - b.fit).reverse();
+            status = "ready";
+            stopWatchState.stop();
+    
+            // Aufbereitung für die Anzeige
+            items = [];
+    
+            for (let searchResult of searchResults) {
+                let item = {
+                    type:  "link",
+                    text:  searchResult.title,
+                    extra: `${Math.round(searchResult.fit * 100)}%`,
+                    href:  textPageState.getTextPageUrl(searchResult.file),
+                    lines: [],
                 }
+    
+                for (let text of searchResult.texts) {
+                    item.lines.push({
+                        text:  text.text,
+                        extra: `${Math.round(text.fit * 100)}%`,
+                    });
+                }
+    
+                items.push(item);
             }
-        }
-
-        searchResults.sort((a, b) => a.fit - b.fit).reverse();
-        status = "ready";
-        stopWatchState.stop();
-
-        // Aufbereitung für die Anzeige
-        items = [];
-
-        for (let searchResult of searchResults) {
-            let item = {
-                type:  "link",
-                text:  searchResult.title,
-                extra: `${Math.round(searchResult.fit * 100)}%`,
-                href:  textPageState.getTextPageUrl(searchResult.file),
-                lines: [],
-            }
-
-            for (let text of searchResult.texts) {
-                item.lines.push({
-                    text:  text.text,
-                    extra: `${Math.round(text.fit * 100)}%`,
-                });
-            }
-
-            items.push(item);
+        } catch (error) {
+            console.error(error);
+            errorMessage = error.toString();
+            stopWatchState.stop();
         }
     }
 </script>
@@ -211,6 +221,10 @@ KI-Anwendungsfall: Semantische Suche von Textseiten
 {/if}
 
 <Section line={false}>
+    {#if errorMessage}
+        <IconText type="error" text={errorMessage}/>
+    {/if}
+
     <StopWatch measurements={stopWatchState.measurements}/>
 </Section>
 

@@ -60,7 +60,7 @@ Auswahl eines KI-Modells
         {#if status === "loading"}
             <Loading text="Modell wird geladen"/>
         {:else if status === "error"}
-            <IconText icon="bi-exclamation-circle-fill" text={errorMessage} iconColor="crimson" textColor="darkred"/>
+            <IconText type="error" text={errorMessage}/>
         {:else if !loadedModel.modelId}
             <IconText text="Es wurde noch kein Modell geladen." textColor="darkgrey"/>
         {:else}

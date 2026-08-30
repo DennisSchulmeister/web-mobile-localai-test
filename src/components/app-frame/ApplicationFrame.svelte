@@ -34,7 +34,7 @@ SPA-Routing ermöglicht.
 
 <style>
     :global(html) {
-        height: 100%;
+        min-height: 100%;
         margin: 0;
         background-image: linear-gradient(to right top, #6bb2d1, #6bb1d7, #6eafdc, #73ade0, #7aabe4, #77aae4, #73a9e4, #70a8e4, #5ea8e1, #4aa8dd, #34a8d7, #13a7d1);
 

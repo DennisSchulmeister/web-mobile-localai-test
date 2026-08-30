@@ -119,6 +119,13 @@ für Sentency Similarity und Question Answering verwendet werden.
 Lessons Learned
 ---------------
 
+### Web-Plattform
+
+* `Uint8Array.fromBase64()` wird von der Android Webview noch nicht durchgängig unterstützt.
+  Älteren Geräte, die seit einem Jahr keine Updates mehr erhalten haben (eine Pest im Android-Ökosystem!)
+  fehlen die Base64-Methoden, so dass hier auf eine kompliziertere Implementierung ausgewichen
+  werden muss.
+
 ### transformers.js und HuggingFace
 
 * transformers.js benötigt die Modelle im ONNX-Format, da es sich um Grunde genommen um

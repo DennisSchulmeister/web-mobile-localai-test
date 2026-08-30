@@ -13,11 +13,32 @@ Icon mit Text
 
 <script>
     let {
+        type      = "",         // empty, "error", "warning", "info"
         icon      = "",
         text      = "",
         iconColor = "",
         textColor = "",
     } = $props();
+
+    $effect(() => {
+        switch (type) {
+            case "error":
+                icon      = "bi-x-circle-fill";
+                iconColor = "crimson";
+                textColor = "darkred";
+                break;
+            case "warning":
+                icon      = "bi-exclamation-circle-fill";
+                iconColor = "darkorange";
+                textColor = "goldenrod";
+                break;
+            case "info":
+                icon      = "bi-info-circle-fill";
+                iconColor = "darkblue";
+                textColor = "darkslateblue";
+                break;
+        }
+    })
 </script>
 
 <span class="iconText">
