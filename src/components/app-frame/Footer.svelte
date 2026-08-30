@@ -12,13 +12,20 @@ Container für die Fußzeile einer Seite
 -->
 
 <script>
+    import {replace}       from "svelte-spa-router";
     import navigationState from "../../state/NavigationState.svelte.js";
+
+    function onLinkClicked(event) {
+        event.preventDefault();
+        let [_, anchor] = event.target.href.split("#");
+        replace(anchor);
+    }
 </script>
 
 <footer>
     {#each navigationState.subPages as subPage}
         <div class="footerItem {navigationState.currentSubPage === subPage.id ? 'active' : ''}">
-            <a href="{subPage.url}" aria-label="{subPage.label}"></a>
+            <a href="{subPage.url}" aria-label="{subPage.label}" onclick={onLinkClicked}></a>
             <div class="icon {subPage.icon}"></div>
             <div class="label">{subPage.label}</div>
         </div>
