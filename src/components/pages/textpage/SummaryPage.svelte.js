@@ -24,7 +24,7 @@ class SummaryPageState {
 
     answer          = $derived(textPageState.currentPage.file ? "" : "");
     minTokens       = $state(10);
-    maxTokens       = $derived(textPageState.wordCount * 3);
+    maxTokens       = $derived(textPageState.wordCount);
     maxNewTokens    = $derived(this.maxTokens * 0.5);
 
     /**
