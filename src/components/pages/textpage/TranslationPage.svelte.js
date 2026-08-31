@@ -22,7 +22,7 @@ class TranslationPageState {
     errorMessage    = $state("");
     stopWatchState  = new StopWatchState();
 
-    result          = $state("");
+    result          = $derived(textPageState.currentPage.file ? "" : "");
 
     /**
      * Text übersetzen

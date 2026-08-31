@@ -23,7 +23,7 @@ class QuestionAnsweringPageState {
     stopWatchState  = new StopWatchState();
 
     query           = $state("");
-    answer          = $state("");
+    answer          = $derived(textPageState.currentPage.file ? "" : "");
 
     /**
      * Eingegebene Frage beantworten

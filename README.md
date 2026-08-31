@@ -8,6 +8,7 @@ Web/Mobile-Test für lokale KI
 1. [Künftige Web APIs](#künftige-web-apis)
 1. [Weitere Ideen](#weitere-ideen)
 1. [Lessons Learned](#lessons-learned)
+1. [Fazit](#fazit)
 1. [Copyright](#copyright)
 
 Beschreibung
@@ -300,6 +301,30 @@ Lessons Learned
   unsinnige Artefakte (falsche Wortfetzen mit technischen Begriffen ohne Bezug zum Kontext)
   ein, die vermutlich in den Trainingsdaten enthalten waren. Dadurch wird die Lesbarkeit
   deutlich gestört.
+
+Fazit
+----
+
+Kleinere Anwendungsfälle, die mit Modellen zwischen 300 und 500 MB auskommen, lassen sich
+auf mobilen Geräten innerhalb einer Webawendung lokal ausführen. Allerdings nur mit
+Einschränkungen:
+
+* Es funktioniert nicht mit jedem Browser. Chrome hat bisher am besten funktioniert.
+  Firefox am schlechtesten (Abstürze, keine WASM SIMD-Unterstützen auf älteren Geräten, ... ).
+
+* WebGPU war auf keinem der getesteten, mobilen Geräte verfügbar, obwohl es laut
+  [Can I Use](https://caniuse.com/?search=webgpu) ab Chrome für Android 151 unterstützt
+  werden sollte.
+
+* Speicher ist sehr knapp. Mehrere Modelle können daher nicht praktikabel im Speicher
+  gehalten werden, sondern die Modelle regelmäßig neu geladen werden. Neben der Wartezeit
+  erhöht dies auch den Traffic.
+
+* Der Browser friert ein, während ein Modell ausgeführt wird. Es findet kein Rendering
+  und somit auch keine Aktualisierung der Anzeige statt, während ein Modell läuft.
+
+* Dadurch, dass nur sehr kleine Modelle ausführbar sind, lassen sich auch keine
+  Anwendungsfälle lokale umsetzen, die man heute mit einem LLM assoziieren würde.
 
 Copyright
 ---------
