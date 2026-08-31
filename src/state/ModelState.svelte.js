@@ -31,7 +31,8 @@ class ModelState {
         dtype:   "",            // Datentyp
         device:  "",            // Ausführumgebung
         status:  "not-loaded",  // "not-loaded", "loading", "ready", "error"
-        message: "",            // Fehlermeldung bei status "error"
+        message: "",            // Fehlermeldung bei status "error",
+        config:  {},            // JSON-Konfiguration aus der Datei `models.json`
     });
 
     /**
@@ -98,6 +99,7 @@ class ModelState {
                 this.loadedModel.dtype   = dtype;
                 this.loadedModel.device  = device;
                 this.loadedModel.status  = "ready";
+                this.loadedModel.config  = this.models[task].find(e => e.modelId === modelId);
             }
         } catch (error) {
             this.loadedModel.status  = "error";

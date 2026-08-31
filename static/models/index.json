@@ -1,7 +1,11 @@
 {
     "summarization": [
         {
-            "modelId": "onnx-community/text_summarization-ONNX",
+            "modelId": "onnx-community/t5-small-german-ONNX",
+            "dtypes": ["int8"]
+        },
+        {
+            "modelId": "onnx-community/bart-german-ONNX",
             "dtypes": ["int8"]
         }
     ],

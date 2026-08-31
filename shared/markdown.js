@@ -31,6 +31,7 @@ export function parseMarkdown(mdText) {
  * 
  * - Hierfür werden alle Formatierungen für Fett und Kursiv entfernt.
  * - Links werden durch ihren Text ersetzt.
+ * - Überschriften werden durch Absätze ersetzt.
  * - Bilder, Tabellen, Codeblöcke und HTML-Blöcke werden entfernt.
  * 
  * @param {object} mdAst Syntaxbaum des Dokuments
@@ -39,19 +40,30 @@ export function parseMarkdown(mdText) {
 export function simplifyMarkdown(mdAst) {
     remove(mdAst, ["code", "definition", "html", "image", "imageReference", "thematicBreack"]);
 
-    if (["strong", "emphasis", "link", "linkReference"].includes(mdAst.type)) {
-        mdAst.value    = toString(mdAst);
-        mdAst.type     = "text";
-        mdAst.children = [];
+    function _simplify(node) {
+        if (["strong", "emphasis", "link", "linkReference"].includes(mdAst.type)) {
+            node.value    = toString(node);
+            node.type     = "text";
+            node.children = [];
+    
+            delete node.title;
+            delete node.url;
+            delete node.identifier;
+            delete node.label;
+            delete node.referenceType;
+        } else if (node.type === "heading") {
+            node.type = "paragraph";
+            delete node.depth;
+        }
 
-        delete mdAst.title;
-        delete mdAst.url;
-        delete mdAst.identifier;
-        delete mdAst.label;
-        delete mdAst.referenceType;
+        for (let child of node.children || []) {
+            _simplify(child);
+        }
+
+        return node;
     }
 
-    return mdAst;
+    return _simplify(mdAst);
 }
 
 /**

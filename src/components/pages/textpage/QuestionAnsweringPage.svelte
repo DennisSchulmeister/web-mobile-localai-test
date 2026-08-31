@@ -15,15 +15,74 @@ KI-Anwendungsfall: Question Answering
     import MarkdownIt      from 'markdown-it'
     import {onMount}       from "svelte";
 
+    import IconText        from "../../basic/IconText.svelte";
+    import Loading         from "../../basic/Loading.svelte";
+    import ModelSelector   from "../../basic/ModelSelector.svelte";
+    import Section         from "../../basic/Section.svelte";
+    import StopWatch       from "../../basic/StopWatch.svelte";
+
     import navigationState from "../../../state/NavigationState.svelte.js";
     import state           from "./QuestionAnsweringPage.svelte.js";
+
+    let md = new MarkdownIt();
+    let htmlAnswer = $derived(md.render(state.answer));
 
     onMount(() => {
         navigationState.pageTitle = "Fragen beantworten";
     });
+
+    async function onExecuteClicked() {
+        await state.execute();
+    }
 </script>
 
-<h1>KI-Antworten</h1>
+<Section>
+    <ModelSelector task="question-answering" disabled={state.working}/>
+</Section>
+
+<Section>
+    Optionen
+
+    <!--
+    <form role="search" onsubmit={onSubmit}>
+        <input type="search" placeholder="Suchbegriff" bind:value={state.query} disabled={state.disabled}/>
+        <input type="submit" value="Suchen" disabled={state.disabled || !state.query}/>
+    </form>
+
+    <div class="options">
+        <label>
+            <input type="checkbox" role="switch" bind:checked={state.searchAll} disabled={state.disabled}/>
+            Volltextsuche
+        </label>
+    
+        <label>
+            <input type="checkbox" role="switch" bind:checked={state.matchText} disabled={state.disabled}/>
+            Direkter Textvergleich
+        </label>
+    </div>
+    -->
+</Section>
+
+{#if state.working}
+    <Section line={true}>
+        <Loading text="Antwort wird generiert"/>
+    </Section>
+{:else if state.answer}
+    <Section line={true}>
+        {@html htmlAnswer}
+    </Section>
+{/if}
+
+<Section line={false}>
+    {#if state.errorMessage}
+        <IconText type="error" text={state.errorMessage}/>
+    {/if}
+
+    <StopWatch measurements={state.stopWatchState.measurements}/>
+</Section>
 
 <style>
+    /* label {
+        margin: 0;
+    }    */
 </style>

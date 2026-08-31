@@ -80,7 +80,7 @@ export default class StopWatchState {
         });
 
         if (!this.#intervalId) {
-            this.#intervalId = window.setInterval(this.#updateCurrentMeasurment.bind(this), this.interval);
+            this.#intervalId = window.setInterval(() => this.#updateCurrentMeasurment(), this.interval);
         }
     }
 

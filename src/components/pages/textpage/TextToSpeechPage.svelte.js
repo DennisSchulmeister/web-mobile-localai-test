@@ -6,8 +6,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import * as transformers from '@huggingface/transformers';
-
 import modelState        from "../../../state/ModelState.svelte";
 import StopWatchState    from "../../../state/StopWatchState.svelte.js";
 import textPageState     from "../../../state/TextPageState.svelte.js";
@@ -22,15 +20,11 @@ class TextToSpeachPageState {
     errorMessage    = $state("");
     stopWatchState  = new StopWatchState();
 
-    query           = $state("");
-    answer          = $state("");
-
     /**
-     * Eingegebene Frage beantworten
+     * Sprachausgabe generieren
      */
-    async answerQuestion() {
+    async execute() {
         try {
-            if (!this.query) return;
             if (!modelState.loadedModel.status === "ready") return;
             if (!modelState.loadedModel.task === "text-to-speech") return;
     

@@ -6,7 +6,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import * as transformers from '@huggingface/transformers';
+import {TextStreamer}    from "@huggingface/transformers";
 
 import modelState        from "../../../state/ModelState.svelte";
 import StopWatchState    from "../../../state/StopWatchState.svelte.js";
@@ -22,20 +22,24 @@ class TranslationPageState {
     errorMessage    = $state("");
     stopWatchState  = new StopWatchState();
 
-    query           = $state("");
-    answer          = $state("");
+    result          = $state("");
 
     /**
-     * Eingegebene Frage beantworten
+     * Text übersetzen
      */
-    async answerQuestion() {
+    async execute() {
         try {
-            if (!this.query) return;
             if (!modelState.loadedModel.status === "ready") return;
             if (!modelState.loadedModel.task === "translation") return;
     
             this.stopWatchState.start("Antwort", "bi-pen");
-            this.working = true;
+
+            this.result       = true;
+            this.answer       = "";
+            this.errorMessage = "";
+
+            // Kleine Pause, damit wenigstens der Loading-State im UI erscheint!
+            await new Promise(resolve => window.setTimeout(resolve, 500));
 
             // TODO
 

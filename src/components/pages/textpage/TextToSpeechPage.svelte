@@ -14,15 +14,72 @@ KI-Anwendungsfall: Text to Speach
 <script>
     import {onMount}       from "svelte";
 
+    import IconText        from "../../basic/IconText.svelte";
+    import Loading         from "../../basic/Loading.svelte";
+    import ModelSelector   from "../../basic/ModelSelector.svelte";
+    import Section         from "../../basic/Section.svelte";
+    import StopWatch       from "../../basic/StopWatch.svelte";
+
     import navigationState from "../../../state/NavigationState.svelte.js";
     import state           from "./TextToSpeechPage.svelte.js";
 
     onMount(() => {
         navigationState.pageTitle = "Text vorlesen";
     });
+
+    async function onExecuteClicked() {
+        await state.execute();
+    }
 </script>
 
-<h1>KI-Sprachausgabe</h1>
+<Section>
+    <ModelSelector task="text-to-speech" disabled={state.working}/>
+</Section>
+
+<Section>
+    Optionen
+    <!--
+    <form role="search" onsubmit={onSubmit}>
+        <input type="search" placeholder="Suchbegriff" bind:value={state.query} disabled={state.disabled}/>
+        <input type="submit" value="Suchen" disabled={state.disabled || !state.query}/>
+    </form>
+
+    <div class="options">
+        <label>
+            <input type="checkbox" role="switch" bind:checked={state.searchAll} disabled={state.disabled}/>
+            Volltextsuche
+        </label>
+    
+        <label>
+            <input type="checkbox" role="switch" bind:checked={state.matchText} disabled={state.disabled}/>
+            Direkter Textvergleich
+        </label>
+    </div>
+    -->
+</Section>
+
+<Section line={false}>
+    Antwort
+
+    {#if state.working}
+        <Loading text="Audio wird generiert"/>
+    <!--
+    {:else if state.answer}
+        {@html htmlAnswer}
+    -->
+    {/if}
+</Section>
+
+<Section line={false}>
+    {#if state.errorMessage}
+        <IconText type="error" text={state.errorMessage}/>
+    {/if}
+
+    <StopWatch measurements={state.stopWatchState.measurements}/>
+</Section>
 
 <style>
+    /* label {
+        margin: 0;
+    }    */
 </style>

@@ -7,7 +7,6 @@
  */
 
 import fs                  from "node:fs/promises";
-import path                from "node:path";
 import process             from "node:process";
 import {SentenceTokenizer} from "natural/lib/natural/tokenizers/index.js";
 import {toString}          from "mdast-util-to-string";

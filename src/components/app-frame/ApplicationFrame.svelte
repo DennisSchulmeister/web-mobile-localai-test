@@ -77,6 +77,10 @@ SPA-Routing ermöglicht.
         word-wrap: break-word;
     }
 
+    :global(label) {
+        font-size: 85%;
+    }
+
     @media (min-width: 38em) {
         :global(body) {
             padding: 2em;

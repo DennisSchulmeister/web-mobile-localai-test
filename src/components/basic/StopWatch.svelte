@@ -16,15 +16,15 @@ UI-Komponente zur Darstellung eines `StopWatchState`.
 </script>
 
 <div class="measurements">
-    {#each measurements as measurment}
+    {#each measurements as measurement}
         <div class="measurement">
-            <span class="bi {measurment.icon || ''}"></span>
+            <span class="bi {measurement.icon || ''}"></span>
             
-            {#if measurment.name}
-                <span>{measurment.name}:</span>
+            {#if measurement.name}
+                <span>{measurement.name}:</span>
             {/if}
 
-            <span class="value">{measurment.formatted}</span>
+            <span class="value">{measurement.formatted}</span>
         </div>
     {/each}
 </div>

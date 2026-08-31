@@ -22,7 +22,7 @@ Auswahl eines KI-Modells
     } = $props();
 
     let text_device = {
-        "":       "WASM",
+        "wasm":   "WASM",
         "webgpu": "WebGPU",
         "webnn":  "WebNN"
     };
@@ -31,9 +31,9 @@ Auswahl eines KI-Modells
     let selected_index      = $derived(modelState.models[task]?.findIndex(e => e.modelId === selected_modelId));
     let selected_dtypes     = $derived(modelState.models[task]?.[selected_index]?.dtypes || []);
     let selected_dtype      = $derived(modelState.models[task]?.[selected_index]?.dtypes?.[0] || "");
-    let selected_device     = $state(navigator.ml ? "webnn" : navigator.gpu ? "webgpu" : "");
+    let selected_device     = $state(navigator.ml ? "webnn" : navigator.gpu ? "webgpu" : "wasm");
     let loaded_device_text  = $derived(text_device[modelState.loadedModel.device])
-    let loaded_device_color = $derived(modelState.loadedModel.device === "" ? "darkred" : "darkgreen");
+    let loaded_device_color = $derived(modelState.loadedModel.device === "wasm" ? "darkred" : "darkgreen");
 
     async function onLoadClicked() {
         await modelState.loadModel({
@@ -105,7 +105,7 @@ Auswahl eines KI-Modells
                 <label>
                     <span>Ausführumgebung</span>
                     <select bind:value={selected_device} {disabled}>
-                        <option value="">{text_device[""]}</option>
+                        <option value="wasm">{text_device["wasm"]}</option>
 
                         {#if navigator.gpu}
                             <option value="webgpu">{text_device["webgpu"]}</option>
@@ -125,10 +125,6 @@ Auswahl eines KI-Modells
 <style>
     details, fieldset {
         margin-bottom: 0;
-    }
-
-    label {
-        font-size: 85%;
     }
 
     .loadedModel {

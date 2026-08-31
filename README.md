@@ -129,10 +129,6 @@ von Machine-Learning-Modellen. Dies könnte sich aber künftig ändern:
 Weitere Ideen
 -------------
 
-Eventuell könnte es sinnvoll sein, ein besseres Modell für Zusammenfassungen zu verwenden.
-[deutsche-telekom/mt5-small-sum-de-en-v1](https://huggingface.co/deutsche-telekom/mt5-small-sum-de-en-v1)
-würde sich anbieten, müsste aber noch [in das ONXX-Format konvertiert](https://huggingface.co/spaces/onnx-community/convert-to-onnx) werden.
-
 [shannondata/multilingual-e5-small](https://huggingface.co/shannondata/multilingual-e5-small) kann vermutlich
 für Sentency Similarity und Question Answering verwendet werden.
 
@@ -145,6 +141,11 @@ Lessons Learned
   Älteren Geräte, die seit einem Jahr keine Updates mehr erhalten haben (eine Pest im Android-Ökosystem!)
   fehlen die Base64-Methoden, so dass hier auf eine kompliziertere Implementierung ausgewichen
   werden muss.
+
+* Die Ausführung großer Modelle (bereits um die 300 MB) mit Web Assembly blockiert den Browser
+  so sehr, dass diese währenddessen alle anderen Prozesse unterbricht. Vor allem findet kein
+  Rendering statt. Deshalb scheint unsere Stoppuhr nicht zu laufen und auch die gestreamten
+  Texte werden nicht angezeigt. Getestet mit Firefox Desktop und Chrome Desktop.
 
 ### transformers.js und HuggingFace
 
@@ -171,12 +172,31 @@ Lessons Learned
 * Manchmal unterstützen die Modell die deutsche Sprache, auch wenn dies in den Metadaten
   nicht explizit angegeben ist. Zum Beispiel [onnx-community/text_summarization-ONNX](https://huggingface.co/onnx-community/text_summarization-ONNX).
 
+* Allerdings scheinen Modelle für die deutsche Sprache insgesamt selten zu sein. Die allermeisten
+  Modelle sind auf Englisch trainiert. Zum Beispiel: [Xenova/distilbart-xsum-12-1](https://huggingface.co/Xenova/distilbart-xsum-12-1)
+  generiert bei einem deutschen Text nur Müll.
+
 * Die Dokumentation von transformers.js ist teilweise unvollständig und fehlerhaft. Manche
   Funktionen wie Text2Audio werden nur im Code in Form von Kommentaren dokumentiert. Andere
   Module wie `utils/hub` sind zwar dokumentiert, werden aber nicht exportiert.
 
 * transformers.js besitzt für viele Modelle, in der Dokumentation nicht erwähnte, feste
   Konfigurationen im Code. Die Hoffnung ist, dass andere Modelle trotzdem nutzbar sind.
+
+* transformers.js Version 4.2.0, basierend auf ONNX Runtime 1.25+: Unter Web Assembly lassen
+  sich aktuell nur Modelle vom Typ FP32 laden. Der Versuch, ein quantisiertes Modell zu laden
+  schlägt mit „TransposeDQWeightsForMatMulNBits Missing required scale“ fehl, weil in ONXX ein
+  Optimierungsdurchlauf eingeführt wurde, der bestimmte Skalierungstensoren in quantisierten
+  Modellen erwartet, die ältere quantisierte Exporte nicht bereitstellen.
+
+  Soll angeblich in transformers.js 4.3.0 behoben werden: [GitHub Issue](https://github.com/huggingface/transformers.js/issues/1707#issuecomment-4684921369)
+  Diese ist Stand 31.08.2026 aber noch nicht veröffentlicht.
+
+* Modelle, die noch nicht im ONNX-Format vorliegen, können mit folgendem Online-Tool automatisch
+  konvertiert und auf HuggingFace hochgeladen werden. Gibt man keinen eigenen Write Token an,
+  werden sie unter der Organisation `onnx-community` hochgeladen:
+
+  [Space: Conver to ONNX][https://huggingface.co/spaces/onnx-community/convert-to-onnx]
 
 ### Semantische Suche
 
@@ -231,6 +251,55 @@ Lessons Learned
   als Synonyme zu kennen, `IoT` und `Internet of Things` aber nicht. Dennoch sinkt die
   Trefferwahrscheinlichkeit deutlich, wenn man `WWW` sucht, im Text aber `World Wide Web`
   steht.
+
+### Text zusammenfassen
+
+* Die im ONNX-Format verfügbaren Modelle auf HuggingFace sind alle nur auf englischen
+  Texten trainiert. Deutsche Texte werden daher wörtlich wiedergegeben und nach einer
+  Festen länge abgebrochen.
+
+* Lediglich [Shahm/bart-german](https://huggingface.co/Shahm/bart-german) scheint auf
+  einem deutschen Datensatz trainiert zu sein. Das Repository hat aber nicht die von
+  transformers.js erwartete Struktur.
+
+* In anderen Formaten als ONXX gibt es zumindest eine kleine Auswahl.
+  [deutsche-telekom/mt5-small-sum-de-en-v2](https://huggingface.co/deutsche-telekom/mt5-small-sum-de-en-v2)
+  wurde für diesen Test ins ONNX-Format konvertiert. Die FP32-Variante ist aber 1,8 GB groß.
+
+    * int8: ca. 1,4 GB. In Firefox Desktop crash der Tab beim Laden.
+
+    * q4f16: ca. 600 MB. Lässt sich aber nicht laden.
+
+      ```
+      Error: Can't create a session. ERROR_CODE: 1, ERROR_MESSAGE: Type Error: Type (tensor(float16)) of output arg (/block.0/layer.0/layer_norm/Cast_output_0) of node (/block.0/layer.0/layer_norm/Cast) does not match expected type (tensor(float)).
+      ```
+
+    * fp16: ca. 817 MB. Lässt sich mit derselben Fehlermeldung nicht laden
+
+    * q4: ca. 1,1 GB. Lässt sich laden, aber die Datei `tokenizer_config.json` fehlt.
+      Die Generierung bricht daher mit `TypeError: tokenizer is not a function` ab.
+
+
+  Es sieht so aus, als ob die ONNX Runtime fp16 nicht unterstützt.
+
+* [Shahm/t5-small-german](https://huggingface.co/Shahm/t5-small-german) konnte erfolgreich
+  konvertiert und getestet werden. Die besonders kleinen q4 und bnb4-Varianten erzeugen
+  allerdings keinen Text. Und die Zusammenfassungen sind dast immer nur einen Satz lang. 🙂
+
+* Lässt man das Modell zu wenig Token erzeugen (zum Beispiel nur zehn), wird der Text
+  abgeschnitten. Generell scheint das Modell darauf ausgelegt zu sein, eine Textstelle
+  aus der Anfrage zu extrahieren.
+
+* Generell scheint es keine guten deutschsprachigen Modelle zu geben, oder diese sind
+  für die Nutzung im Browser zu groß (1,5 GB und mehr). Von daher ist "summarization"
+  mit [Shahm/t5-small-german](https://huggingface.co/Shahm/t5-small-german) zwar machbar.
+  Die Zusammenfassung ist aber zu kurz.
+  
+  [onnx-community/bart-german-ONNX](https://huggingface.co/Shahm/t5-small-german) liefert
+  etwas längere Texte bis zu drei Sätze. Das ist immer noch zu kurz. Und das Modell streut
+  unsinnige Artefakte (falsche Wortfetzen mit technischen Begriffen ohne Bezug zum Kontext)
+  ein, die vermutlich in den Trainingsdaten enthalten waren. Dadurch wird die Lesbarkeit
+  deutlich gestört.
 
 Copyright
 ---------

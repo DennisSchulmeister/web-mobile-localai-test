@@ -6,11 +6,11 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import * as transformers from '@huggingface/transformers';
+import {TextStreamer} from "@huggingface/transformers";
 
-import modelState        from "../../../state/ModelState.svelte";
-import StopWatchState    from "../../../state/StopWatchState.svelte.js";
-import textPageState     from "../../../state/TextPageState.svelte.js";
+import modelState     from "../../../state/ModelState.svelte";
+import StopWatchState from "../../../state/StopWatchState.svelte.js";
+import textPageState  from "../../../state/TextPageState.svelte.js";
 
 /**
  * Gesicherter Zustand für die "Zusammenfassen" Seite, damit dieser bei der
@@ -22,22 +22,51 @@ class SummaryPageState {
     errorMessage    = $state("");
     stopWatchState  = new StopWatchState();
 
-    query           = $state("");
-    answer          = $state("");
+    answer          = $derived(textPageState.currentPage.file ? "" : "");
+    minTokens       = $state(10);
+    maxTokens       = $derived(textPageState.wordCount * 3);
+    maxNewTokens    = $derived(this.maxTokens * 0.5);
 
     /**
-     * Eingegebene Frage beantworten
+     * Text zusammenfassen
      */
-    async answerQuestion() {
+    async execute() {
         try {
-            if (!this.query) return;
             if (!modelState.loadedModel.status === "ready") return;
             if (!modelState.loadedModel.task === "summarization") return;
     
             this.stopWatchState.start("Antwort", "bi-pen");
-            this.working = true;
 
-            // TODO
+            this.working     = true;
+            this.answer       = "";
+            this.errorMessage = "";
+
+            // Kleine Pause, damit wenigstens der Loading-State im UI erscheint!
+            await new Promise(resolve => window.setTimeout(resolve, 500));
+
+            let prompt = textPageState.currentPage.simplified;
+
+            if (modelState.loadedModel.config?.prefix) {
+                prompt = `${modelState.loadedModel.config?.prefix} ${prompt}`;
+            }
+
+            let streamer = new TextStreamer(modelState.model.tokenizer, {
+                skip_prompt: true,
+                callback_function: (text) => this.answer += text,
+            });
+
+            let answer = await modelState.model(prompt, {
+                max_new_tokens: this.maxNewTokens,
+                do_sample:      false,
+                streamer:       streamer,
+            });
+
+            this.answer = answer?.[0]?.summary_text || "";
+
+            if (!this.answer) {
+                console.error("Ungültige Antort des Modells", answer);
+                this.errorMessage = "Das Modell hat keinen Text erzeugt";
+            }
 
             this.stopWatchState.stop();
             this.working = false;

@@ -13,7 +13,8 @@ import * as md from "../../shared/markdown.js";
  */
 class TextPageState {
     categories  = $state([]);
-    currentPage = $state({file: "", content: ""});
+    currentPage = $state({file: "", content: "", simplified: ""});
+    wordCount   = $derived.by(this.estimateWordCount.bind(this));
 
     /**
      * Datei `data/index.json` mit der Liste der Textseiten je Kategorie laden.
@@ -38,11 +39,37 @@ class TextPageState {
             let content = await (await fetch(`data/${pageFile}`)).text();
             let mdAst   = md.fixRelativeUrls(md.parseMarkdown(content), pageDir);
             
-            this.currentPage.content = md.stringifyMarkdown(mdAst);
+            this.currentPage.content    = md.stringifyMarkdown(mdAst);
+            this.currentPage.simplified = md.stringifyMarkdown(md.simplifyMarkdown(mdAst));
         } catch (error) {
-            this.currentPage.content = error.toString();
+            this.currentPage.content    = error.toString();
+            this.currentPage.simplified = "";
             throw error;
         }
+    }
+
+    /**
+     * Anzahl Wörter der aktuellen Markdown-Datei schätzen.
+     * @returns {number} Geschätzte Anazhl Wörter
+     */
+    estimateWordCount() {
+        let text       = (this.currentPage.content || "").replaceAll("\r\n", "\n").replaceAll("\r", "\n");
+        let count      = 0;
+        let whitespace = true;
+    
+        for (let i = 0; i < text.length; i++) {
+            let c = this.currentPage.content[i];
+
+            if ([" ", "\t", "\n"].includes(c)) {
+                if (!whitespace) count++;
+                whitespace = true;
+            } else {
+                whitespace = false;
+            }
+        }
+
+        if (count === 0 && this.currentPage.content) count = 1;
+        return count;
     }
 
     /**
