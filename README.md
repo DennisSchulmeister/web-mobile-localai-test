@@ -326,6 +326,10 @@ Einschränkungen:
 * Dadurch, dass nur sehr kleine Modelle ausführbar sind, lassen sich auch keine
   Anwendungsfälle lokale umsetzen, die man heute mit einem LLM assoziieren würde.
 
+* Das Ökosystem entwickelt sich schnell weiter. Aber in Folge daraus, ist es auch nicht
+  sehr stabil, was die durch ONNX 1.25 ausgelösten Fehlermeldungen zeigen, die über
+  Monate hinweg nicht gefixt werden.
+
 Copyright
 ---------
 
