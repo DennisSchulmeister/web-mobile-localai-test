@@ -160,6 +160,7 @@ Lessons Learned
 * Die Modelle müssen eine feste Verzeichnisstruktur besitzen, um genutzt werden zu können:
 
     - `/config.json`
+    - `/tokenizer_config.json`
     - `onnx/model.onnx`
     - `onnx/model_{dtype}.onnx`
 
@@ -301,6 +302,13 @@ Lessons Learned
   unsinnige Artefakte (falsche Wortfetzen mit technischen Begriffen ohne Bezug zum Kontext)
   ein, die vermutlich in den Trainingsdaten enthalten waren. Dadurch wird die Lesbarkeit
   deutlich gestört.
+
+### Text übersetzen
+
+* [huggingworld/m2m100_418M](https://huggingface.co/huggingworld/m2m100_418M) lässt sich
+  wegen dem ONNX-Problem aktuell nicht laden.
+  [casawolice/small100-onnx](https://huggingface.co/casawolice/small100-onnx) ist ähnlich klein
+  und lässt sich laden. Alle anderen Modelle auf HuggingFace sind zu groß.
 
 Fazit
 ----

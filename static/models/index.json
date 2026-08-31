@@ -11,8 +11,8 @@
     ],
     "translation": [
         {
-            "modelId": "huggingworld/m2m100_418M",
-            "dtypes": ["q8"],
+            "modelId": "casawolice/small100-onnx",
+            "dtypes": ["fp32"],
             "languages": ["de", "en", "fr"]
         }
     ],
