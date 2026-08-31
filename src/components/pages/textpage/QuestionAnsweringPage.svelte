@@ -31,7 +31,8 @@ KI-Anwendungsfall: Question Answering
         navigationState.pageTitle = "Fragen beantworten";
     });
 
-    async function onExecuteClicked() {
+    async function onExecuteClicked(event) {
+        event.preventDefault();
         await state.execute();
     }
 </script>
@@ -41,26 +42,13 @@ KI-Anwendungsfall: Question Answering
 </Section>
 
 <Section>
-    Optionen
-
-    <!--
-    <form role="search" onsubmit={onSubmit}>
-        <input type="search" placeholder="Suchbegriff" bind:value={state.query} disabled={state.disabled}/>
-        <input type="submit" value="Suchen" disabled={state.disabled || !state.query}/>
+    <!-- svelte-ignore a11y_no_redundant_roles -->
+    <form onsubmit={onExecuteClicked}>
+        <fieldset role="group">
+            <input placeholder="Frage" bind:value={state.question} disabled={state.disabled}/>
+            <input type="submit" value="Start" disabled={state.disabled}/>
+        </fieldset>
     </form>
-
-    <div class="options">
-        <label>
-            <input type="checkbox" role="switch" bind:checked={state.searchAll} disabled={state.disabled}/>
-            Volltextsuche
-        </label>
-    
-        <label>
-            <input type="checkbox" role="switch" bind:checked={state.matchText} disabled={state.disabled}/>
-            Direkter Textvergleich
-        </label>
-    </div>
-    -->
 </Section>
 
 {#if state.working}

@@ -22,7 +22,7 @@ class QuestionAnsweringPageState {
     errorMessage    = $state("");
     stopWatchState  = new StopWatchState();
 
-    query           = $state("");
+    question        = $state("");
     answer          = $derived(textPageState.currentPage.file ? "" : "");
 
     /**
@@ -30,7 +30,7 @@ class QuestionAnsweringPageState {
      */
     async execute() {
         try {
-            if (!this.query) return;
+            if (!this.question) return;
             if (!modelState.loadedModel.status === "ready") return;
             if (!modelState.loadedModel.task === "question-answering") return;
     
@@ -43,7 +43,32 @@ class QuestionAnsweringPageState {
             // Kleine Pause, damit wenigstens der Loading-State im UI erscheint!
             await new Promise(resolve => window.setTimeout(resolve, 500));
 
-            // TODO
+            let question = this.question;
+            let context  = textPageState.currentPage.simplified;
+
+            if (modelState.loadedModel.config?.prefix?.question) {
+                question = `${modelState.loadedModel.config.prefix.question} ${question}`;
+            }
+
+            if (modelState.loadedModel.config?.prefix?.context) {
+                context = `${modelState.loadedModel.config.prefix.context} ${context}`;
+            }
+
+            let streamer = new TextStreamer(modelState.model.tokenizer, {
+                skip_prompt: true,
+                callback_function: (text) => this.answer += text,
+            });
+
+            let answer = await modelState.model(question, context, {
+                streamer: streamer,
+            });
+
+            this.answer = answer?.answer || "";
+
+            if (!this.answer) {
+                console.error("Ungültige Antort des Modells", answer);
+                this.errorMessage = "Das Modell hat keinen Text erzeugt";
+            }
 
             this.stopWatchState.stop();
             this.working = false;

@@ -303,6 +303,23 @@ Lessons Learned
   ein, die vermutlich in den Trainingsdaten enthalten waren. Dadurch wird die Lesbarkeit
   deutlich gestört.
 
+* Beide Modelle scheinen auch nur den Anfang der Texte zu betrachten und geben diesen
+  teilweise einfach wörtlich wieder.
+
+### Fragen beantworten
+
+* Die Modelle versuchen, eine einzelne Textpassage zu finden, die die gegebene
+  Frage zu beantworten scheint. Diese wird nahezu wörtlich wiedergeben, auch wenn
+  es sich dabei nur um Satzschnippsel handelt.
+
+* Das kleine Modell [onnx-community/all-MiniLM-L12-v2-qa-all-ONNX](https://huggingface.co/onnx-community/all-MiniLM-L12-v2-qa-all-ONNX)
+  schneidet relativ gut ab, liefert aber nur einen sehr kleinen Textausschnitt.
+  Es scheint aber mit Umlauten und Groß-/Kleinschreibung probleme zu haben, da
+  die Antworten grundsätzlich kleingeschrieben und ohne Umlaute sind.
+
+* Das größere Modell [dewdev/mdeberta-v3-base-squad2-onnx](https://huggingface.co/dewdev/mdeberta-v3-base-squad2-onnx)
+  liefert ungemein größere Antworten, diese passen aber oft nicht zur gestellten Frage.
+
 ### Text übersetzen
 
 * [huggingworld/m2m100_418M](https://huggingface.co/huggingworld/m2m100_418M) lässt sich
@@ -336,7 +353,12 @@ Einschränkungen:
 
 * Das Ökosystem entwickelt sich schnell weiter. Aber in Folge daraus, ist es auch nicht
   sehr stabil, was die durch ONNX 1.25 ausgelösten Fehlermeldungen zeigen, die über
-  Monate hinweg nicht gefixt werden.
+  Monate hinweg nicht gefixt werden. Aber auch anhand der unvollständigen und fehlerhaften
+  Dokumentation zu transformers.js, obwohl die Bibliothek immerhin schon in Version
+  4.2.0 vorliegt.
+
+* Fine Tuning oder die Entwicklung eigener Modelle wären die nächsten logischen Schritte,
+  um kleine Modelle für spezialisierte Anforderungen zu erstellen.
 
 Copyright
 ---------
