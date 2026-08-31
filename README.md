@@ -358,7 +358,28 @@ Einschränkungen:
   4.2.0 vorliegt.
 
 * Fine Tuning oder die Entwicklung eigener Modelle wären die nächsten logischen Schritte,
-  um kleine Modelle für spezialisierte Anforderungen zu erstellen.
+  um kleine Modelle für spezialisierte Anforderungen zu erstellen. Das Ziel müsste vermutlich
+  sein, ein mittelgroßes LLM (17B bis 33B) so abzuspecken, dass aus auf dem Device laufen
+  könnte, um halbwegs zufriedenstellende Ergebnisse zu liefern. In absehbarer Zeit ist das
+  für mobile Endgeräte und die Ausführung im Web-Browser eher unwahrscheinlich.
+
+* Interessante Ansätze in diese Richtung könnten 1,5bit-Modelle sein, da sie deutlich
+  kompakter als die herkömmlichen Modelle sind, z.B.
+  [Bonsai-27B-mlx-1bit](https://huggingface.co/prism-ml/Bonsai-27B-mlx-1bit)
+
+* Auf der anderen Seite stehen "herkömmliche" Mini-LLM wie
+  [teapotai/teapotllm](https://huggingface.co/teapotai/teapotllm), die sich speziell
+  für RAG eignen, da sie darauf trainiert sind, Antworten nur anhand des Kontextes
+  zu geben und sonst mit "ich weiß es nicht" zu antworten. Dies könnte eine bessere
+  Alternative zu den hier getesteten "Question Answering" Modellen sein. Leider ist
+  aber zumindest TeapotLLM nur auf englisch trainiert.
+
+* In Summe kommt es daher sehr auf den Anwendungsfall an. Sehr spezialisierte Aufgaben
+  lassen sich, wenn die Devices mit fortschreitender Zeit leistunfähiger werden, die
+  Modelle insgesamt besser und die APIs ausgereifter, lokal ausführen. Von einem rein
+  lokalen LLM innerhalb einer Webanwendung sind wir aber noch weit entfernt. Dies lässt
+  sich Stand heute nur in Native-Apps und auch dort nur auf den leistungsfähigsten
+  Geräten umsetzen.
 
 Copyright
 ---------
