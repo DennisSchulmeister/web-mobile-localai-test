@@ -13,7 +13,7 @@
         {
             "modelId": "casawolice/small100-onnx",
             "dtypes": ["fp32"],
-            "languages": ["de", "en", "fr"]
+            "languages": ["de", "en", "es", "fr", "it"]
         }
     ],
     "question-answering": [

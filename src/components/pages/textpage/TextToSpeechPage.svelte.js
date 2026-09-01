@@ -16,7 +16,7 @@ import textPageState     from "../../../state/TextPageState.svelte.js";
  */
 class TextToSpeachPageState {
     working         = $state(false);
-    disabled        = $derived(this.working || modelState.loadedModel.status !== "ready")
+    disabled        = $derived(this.working || modelState.loadedModel.status !== "ready" || modelState.loadedModel.task !== "text-to-speech")
     errorMessage    = $state("");
     stopWatchState  = new StopWatchState();
 
@@ -25,8 +25,7 @@ class TextToSpeachPageState {
      */
     async execute() {
         try {
-            if (!modelState.loadedModel.status === "ready") return;
-            if (!modelState.loadedModel.task === "text-to-speech") return;
+            if (this.disabled) return;
     
             this.stopWatchState.start("Audio-Generierung", "bi-soundwave");
             this.working = true;

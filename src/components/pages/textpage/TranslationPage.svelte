@@ -22,6 +22,7 @@ KI-Anwendungsfall: Translation
     import StopWatch       from "../../basic/StopWatch.svelte";
 
     import navigationState from "../../../state/NavigationState.svelte.js";
+    import modelState      from "../../../state/ModelState.svelte.js";
     import state           from "./TranslationPage.svelte.js";
 
     let md = new MarkdownIt();
@@ -31,7 +32,8 @@ KI-Anwendungsfall: Translation
         navigationState.pageTitle = "Text übersetzen";
     });
 
-    async function onExecuteClicked() {
+    async function onSubmit(event) {
+        event.preventDefault();
         await state.execute();
     }
 </script>
@@ -41,25 +43,25 @@ KI-Anwendungsfall: Translation
 </Section>
 
 <Section>
-    Optionen
-    <!--
-    <form role="search" onsubmit={onSubmit}>
-        <input type="search" placeholder="Suchbegriff" bind:value={state.query} disabled={state.disabled}/>
-        <input type="submit" value="Suchen" disabled={state.disabled || !state.query}/>
+    <form onsubmit={onSubmit} class="grid">
+        <label>
+            Von
+            <select value={state.src_language} disabled>
+                {#each Object.keys(modelState.config.translation.languages) as language}
+                    <option value={language}>{modelState.config.translation.languages[language]}</option>
+                {/each}
+            </select>
+        </label>
+        <label>
+            Nach
+            <select bind:value={state.dst_language} disabled={state.disabled}>
+                {#each modelState.loadedModel?.config?.languages as language}
+                    <option value={language}>{modelState.config.translation.languages[language]}</option>
+                {/each}
+            </select>
+        </label>
+        <input type="submit" value="Start" disabled={state.disabled || !state.dst_language}/>
     </form>
-
-    <div class="options">
-        <label>
-            <input type="checkbox" role="switch" bind:checked={state.searchAll} disabled={state.disabled}/>
-            Volltextsuche
-        </label>
-    
-        <label>
-            <input type="checkbox" role="switch" bind:checked={state.matchText} disabled={state.disabled}/>
-            Direkter Textvergleich
-        </label>
-    </div>
-    -->
 </Section>
 
 {#if state.working}
@@ -81,7 +83,11 @@ KI-Anwendungsfall: Translation
 </Section>
 
 <style>
-    /* label {
-        margin: 0;
-    }    */
+    label {
+        margin-bottom: 0;
+    }
+
+    .grid {
+        align-items: end;
+    }
 </style>

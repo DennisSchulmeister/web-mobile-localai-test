@@ -327,6 +327,19 @@ Lessons Learned
   [casawolice/small100-onnx](https://huggingface.co/casawolice/small100-onnx) ist ähnlich klein
   und lässt sich laden. Alle anderen Modelle auf HuggingFace sind zu groß.
 
+* Das kleine Modell scheint nur zur Übersetzung kleinster Text mit einfachen Sätzen geeignet
+  zu sein. Bei großen Texten liefert es teilweise gar keine Übersetzung oder nur sinnlose
+  Zeichenketten. Bei kleinen Texten kommt eine Übersetzunt, diese ist grammatikalisch aber
+  falsch und enthält Rechtschreibfehler.
+
+* Unter Firefox Desktop friert der Browser für ca. 18 Sekunden ein. Auf mobilen Geräten wird
+  diese Funktion daher wohl gar nicht nutzbar sein.
+
+### Alle Modelle
+
+* Anders als bei den meisten LLMs, sind die hier verwendeten kleinen Modelle nicht gut darin,
+  Markdown-Syntax zu verarbeiten oder zu erzeugen.
+
 Fazit
 ----
 

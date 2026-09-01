@@ -18,7 +18,7 @@ import textPageState     from "../../../state/TextPageState.svelte.js";
  */
 class QuestionAnsweringPageState {
     working         = $state(false);
-    disabled        = $derived(this.working || modelState.loadedModel.status !== "ready")
+    disabled        = $derived(this.working || modelState.loadedModel.status !== "ready" || modelState.loadedModel.task !== "question-answering")
     errorMessage    = $state("");
     stopWatchState  = new StopWatchState();
 
@@ -31,8 +31,7 @@ class QuestionAnsweringPageState {
     async execute() {
         try {
             if (!this.question) return;
-            if (!modelState.loadedModel.status === "ready") return;
-            if (!modelState.loadedModel.task === "question-answering") return;
+            if (this.disabled) return;
     
             this.stopWatchState.start("Antwort", "bi-pen");
 

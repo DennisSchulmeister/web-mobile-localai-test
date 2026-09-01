@@ -10,5 +10,14 @@
     },
     "semanticSearch": {
         "fitThreshold": 0.5
+    },
+    "translation": {
+        "languages": {
+            "de": "Deutsch",
+            "en": "Englisch",
+            "es": "Spanisch",
+            "fr": "Französisch",
+            "it": "Italienisch"
+        }
     }
 }

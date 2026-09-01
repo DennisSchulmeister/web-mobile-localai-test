@@ -13,7 +13,7 @@ import * as md from "../../shared/markdown.js";
  */
 class TextPageState {
     categories  = $state([]);
-    currentPage = $state({file: "", content: "", simplified: ""});
+    currentPage = $state({file: "", content: "", simplified: "", language: ""});
     wordCount   = $derived.by(this.estimateWordCount.bind(this));
 
     /**
@@ -31,8 +31,10 @@ class TextPageState {
      * @param {string} pageFile Markdown-Pfad
      */
     async setCurrentPage(pageFile) {
-        this.currentPage.content = "";
-        this.currentPage.file    = pageFile;
+        this.currentPage.content    = "";
+        this.currentPage.simplified = "";
+        this.currentPage.language   = "";
+        this.currentPage.file       = pageFile;
 
         try {
             let pageDir = `data/${pageFile.split("/").slice(0, -1).join("/")}/`;
@@ -41,9 +43,12 @@ class TextPageState {
             
             this.currentPage.content    = md.stringifyMarkdown(mdAst);
             this.currentPage.simplified = md.stringifyMarkdown(md.simplifyMarkdown(mdAst));
+
+            let page = this.findTextPage(pageFile);
+            this.currentPage.language = page?.language || "";
         } catch (error) {
-            this.currentPage.content    = error.toString();
-            this.currentPage.simplified = "";
+            this.currentPage.content  = error.toString();
+            this.currentPage.language = "en";
             throw error;
         }
     }
@@ -75,13 +80,13 @@ class TextPageState {
     /**
      * Indexeintrag eienr Seite finden.
      * 
-     * @param {string} file Dateiname der Seite
+     * @param {string} pageFile Dateiname der Seite
      * @returns Indexeintrag mit Seitentitel
      */
-    findTextPage(file) {
+    findTextPage(pageFile) {
         for (let category of this.categories || []) {
             for (let page of category.pages || []) {
-                if (page.file === file) return page;
+                if (page.file === pageFile) return page;
             }
         }
     }
@@ -89,11 +94,11 @@ class TextPageState {
     /**
      * URL zur Anzeige einer Textseite ermitteln.
      * 
-     * @param {string} file Dateiname der Seite
+     * @param {string} pageFile Dateiname der Seite
      * @returns URL zur Anzeige
      */
-    getTextPageUrl(file) {
-        return `#/page/${file}/content`;
+    getTextPageUrl(pageFile) {
+        return `#/page/${pageFile}/content`;
     }
 }
 
