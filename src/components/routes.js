@@ -12,12 +12,12 @@ const routes = new Map();
 export default routes;
 
 // Home mit Unterseiten
-routes.set(/^\/(search)?$/, wrap({
+routes.set(/^\/(search|chat)?$/, wrap({
     asyncComponent: () => import("./pages/HomePage.svelte"),
 }));
 
 // Textseite mit Unterseiten
-routes.set(/^\/page\/(.*)\/(content|summary|qa|translation|tts)$/, wrap({
+routes.set(/^\/page\/(.*)\/(content|summary|qa|translation)$/, wrap({
     asyncComponent: () => import("./pages/TextPage.svelte"),
 }));
 

@@ -76,7 +76,13 @@ class ModelState {
     /**
      * KI-Modell laden. Da die Modelle sehr groß sind, wird immer nur das zuletzt
      * geladene Modell im Speicher behalten. Das Modell wird im Attribut `model`
-     * abgelegt. `loadedModel` wird entsprechend mit den Metadatan aktualisiert.
+     * abgelegt. `loadedModel` wird entsprechend mit den Metadaten aktualisiert.
+     * 
+     * Wir nutzen hier die high-level Pipeline API von transformers.js, da diese
+     * für jede Modellart die typischen Verarbeitungsschritte kapselt. Sollte dies
+     * für bestimmte Modelle nicht ausreichen, könnte man hier je nach Modellart in
+     * eine neue Methode verzweigen, die die low-level Model/Tokenizer/…-Klassen
+     * selbst nutzt.
      * 
      * @param {string} task Art des Modells
      * @param {string} modelId Model ID

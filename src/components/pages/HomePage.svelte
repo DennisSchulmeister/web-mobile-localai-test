@@ -13,6 +13,7 @@ Startseite mit Auswahl und Suche von Textseiten.
 
 <script>
     import {onMount}          from "svelte";
+    import ChatPage           from "./home/ChatPage.svelte";
     import ChoosePage         from "./home/ChoosePage.svelte";
     import SemanticSearchPage from "./home/SemanticSearchPage.svelte";
     import navigationState    from "../../state/NavigationState.svelte.js";
@@ -40,6 +41,12 @@ Startseite mit Auswahl und Suche von Textseiten.
                 label:  "Suche",
                 url:    "#/search",
             },
+            {
+                id:     "chat",
+                icon:   "bi-chat-dots",
+                label:  "Chat",
+                url:    "#/chat",
+            },
         ];
     });
 </script>
@@ -49,6 +56,8 @@ Startseite mit Auswahl und Suche von Textseiten.
         <ChoosePage/>
     {:else if subPageId === "search"}
         <SemanticSearchPage/>
+    {:else if subPageId === "chat"}
+        <ChatPage/>
     {/if}
 </div>
 

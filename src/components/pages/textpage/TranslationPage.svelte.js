@@ -56,7 +56,7 @@ class TranslationPageState {
             this.result = answer?.[0]?.translation_text || answer?.translation_text || "";
 
             if (!this.result) {
-                console.error("Ungültige Antort des Modells", answer);
+                console.error("Ungültige Antwort des Modells", answer);
                 this.errorMessage = "Das Modell hat keinen Text erzeugt";
             }
 

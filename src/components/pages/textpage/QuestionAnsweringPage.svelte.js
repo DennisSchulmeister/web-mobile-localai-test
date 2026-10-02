@@ -42,7 +42,7 @@ class QuestionAnsweringPageState {
             // Kleine Pause, damit wenigstens der Loading-State im UI erscheint!
             await new Promise(resolve => window.setTimeout(resolve, 500));
 
-            let question = this.question;
+            let question = this.question.trim();
             let context  = textPageState.currentPage.simplified;
 
             if (modelState.loadedModel.config?.prefix?.question) {
@@ -65,7 +65,7 @@ class QuestionAnsweringPageState {
             this.answer = answer?.answer || "";
 
             if (!this.answer) {
-                console.error("Ungültige Antort des Modells", answer);
+                console.error("Ungültige Antwort des Modells", answer);
                 this.errorMessage = "Das Modell hat keinen Text erzeugt";
             }
 

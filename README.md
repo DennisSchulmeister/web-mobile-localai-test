@@ -24,25 +24,25 @@ Folgende Anwendungsfälle sollen hier getestet werden:
 
 1. Text zusammenfassen (Summarization)
 1. Text übersetzen (Translation)
-1. Fragen beantworten (Question Answertung)
+1. Fragen beantworten (Question Answering)
 1. Semantische Suche (Sentence Similarity)
-1. Text vorlesen (Text to Speach)
+1. Chat (Text Generation / Text2Text Generation)
 
 <table>
     <tr>
         <td>
             <a href="./doc/screenshot1.png">
-                <img src="./doc/screenshot1.png" width="200">
+                <img src="./doc/screenshot1.png" width="200" alt="Screenshot 1">
             </a>
         </td>
         <td>
             <a href="./doc/screenshot2.png">
-                <img src="./doc/screenshot2.png" width="200">
+                <img src="./doc/screenshot2.png" width="200" alt="Screenshot 2">
             </a>
         </td>
         <td>
             <a href="./doc/screenshot3.png">
-                <img src="./doc/screenshot3.png" width="200">
+                <img src="./doc/screenshot3.png" width="200" alt="Screenshot 3">
             </a>
         </td>
     </tr>
@@ -69,11 +69,11 @@ Bevor die Anwendung gestartet werden kann, müssen folgende Schritte ausgeführt
    Kosinus-Ähnlichkeit von Worteinbettungen. Während der Suche wird die Einbettung
    des Suchbegriffs berechnet und mit den Einbettungen der aus den Testdokumenten
    erzeugten Kontextblöcke verglichen. Siehe [Lessons Learned](#semantische-suche)
-   unten. Da sich letztere nur ändern, wenn sich die Testdaten ändern, müssne sie
+   unten. Da sich letztere nur ändern, wenn sich die Testdaten ändern, müssen sie
    vor Ausführung der App einmalig vorberechnet werden.
 
 Alle drei Schritte können mit `npm run init` hintereinander ausgeführt werden.
-Alterantiv können die Schritte einzeln ausgeführt werden:
+Alternativ können die Schritte einzeln ausgeführt werden:
 
 1. `npm run init:download`: Modelle herunterladen
 2. `npm run init:preprocess`: Testdaten aufbereiten
@@ -85,7 +85,7 @@ Wenn sich die verwendeten Modelle ändern, müssen in die Schritte 1 und 3 ausge
 Da die Daten für die clientseitigen Webanwendung nutzbar sein müssen, liegen die Ergebnisse
 dieser Schritte im `static`-Verzeichnis, sind aber von der Git-Versionierung ausgeschlossen.
 
-Start der Anwendung 
+Start der Anwendung
 -------------------
 
 Der Devserver kann mit `npm start` oder `npm run watch` gestartet werden. Die Anwendung
@@ -107,8 +107,13 @@ Versuch abzulenken. Für die Weboberfläche kommen zum Einsatz:
 
 Für die KI kommen folgende Bibliotheken und Modelle zum Einsatz:
 
-* **Runtime:** [transformers.js](https://huggingface.co/docs/transformers.js/index) (basiert auf [ONNX}(https://onnxruntime.ai/))
+* **Runtime:** [transformers.js](https://huggingface.co/docs/transformers.js/index) (basiert auf [ONNX](https://onnxruntime.ai/))
 * **KI-Modelle:** Siehe [./static/models/index.json](static/models/index.json)
+
+Die Anwendung nutzt die high-level Pipeline API von transformers.js, da diese für jede
+Modellart die typischen Verarbeitungsschritte kapselt. Bei Bedarf könnte aber auf die
+low-lever `Model`/`Tokenizer`/…-Klassen gewechselt werden, durch Anpassung der Methode
+`loadModel()` der Klasse `ModelState`.
 
 Künftige Web APIs
 -----------------
@@ -116,22 +121,17 @@ Künftige Web APIs
 Aktuell bietet der Web-Plattform noch keine nativen APIs für die lokale Ausführung
 von Machine-Learning-Modellen. Dies könnte sich aber künftig ändern:
 
-* W3C Web Machine Learning Group
-    * [Webseite](https://webmachinelearning.github.io/)
-    * [W3C-Seite](https://www.w3.org/groups/cg/webmachinelearning/)
-    * [GitHub](github.com/webmachinelearning/)
-* Vorgeschlagene APIs (Auswahl)
-    * [Web Neural Network API](https://www.w3.org/TR/webnn/)
-    * [Danymic AI Offloading Protocol](https://github.com/webmachinelearning/daop)
-    * [Prompt API](https://github.com/webmachinelearning/prompt-api)
-    * [Writing Assistance API](https://github.com/webmachinelearning/writing-assistance-apis)
-    * [WebMPC](https://github.com/webmachinelearning/webmcp)
+* __W3C Web Machine Learning Group__
+  * [Webseite](https://webmachinelearning.github.io/)
+  * [W3C-Seite](https://www.w3.org/groups/cg/webmachinelearning/)
+  * [GitHub](github.com/webmachinelearning/)
 
-Weitere Ideen
--------------
-
-[shannondata/multilingual-e5-small](https://huggingface.co/shannondata/multilingual-e5-small) kann vermutlich
-für Sentency Similarity und Question Answering verwendet werden.
+* __Vorgeschlagene APIs (Auswahl)__
+  * [Web Neural Network API](https://www.w3.org/TR/webnn/)
+  * [Danymic AI Offloading Protocol](https://github.com/webmachinelearning/daop)
+  * [Prompt API](https://github.com/webmachinelearning/prompt-api)
+  * [Writing Assistance API](https://github.com/webmachinelearning/writing-assistance-apis)
+  * [WebMPC](https://github.com/webmachinelearning/webmcp)
 
 Lessons Learned
 ---------------
@@ -151,18 +151,18 @@ Lessons Learned
 ### transformers.js und HuggingFace
 
 * transformers.js benötigt die Modelle im ONNX-Format, da es sich um Grunde genommen um
-  einen Wrapper um ONXX handelt.
+  einen Wrapper um ONNX handelt.
   
 * Um wirklich alle kompatiblem Modelle zu finden, muss man auf HuggingFace unter "Libraries"
-  nach beidem getrennt suchen, da ONXX und transformers.js zwei Filtereinträge sind. Wählt man
+  nach beidem getrennt suchen, da ONNX und transformers.js zwei Filtereinträge sind. Wählt man
   aber beide aus, erhält man nur Treffer, die auch beides in ihren Metadaten deklarieren.
 
 * Die Modelle müssen eine feste Verzeichnisstruktur besitzen, um genutzt werden zu können:
 
-    - `/config.json`
-    - `/tokenizer_config.json`
-    - `onnx/model.onnx`
-    - `onnx/model_{dtype}.onnx`
+  * `/config.json`
+  * `/tokenizer_config.json`
+  * `onnx/model.onnx`
+  * `onnx/model_{dtype}.onnx`
 
   Fehlt beispielsweise die `config.json`-Datei, wirft transformers.js beim Herunterladen
   des Modells einen Fehler.
@@ -171,7 +171,7 @@ Lessons Learned
   werden. Das Skript `bin/init/download.js` ruft daher die Funktion `ModelRegistry.get_available_dtypes()`
   auf, um die verfügbaren Datentypen abzurufen und zeigt diese auf der Konsole an.
 
-* Manchmal unterstützen die Modell die deutsche Sprache, auch wenn dies in den Metadaten
+* Manchmal unterstützen die Modelle die deutsche Sprache, auch wenn dies in den Metadaten
   nicht explizit angegeben ist. Zum Beispiel [onnx-community/text_summarization-ONNX](https://huggingface.co/onnx-community/text_summarization-ONNX).
 
 * Allerdings scheinen Modelle für die deutsche Sprache insgesamt selten zu sein. Die allermeisten
@@ -186,19 +186,20 @@ Lessons Learned
   Konfigurationen im Code. Die Hoffnung ist, dass andere Modelle trotzdem nutzbar sind.
 
 * transformers.js Version 4.2.0, basierend auf ONNX Runtime 1.25+: Unter Web Assembly lassen
-  sich aktuell nur Modelle vom Typ FP32 laden. Der Versuch, ein quantisiertes Modell zu laden
-  schlägt mit „TransposeDQWeightsForMatMulNBits Missing required scale“ fehl, weil in ONXX ein
+  sich damit nur Modelle vom Typ FP32 laden. Der Versuch, ein quantisiertes Modell zu laden
+  schlägt mit „TransposeDQWeightsForMatMulNBits Missing required scale“ fehl, weil in ONNX ein
   Optimierungsdurchlauf eingeführt wurde, der bestimmte Skalierungstensoren in quantisierten
   Modellen erwartet, die ältere quantisierte Exporte nicht bereitstellen.
 
-  Soll angeblich in transformers.js 4.3.0 behoben werden: [GitHub Issue](https://github.com/huggingface/transformers.js/issues/1707#issuecomment-4684921369)
-  Diese ist Stand 31.08.2026 aber noch nicht veröffentlicht.
+  Seit transformers.js 4.3.0 behoben: [GitHub Issue](https://github.com/huggingface/transformers.js/issues/1707#issuecomment-4684921369)
 
 * Modelle, die noch nicht im ONNX-Format vorliegen, können mit folgendem Online-Tool automatisch
   konvertiert und auf HuggingFace hochgeladen werden. Gibt man keinen eigenen Write Token an,
   werden sie unter der Organisation `onnx-community` hochgeladen:
 
-  [Space: Conver to ONNX][https://huggingface.co/spaces/onnx-community/convert-to-onnx]
+  [Space: Convert to ONNX](https://huggingface.co/spaces/onnx-community/convert-to-onnx)
+
+* Firefox 156 / Linux / WebGPU scheint keine Ausgaben zu generieren.
 
 ### Semantische Suche
 
@@ -241,7 +242,6 @@ Lessons Learned
   Vgl. [Wikipedia: Kosinus-Ähnlichkeit](https://de.wikipedia.org/wiki/Kosinus-%C3%84hnlichkeit) <br>
   Vgl. [transformers.js: maths.cos_sim()](https://huggingface.co/docs/transformers.js/api/utils/maths#utilsmathscossimarr1-arr2--number)
 
-
 * Werden die Vektoren zusätzlich auf Einheitslänge normalisiert, reduziert sich die Berechnung
   der Kosinus-Ähnlichkeit auf das Skalarprodukt der beiden Vektoren.
 
@@ -264,23 +264,22 @@ Lessons Learned
   einem deutschen Datensatz trainiert zu sein. Das Repository hat aber nicht die von
   transformers.js erwartete Struktur.
 
-* In anderen Formaten als ONXX gibt es zumindest eine kleine Auswahl.
+* In anderen Formaten als ONNX gibt es zumindest eine kleine Auswahl.
   [deutsche-telekom/mt5-small-sum-de-en-v2](https://huggingface.co/deutsche-telekom/mt5-small-sum-de-en-v2)
   wurde für diesen Test ins ONNX-Format konvertiert. Die FP32-Variante ist aber 1,8 GB groß.
 
-    * int8: ca. 1,4 GB. In Firefox Desktop crash der Tab beim Laden.
+  * int8: ca. 1,4 GB. In Firefox Desktop crash der Tab beim Laden.
 
-    * q4f16: ca. 600 MB. Lässt sich aber nicht laden.
+  * q4f16: ca. 600 MB. Lässt sich aber nicht laden.
 
-      ```
-      Error: Can't create a session. ERROR_CODE: 1, ERROR_MESSAGE: Type Error: Type (tensor(float16)) of output arg (/block.0/layer.0/layer_norm/Cast_output_0) of node (/block.0/layer.0/layer_norm/Cast) does not match expected type (tensor(float)).
-      ```
+    ```text
+    Error: Can't create a session. ERROR_CODE: 1, ERROR_MESSAGE: Type Error: Type (tensor(float16)) of output arg (/block.0/layer.0/layer_norm/Cast_output_0) of node (/block.0/layer.0/layer_norm/Cast) does not match expected type (tensor(float)).
+    ```
 
-    * fp16: ca. 817 MB. Lässt sich mit derselben Fehlermeldung nicht laden
+  * fp16: ca. 817 MB. Lässt sich mit derselben Fehlermeldung nicht laden
 
-    * q4: ca. 1,1 GB. Lässt sich laden, aber die Datei `tokenizer_config.json` fehlt.
-      Die Generierung bricht daher mit `TypeError: tokenizer is not a function` ab.
-
+  * q4: ca. 1,1 GB. Lässt sich laden, aber die Datei `tokenizer_config.json` fehlt.
+    Die Generierung bricht daher mit `TypeError: tokenizer is not a function` ab.
 
   Es sieht so aus, als ob die ONNX Runtime fp16 nicht unterstützt.
 
@@ -322,23 +321,49 @@ Lessons Learned
 
 ### Text übersetzen
 
-* [huggingworld/m2m100_418M](https://huggingface.co/huggingworld/m2m100_418M) lässt sich
-  wegen dem ONNX-Problem aktuell nicht laden.
-  [casawolice/small100-onnx](https://huggingface.co/casawolice/small100-onnx) ist ähnlich klein
-  und lässt sich laden. Alle anderen Modelle auf HuggingFace sind zu groß.
+* [huggingworld/m2m100_418M](https://huggingface.co/huggingworld/m2m100_418M) generiert
+  bei zu großer Eingabe nur Giberish. Gut funktioniert die Seite "Aus was besteht ein
+  Computer?", auch wenn die Übersetzung nicht perfekt ist. Die anderen Seiten sind
+  wohl zu groß. Es wiederholt sich immer dieselbe Anfangszeichenkette.
 
-* Das kleine Modell scheint nur zur Übersetzung kleinster Text mit einfachen Sätzen geeignet
-  zu sein. Bei großen Texten liefert es teilweise gar keine Übersetzung oder nur sinnlose
-  Zeichenketten. Bei kleinen Texten kommt eine Übersetzunt, diese ist grammatikalisch aber
-  falsch und enthält Rechtschreibfehler.
+* Ähnlich scheint es sich beim etwas kleineren [casawolice/small100-onnx](https://huggingface.co/casawolice/small100-onnx)
+  zu verhalten. Bei großen Texten liefert es teilweise gar keine Übersetzung oder nur sinnlose
+  Zeichenketten. Bei kleinen Texten kommt eine Übersetzung, diese ist grammatikalisch aber
+  falsch und enthält viele Rechtschreibfehler.
 
-* Unter Firefox Desktop friert der Browser für ca. 18 Sekunden ein. Auf mobilen Geräten wird
-  diese Funktion daher wohl gar nicht nutzbar sein.
+### Chat
+
+* Es gibt im Wesentlichen zwei Arten von Dialogmodellen (Conversational Models), die
+  mit unterschiedlichen Pipelines genutzt werden müssen:
+
+  * T5-Style: [`text2text-generation`-Pipeline](https://huggingface.co/docs/transformers.js/main/en/api/pipelines?utm_source=chatgpt.com#module_pipelines.Text2TextGenerationPipeline)
+  * GPT-Style (CasualLM): [`text-generation`-Pipeline](https://huggingface.co/docs/transformers.js/main/en/api/pipelines?utm_source=chatgpt.com#module_pipelines.TextGenerationPipeline)
+
+* Die `text2text-generation`-Pipeline erwartet die Eingabenachricht einfals String,
+  oder ein String-Array mit mehreren Nachrichten.
+
+* Die `text-generation`-Pipeline kann alternativ `Chat`-Objekte, die den Nachrichten
+  eine Rolle wie `system` oder `user` zuweisen, entgegennehmen:
+
+  ```js
+  const messages = [
+      { role: 'system', content: 'You are a helpful assistant.' },
+      { role: 'user', content: 'Write me a poem about Machine Learning.' },
+  ];
+  ```
 
 ### Alle Modelle
 
 * Anders als bei den meisten LLMs, sind die hier verwendeten kleinen Modelle nicht gut darin,
   Markdown-Syntax zu verarbeiten oder zu erzeugen.
+
+* Die Modelle lassen sich in drei Grundarchitekturen einordnen, gemäß untenstehender Tabelle.
+
+| Modellarchitektur         | High-Level Pipelines                                   | Low-Level AutoModel           |
+|---------------------------|--------------------------------------------------------|-------------------------------|
+| Encoder-only              | z.B. `feature-extraction`, `text-classification`       | `AutoModel` / task-spezifisch |
+| Encoder-decoder / Seq2Seq | `text2text-generation`, `translation`, `summarization` | `AutoModelForSeq2SeqLM`       |
+| Decoder-only / Causal LM  | `text-generation`                                      | `AutoModelForCausalLM`        |
 
 Fazit
 ----
@@ -350,25 +375,30 @@ Einschränkungen:
 * Es funktioniert nicht mit jedem Browser. Chrome hat bisher am besten funktioniert.
   Firefox am schlechtesten (Abstürze, keine WASM SIMD-Unterstützen auf älteren Geräten, ... ).
 
-* WebGPU war auf keinem der getesteten, mobilen Geräte verfügbar, obwohl es laut
-  [Can I Use](https://caniuse.com/?search=webgpu) ab Chrome für Android 151 unterstützt
-  werden sollte.
-
 * Speicher ist sehr knapp. Mehrere Modelle können daher nicht praktikabel im Speicher
   gehalten werden, sondern die Modelle regelmäßig neu geladen werden. Neben der Wartezeit
   erhöht dies auch den Traffic.
 
-* Der Browser friert ein, während ein Modell ausgeführt wird. Es findet kein Rendering
+* WASM: Der Browser friert ein, während ein Modell ausgeführt wird. Es findet kein Rendering
   und somit auch keine Aktualisierung der Anzeige statt, während ein Modell läuft.
+  Die Ausführung auf der CPU macht daher nur bei sehr kleinen Modelle, wie z.B. bei der
+  semantische Suche Sinn.
 
 * Dadurch, dass nur sehr kleine Modelle ausführbar sind, lassen sich auch keine
-  Anwendungsfälle lokale umsetzen, die man heute mit einem LLM assoziieren würde.
+  Anwendungsfälle lokal umsetzen, die man heute mit einem LLM assoziieren würde.
+  Die Ergebnisse der kleinen Modelle sind schlicht unbrauchbar für Übersetzungen,
+  Zusammenfassungen und so weiter.
+
+* Am aussichtsreichsten ist tatsächlich noch, LLM zu finden (siehe Tabelle der
+  Modellarchitekturen oben), die klein genug für die lokale Ausführung im Web sind
+  und den gewünschten Anwendungsfall noch am besten unterstützen. Aktuell ist die
+  Technik aber noch nicht so weit, dass dies wirklich praktikabel wäre.
 
 * Das Ökosystem entwickelt sich schnell weiter. Aber in Folge daraus, ist es auch nicht
   sehr stabil, was die durch ONNX 1.25 ausgelösten Fehlermeldungen zeigen, die über
   Monate hinweg nicht gefixt werden. Aber auch anhand der unvollständigen und fehlerhaften
   Dokumentation zu transformers.js, obwohl die Bibliothek immerhin schon in Version
-  4.2.0 vorliegt.
+  4.3.0 vorliegt.
 
 * Fine Tuning oder die Entwicklung eigener Modelle wären die nächsten logischen Schritte,
   um kleine Modelle für spezialisierte Anforderungen zu erstellen. Das Ziel müsste vermutlich
@@ -385,14 +415,11 @@ Einschränkungen:
   für RAG eignen, da sie darauf trainiert sind, Antworten nur anhand des Kontextes
   zu geben und sonst mit "ich weiß es nicht" zu antworten. Dies könnte eine bessere
   Alternative zu den hier getesteten "Question Answering" Modellen sein. Leider ist
-  aber zumindest TeapotLLM nur auf englisch trainiert.
+  TeapotLLM aber nur auf englisch trainiert.
 
-* In Summe kommt es daher sehr auf den Anwendungsfall an. Sehr spezialisierte Aufgaben
-  lassen sich, wenn die Devices mit fortschreitender Zeit leistunfähiger werden, die
-  Modelle insgesamt besser und die APIs ausgereifter, lokal ausführen. Von einem rein
-  lokalen LLM innerhalb einer Webanwendung sind wir aber noch weit entfernt. Dies lässt
-  sich Stand heute nur in Native-Apps und auch dort nur auf den leistungsfähigsten
-  Geräten umsetzen.
+* Generell sind die kleineren, offenen Modelle in der großen Mehrzahl auf englisch
+  trainiert. Explizit deutschsprachige Modelle sind selten und die Qualität ist auch
+  nicht sehr hoch.
 
 Copyright
 ---------

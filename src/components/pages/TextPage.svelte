@@ -17,7 +17,6 @@ Auswgeählte Textseite
     import QuestionAnsweringPage from "./textpage/QuestionAnsweringPage.svelte";
     import SummaryPage           from "./textpage/SummaryPage.svelte";
     import TextContentPage       from "./textpage/TextContentPage.svelte";
-    import TextToSpeechPage      from "./textpage/TextToSpeechPage.svelte";
     import TranslationPage       from "./textpage/TranslationPage.svelte";
 
     import navigationState       from "../../state/NavigationState.svelte.js";
@@ -59,13 +58,7 @@ Auswgeählte Textseite
                 icon:   "bi-translate",
                 label:  "Übersetzen",
                 url:    `#/page/${textPageId}/translation`,
-            },
-            {
-                id:     "tts",
-                icon:   "bi-speaker",
-                label:  "Vorlesen",
-                url:    `#/page/${textPageId}/tts`,
-            },
+            }
         ];
     });
 </script>
@@ -79,8 +72,6 @@ Auswgeählte Textseite
         <QuestionAnsweringPage/>
     {:else if subPageId === "translation"}
         <TranslationPage/>
-    {:else if subPageId === "tts"}
-        <TextToSpeechPage/>
     {/if}
 </div>
 

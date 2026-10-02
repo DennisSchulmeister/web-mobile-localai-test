@@ -63,7 +63,7 @@ class SummaryPageState {
             this.answer = answer?.[0]?.summary_text || "";
 
             if (!this.answer) {
-                console.error("Ungültige Antort des Modells", answer);
+                console.error("Ungültige Antwort des Modells", answer);
                 this.errorMessage = "Das Modell hat keinen Text erzeugt";
             }
 

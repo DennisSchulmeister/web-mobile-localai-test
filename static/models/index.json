@@ -2,14 +2,19 @@
     "summarization": [
         {
             "modelId": "onnx-community/t5-small-german-ONNX",
-            "dtypes": ["int8"]
+            "dtypes": ["q4", "int8"]
         },
         {
             "modelId": "onnx-community/bart-german-ONNX",
-            "dtypes": ["int8"]
+            "dtypes": ["q4", "int8"]
         }
     ],
     "translation": [
+        {
+            "modelId": "huggingworld/m2m100_418M",
+            "dtypes": ["q8"],
+            "languages": ["de", "en", "es", "fr", "it"]
+        },
         {
             "modelId": "casawolice/small100-onnx",
             "dtypes": ["fp32"],
@@ -19,7 +24,7 @@
     "question-answering": [
         {
             "modelId": "onnx-community/all-MiniLM-L12-v2-qa-all-ONNX",
-            "dtypes": ["int8"],
+            "dtypes": ["q4", "int8"],
             "prefix": {
                 "question": "",
                 "context": ""
@@ -40,10 +45,39 @@
             "dtypes": ["fp32"]
         }
     ],
-    "text-to-speech": [
+    "text-generation": [
         {
-            "modelId": "onnx-community/Supertonic-TTS-ONNX",
-            "dtypes": ["fp32"]
+            "modelId": "onnx-community/SmolLM2-135M-ONNX",
+            "dtypes": ["q4"],
+            "systemPrompt": "You are a helpful assistant."
+        },
+        {
+            "modelId": "onnx-community/Qwen3-0.6B-ONNX",
+            "dtypes": ["q4"],
+            "systemPrompt": "You are a helpful assistant."
+        },
+        {
+            "modelId": "LiquidAI/LFM2.5-1.2B-Instruct-ONNX",
+            "dtypes": ["q4"],
+            "systemPrompt": "You are a helpful assistant."
+        }
+    ],
+    "text2text-generation": [
+        {
+            "modelId": "Xenova/LaMini-Flan-T5-783M",
+            "dtypes": ["q4"],
+            "prefix": {
+                "question": "",
+                "context": ""
+            }
+        },
+        {
+            "modelId": "teapotai/teapotllm",
+            "dtypes": ["q4"],
+            "prefix": {
+                "question": "",
+                "context": ""
+            }
         }
     ]
 }
