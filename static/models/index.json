@@ -47,18 +47,25 @@
     ],
     "text-generation": [
         {
-            "modelId": "onnx-community/SmolLM2-135M-ONNX",
+            "modelId": "onnx-community/SmolLM2-135M-Instruct-ONNX",
             "dtypes": ["q4"],
+            "instructionTuned": true,
             "systemPrompt": "You are a helpful assistant."
         },
         {
             "modelId": "onnx-community/Qwen3-0.6B-ONNX",
             "dtypes": ["q4"],
-            "systemPrompt": "You are a helpful assistant."
+            "instructionTuned": true,
+            "systemPrompt": "You are a helpful assistant.",
+            "tokenizerArgs": {
+                "enable_thinking": false
+            }
+
         },
         {
             "modelId": "LiquidAI/LFM2.5-1.2B-Instruct-ONNX",
             "dtypes": ["q4"],
+            "instructionTuned": true,
             "systemPrompt": "You are a helpful assistant."
         }
     ],

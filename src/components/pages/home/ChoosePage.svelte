@@ -16,6 +16,7 @@ Einfaches Auswahlmenü für die anzuzeigende Textseite.
     import SelectionList   from "../../basic/SelectionList.svelte"
     import navigationState from "../../../state/NavigationState.svelte.js";
     import textPageState   from "../../../state/TextPageState.svelte.js";
+    import {randomId}      from "../../../utils/id.js";
 
     onMount(async () => {
         navigationState.pageTitle = "Textseite auswählen";
@@ -34,6 +35,7 @@ Einfaches Auswahlmenü für die anzuzeigende Textseite.
 
         for (let category of textPageState.categories || []) {
             newItems.push({
+                id:   randomId(),
                 type: "section",
                 text: category.category || "",
                 href: "",
@@ -41,6 +43,7 @@ Einfaches Auswahlmenü für die anzuzeigende Textseite.
 
             for (let page of category.pages || []) {
                 newItems.push({
+                    id:   randomId(),
                     type: "link",
                     text: page.title || page.file || "",
                     href: textPageState.getTextPageUrl(page.file),

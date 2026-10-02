@@ -17,7 +17,7 @@ Auswahl eines KI-Modells
     import modelState from "../../state/ModelState.svelte.js";
 
     let {
-        task = "",               // Erster Parameter für `transformers.pipeline()`
+        task = "",               // Erster Parameter für `transformers.pipeline()` als String oder String Array
         disabled = false,        // Keine Auswahl zulassen, z.B. weil das geladene Modell gerade genutzt wird
     } = $props();
 
@@ -27,17 +27,32 @@ Auswahl eines KI-Modells
         "webnn":  "WebNN"
     };
 
-    let selected_modelId    = $derived(modelState.models[task]?.[0]?.modelId || "");
-    let selected_index      = $derived(modelState.models[task]?.findIndex(e => e.modelId === selected_modelId));
-    let selected_dtypes     = $derived(modelState.models[task]?.[selected_index]?.dtypes || []);
-    let selected_dtype      = $derived(modelState.models[task]?.[selected_index]?.dtypes?.[0] || "");
+    let available_tasks = $derived(Array.isArray(task) ? task : [task]);
+
+    let available_models = $derived.by(() => {
+        let result = [];
+
+        for (let available_task of available_tasks) {
+            for (let model of modelState.models[available_task] || []) {
+                result.push({...model, task: available_task});
+            }
+        }
+
+        return result;
+    });
+
+    let selected_modelId    = $derived(available_models[0]?.modelId || "");
+    let selected_index      = $derived(available_models.findIndex(e => e.modelId === selected_modelId));
+    let selected_task       = $derived(available_models[selected_index]?.task || "");
+    let selected_dtypes     = $derived(available_models[selected_index]?.dtypes || []);
+    let selected_dtype      = $derived(available_models[selected_index]?.dtypes?.[0] || "");
     let selected_device     = $state(navigator.ml ? "webnn" : navigator.gpu ? "webgpu" : "wasm");
     let loaded_device_text  = $derived(text_device[modelState.loadedModel.device])
     let loaded_device_color = $derived(modelState.loadedModel.device === "wasm" ? "darkred" : "darkgreen");
 
     async function onLoadClicked() {
         await modelState.loadModel({
-            task:    task,
+            task:    selected_task,
             modelId: selected_modelId,
             dtype:   selected_dtype,
             device:  selected_device,
@@ -58,7 +73,7 @@ Auswahl eines KI-Modells
             <Loading text="Modell wird geladen"/>
         {:else if modelState.loadedModel.status === "error"}
             <IconText type="error" text={modelState.loadedModel.message}/>
-        {:else if !modelState.loadedModel.modelId || modelState.loadedModel.task !== task}
+        {:else if !modelState.loadedModel.modelId || !available_tasks.includes(modelState.loadedModel.task)}
             <IconText text="Es wurde noch kein Modell geladen." textColor="darkgrey"/>
         {:else}
             <div class="loadedModel">
@@ -84,7 +99,7 @@ Auswahl eines KI-Modells
             <label>
                 <span>Sprachmodell</span>
                 <select bind:value={selected_modelId} {disabled}>
-                    {#each modelState.models[task] as model}
+                    {#each available_models as model}
                         <option value="{model.modelId}">
                             {model.modelId}
                         </option>

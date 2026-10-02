@@ -32,17 +32,22 @@ Folgende Anwendungsfälle sollen hier getestet werden:
     <tr>
         <td>
             <a href="./doc/screenshot1.png">
-                <img src="./doc/screenshot1.png" width="200" alt="Screenshot 1">
+                <img src="./doc/screenshot1.png" width="200" alt="Screenshot: Textseite auswählen">
             </a>
         </td>
         <td>
             <a href="./doc/screenshot2.png">
-                <img src="./doc/screenshot2.png" width="200" alt="Screenshot 2">
+                <img src="./doc/screenshot2.png" width="200" alt="Screenshot: Textseite suchen">
             </a>
         </td>
         <td>
             <a href="./doc/screenshot3.png">
-                <img src="./doc/screenshot3.png" width="200" alt="Screenshot 3">
+                <img src="./doc/screenshot3.png" width="200" alt="Screenshot: Text anzeigen">
+            </a>
+        </td>
+        <td>
+            <a href="./doc/screenshot4.png">
+                <img src="./doc/screenshot4.png" width="200" alt="Screenshot: Freier Chat">
             </a>
         </td>
     </tr>
@@ -178,10 +183,6 @@ Lessons Learned
   Modelle sind auf Englisch trainiert. Zum Beispiel: [Xenova/distilbart-xsum-12-1](https://huggingface.co/Xenova/distilbart-xsum-12-1)
   generiert bei einem deutschen Text nur Müll.
 
-* Die Dokumentation von transformers.js ist teilweise unvollständig und fehlerhaft. Manche
-  Funktionen wie Text2Audio werden nur im Code in Form von Kommentaren dokumentiert. Andere
-  Module wie `utils/hub` sind zwar dokumentiert, werden aber nicht exportiert.
-
 * transformers.js besitzt für viele Modelle, in der Dokumentation nicht erwähnte, feste
   Konfigurationen im Code. Die Hoffnung ist, dass andere Modelle trotzdem nutzbar sind.
 
@@ -200,6 +201,7 @@ Lessons Learned
   [Space: Convert to ONNX](https://huggingface.co/spaces/onnx-community/convert-to-onnx)
 
 * Firefox 156 / Linux / WebGPU scheint keine Ausgaben zu generieren.
+  Ausnahme: Chat
 
 ### Semantische Suche
 
@@ -351,6 +353,49 @@ Lessons Learned
       { role: 'user', content: 'Write me a poem about Machine Learning.' },
   ];
   ```
+
+* `Chat`-Objekte benötigen jedoch ein Chat-Template, um in die vom Modell erwartete Token-Struktur
+  übersetzt zu werden. Aus der [Transformer-Dokumentation](https://huggingface.co/docs/transformers/main/en/chat_templating):
+
+  ```text
+  The critical insight needed to understand chat models is this: All causal
+  LMs, whether chat-trained or not, continue a sequence of tokens. When causal
+  LMs are trained, the training usually begins with “pre-training” on a huge
+  corpus of text, which creates a “base” model. These base models are then
+  often “fine-tuned” for chat, which means training them on data that is
+  formatted as a sequence of messages. The chat is still just a sequence of
+  tokens, though! The list of role and content dictionaries that you pass to a
+  chat model get converted to a token sequence, often with control tokens like
+  <|user|> or <|assistant|> or <|end_of_message|>, which allow the model to see
+  the chat structure. There are many possible chat formats, and different
+  models may use different formats or control tokens, even if they were
+  fine-tuned from the same base model!
+  ```
+
+* Allerdings hängt es vom Modell ab, ob es "Instruction Tuned" ist und somit einen
+  Chat-Struktur als Eingabe erwartet. Ist ein Modell nicht "Instruction Tuned",
+  besitzt es auch kein Chat-Template und kann folglich nur mit einem einfachen
+  String als Eingabe aufgerufen werden.
+
+* [onnx-community/Qwen3-0.6B-ONNX](https://huggingface.co/onnx-community/Qwen3-0.6B-ONNX)
+  und [LiquidAI/LFM2.5-1.2B-Instruct-ONNX](https://huggingface.co/LiquidAI/LFM2.5-1.2B-Instruct-ONNX)
+  sprechen auch deutsch. Bei Qwen sind die Antworten auf deutsche Fragen aber inhaltlich
+  wesentlich schlechter (redet Blödsinn) als auf englische Fragen. Bei LiquidAI vermutlich
+  auch, die deutschen Antworten scheinen aber besser als bei Qwen zu sein. Die Antworten
+  beider Modell sind (in allen Sprachen) ausführlicher als bei den anderen Modellen.
+
+* [onnx-community/SmolLM2-135M-Instruct-ONNX](https://huggingface.co/onnx-community/SmolLM2-135M-Instruct-ONNX)
+  hat eine gute Geschwindigkeit. Das Modell ist auch sehr klein (ca. 200 MB).  Die Qualität
+  der Antworten schwank stark, von gut bis mehr oder weniger Blödsinn. Getestet mit "What is HTML?".
+
+* [Xenova/LaMini-Flan-T5-783M](https://huggingface.co/Xenova/LaMini-Flan-T5-783M) generiert
+  sehr kurze Antworten. Dennoch ist es sehr langsam.
+
+* [teapotai/teapotllm](https://huggingface.co/teapotai/teapotllm) ist eigentlich darauf trainiert,
+  nur Fragen zu einem gegebenen Kontext zu beantworten. Die Frage muss dafür in einer eigenen
+  Zeile, getrennt durch eine Leerzeile, unter dem Kontext stehen. Ohne Kontext antwortet das Modell
+  aber aus seinem internen Wissen heraus, wenn auch noch kürzer als 
+  [Xenova/LaMini-Flan-T5-783M](https://huggingface.co/Xenova/LaMini-Flan-T5-783M).
 
 ### Alle Modelle
 

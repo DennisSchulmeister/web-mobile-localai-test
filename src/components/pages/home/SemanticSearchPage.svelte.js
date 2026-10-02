@@ -12,6 +12,7 @@ import modelState        from "../../../state/ModelState.svelte";
 import StopWatchState    from "../../../state/StopWatchState.svelte.js";
 import textPageState     from "../../../state/TextPageState.svelte.js";
 
+import {randomId}        from "../../../utils/id.js";
 import {decodeEmbedding} from "../../../../shared/embedding.js";
 
 /**
@@ -62,7 +63,7 @@ class SemanticSearchPageState {
             let queryEmbedding = (await modelState.model(this.query, {pooling: "mean", normalize: true})).data;
     
             // Index durchsuchen
-            this.stopWatchState.start("Suche", "bi-serch");
+            this.stopWatchState.start("Suche", "bi-search");
     
             this.progressMax = 0;
     
@@ -120,6 +121,7 @@ class SemanticSearchPageState {
             for (let searchResult of searchResults) {
                 let item = {
                     type:  "link",
+                    id:    randomId(),
                     text:  searchResult.title,
                     extra: `${Math.round(searchResult.fit * 100)}%`,
                     href:  textPageState.getTextPageUrl(searchResult.file),

@@ -58,7 +58,7 @@ export default class StopWatchState {
      * und eine neue Messung gestartet. Läuft gerade keine Messung, werden die
      * alten Messungen verworfen.
      * 
-     * @param {string} name Name der Messumg
+     * @param {string} name Name der Messung
      * @param {string} icon Icon der Messung
      * @param {number?} interval Update-Intervall für das UI (default 100ms)
      */
@@ -67,7 +67,7 @@ export default class StopWatchState {
             this.measurements = [];
             this.running = true;
         } else {
-            this.#updateCurrentMeasurment();
+            this.#updateCurrentMeasurement();
         }
 
         this.measurements.push({
@@ -80,7 +80,7 @@ export default class StopWatchState {
         });
 
         if (!this.#intervalId) {
-            this.#intervalId = window.setInterval(() => this.#updateCurrentMeasurment(), this.interval);
+            this.#intervalId = window.setInterval(() => this.#updateCurrentMeasurement(), this.interval);
         }
     }
 
@@ -96,14 +96,21 @@ export default class StopWatchState {
         if (!this.running) return;
         this.running = false;
 
-        this.#updateCurrentMeasurment();
+        this.#updateCurrentMeasurement();
+    }
+
+    /**
+     * Messungen löschen.
+     */
+    reset() {
+        this.measurements = []; //.splice(0);
     }
 
     /**
      * Aktuell laufende Messung aktualisieren. Aktualisiert die Datenfelder des letzten
      * Eintrags in `this.measurements[]`.
      */
-    #updateCurrentMeasurment() {
+    #updateCurrentMeasurement() {
         if (this.measurements.length > 0) {
             let lastMeasurement = this.measurements[this.measurements.length - 1];
 

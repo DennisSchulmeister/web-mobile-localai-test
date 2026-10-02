@@ -22,55 +22,55 @@ KI-Anwendungsfall: Summarization
     import StopWatch       from "../../basic/StopWatch.svelte";
 
     import navigationState from "../../../state/NavigationState.svelte.js";
-    import state           from "./SummaryPage.svelte.js";
+    import pageState       from "./SummaryPage.svelte.js";
 
     let md = new MarkdownIt();
-    let htmlAnswer = $derived(md.render(state.answer));
+    let htmlAnswer = $derived(md.render(pageState.answer));
 
     onMount(() => {
         navigationState.pageTitle = "Text zusammenfassen";
     });
 
     async function onExecuteClicked() {
-        await state.execute();
+        await pageState.execute();
     }
 </script>
 
 <Section>
-    <ModelSelector task="summarization" disabled={state.working}/>
+    <ModelSelector task="summarization" disabled={pageState.working}/>
 </Section>
 
 <Section>
     <label>
-        Länge: {state.maxNewTokens} Tokens
+        Länge: {pageState.maxNewTokens} Tokens
         <input
             type       = "range"
-            min        = {state.minTokens}
-            max        = {state.maxTokens}
-            bind:value = {state.maxNewTokens}
-            disabled   = {state.disabled}
+            min        = {pageState.minTokens}
+            max        = {pageState.maxTokens}
+            bind:value = {pageState.maxNewTokens}
+            disabled   = {pageState.disabled}
         />
     </label>
 
-    <button onclick={onExecuteClicked} disabled={state.disabled}>Start</button>
+    <button onclick={onExecuteClicked} disabled={pageState.disabled}>Start</button>
 </Section>
 
-{#if state.working}
+{#if pageState.working}
     <Section line={true}>
         <Loading text="Antwort wird generiert"/>
     </Section>
-{:else if state.answer}
+{:else if pageState.answer}
     <Section line={true}>
         {@html htmlAnswer}
     </Section>
 {/if}
 
 <Section line={false}>
-    {#if state.errorMessage}
-        <IconText type="error" text={state.errorMessage}/>
+    {#if pageState.errorMessage}
+        <IconText type="error" text={pageState.errorMessage}/>
     {/if}
 
-    <StopWatch measurements={state.stopWatchState.measurements}/>
+    <StopWatch measurements={pageState.stopWatchState.measurements}/>
 </Section>
 
 <style>

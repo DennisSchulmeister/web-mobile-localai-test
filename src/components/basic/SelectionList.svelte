@@ -22,7 +22,7 @@ Eine einfache Auswahlliste im Android-Style. Items sind Objekte mit folgenden At
 </script>
 
 <div class="selectionList">
-    {#each items as item}
+    {#each items as item (item.id)}
         <div class="listItem {item.type}">
             {#if item.type === "link"}
                 <a href={item.href} aria-label={item.text}></a>

@@ -22,10 +22,10 @@ KI-Anwendungsfall: Question Answering
     import StopWatch       from "../../basic/StopWatch.svelte";
 
     import navigationState from "../../../state/NavigationState.svelte.js";
-    import state           from "./QuestionAnsweringPage.svelte.js";
+    import pageState       from "./QuestionAnsweringPage.svelte.js";
 
     let md = new MarkdownIt();
-    let htmlAnswer = $derived(md.render(state.answer));
+    let htmlAnswer = $derived(md.render(pageState.answer));
 
     onMount(() => {
         navigationState.pageTitle = "Fragen beantworten";
@@ -33,40 +33,40 @@ KI-Anwendungsfall: Question Answering
 
     async function onExecuteClicked(event) {
         event.preventDefault();
-        await state.execute();
+        await pageState.execute();
     }
 </script>
 
 <Section>
-    <ModelSelector task="question-answering" disabled={state.working}/>
+    <ModelSelector task="question-answering" disabled={pageState.working}/>
 </Section>
 
 <Section>
     <!-- svelte-ignore a11y_no_redundant_roles -->
     <form onsubmit={onExecuteClicked}>
         <fieldset role="group">
-            <input placeholder="Frage" bind:value={state.question} disabled={state.disabled}/>
-            <input type="submit" value="Start" disabled={state.disabled}/>
+            <input placeholder="Frage" bind:value={pageState.question} disabled={pageState.disabled}/>
+            <input type="submit" value="Start" disabled={pageState.disabled}/>
         </fieldset>
     </form>
 </Section>
 
-{#if state.working}
+{#if pageState.working}
     <Section line={true}>
         <Loading text="Antwort wird generiert"/>
     </Section>
-{:else if state.answer}
+{:else if pageState.answer}
     <Section line={true}>
         {@html htmlAnswer}
     </Section>
 {/if}
 
 <Section line={false}>
-    {#if state.errorMessage}
-        <IconText type="error" text={state.errorMessage}/>
+    {#if pageState.errorMessage}
+        <IconText type="error" text={pageState.errorMessage}/>
     {/if}
 
-    <StopWatch measurements={state.stopWatchState.measurements}/>
+    <StopWatch measurements={pageState.stopWatchState.measurements}/>
 </Section>
 
 <style>

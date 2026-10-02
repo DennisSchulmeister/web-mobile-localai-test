@@ -23,10 +23,10 @@ KI-Anwendungsfall: Translation
 
     import navigationState from "../../../state/NavigationState.svelte.js";
     import modelState      from "../../../state/ModelState.svelte.js";
-    import state           from "./TranslationPage.svelte.js";
+    import pageState       from "./TranslationPage.svelte.js";
 
     let md = new MarkdownIt();
-    let htmlResult = $derived(md.render(state.result));
+    let htmlResult = $derived(md.render(pageState.result));
 
     onMount(() => {
         navigationState.pageTitle = "Text übersetzen";
@@ -34,19 +34,19 @@ KI-Anwendungsfall: Translation
 
     async function onSubmit(event) {
         event.preventDefault();
-        await state.execute();
+        await pageState.execute();
     }
 </script>
 
 <Section>
-    <ModelSelector task="translation" disabled={state.working}/>
+    <ModelSelector task="translation" disabled={pageState.working}/>
 </Section>
 
 <Section>
     <form onsubmit={onSubmit} class="grid">
         <label>
             Von
-            <select value={state.src_language} disabled>
+            <select value={pageState.src_language} disabled>
                 {#each Object.keys(modelState.config.translation.languages) as language}
                     <option value={language}>{modelState.config.translation.languages[language]}</option>
                 {/each}
@@ -54,32 +54,32 @@ KI-Anwendungsfall: Translation
         </label>
         <label>
             Nach
-            <select bind:value={state.dst_language} disabled={state.disabled}>
+            <select bind:value={pageState.dst_language} disabled={pageState.disabled}>
                 {#each modelState.loadedModel?.config?.languages as language}
                     <option value={language}>{modelState.config.translation.languages[language]}</option>
                 {/each}
             </select>
         </label>
-        <input type="submit" value="Start" disabled={state.disabled || !state.dst_language}/>
+        <input type="submit" value="Start" disabled={pageState.disabled || !pageState.dst_language}/>
     </form>
 </Section>
 
-{#if state.working}
+{#if pageState.working}
     <Section line={true}>
         <Loading text="Antwort wird generiert"/>
     </Section>
-{:else if state.result}
+{:else if pageState.result}
     <Section line={true}>
         {@html htmlResult}
     </Section>
 {/if}
 
 <Section line={false}>
-    {#if state.errorMessage}
-        <IconText type="error" text={state.errorMessage}/>
+    {#if pageState.errorMessage}
+        <IconText type="error" text={pageState.errorMessage}/>
     {/if}
 
-    <StopWatch measurements={state.stopWatchState.measurements}/>
+    <StopWatch measurements={pageState.stopWatchState.measurements}/>
 </Section>
 
 <style>

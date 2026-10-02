@@ -21,7 +21,7 @@ KI-Anwendungsfall: Semantische Suche von Textseiten
     import StopWatch         from "../../basic/StopWatch.svelte";
     
     import navigationState   from "../../../state/NavigationState.svelte.js";
-    import state             from "./SemanticSearchPage.svelte.js";
+    import pageState         from "./SemanticSearchPage.svelte.js";
     
     onMount(() => {
         navigationState.pageTitle = "Textseite suchen";
@@ -29,49 +29,49 @@ KI-Anwendungsfall: Semantische Suche von Textseiten
 
     async function onSubmit(event) {
         event.preventDefault();
-        return state.executeSearch();
+        return pageState.executeSearch();
     }
 </script>
 
 <Section>
-    <ModelSelector task="feature-extraction" disabled={state.working}/>
+    <ModelSelector task="feature-extraction" disabled={pageState.working}/>
 </Section>
 
 <Section>
     <form role="search" onsubmit={onSubmit}>
-        <input type="search" placeholder="Suchbegriff" bind:value={state.query} disabled={state.disabled}/>
-        <input type="submit" value="Suchen" disabled={state.disabled || !state.query}/>
+        <input type="search" placeholder="Suchbegriff" bind:value={pageState.query} disabled={pageState.disabled}/>
+        <input type="submit" value="Suchen" disabled={pageState.disabled || !pageState.query}/>
     </form>
 
     <div class="options">
         <label>
-            <input type="checkbox" role="switch" bind:checked={state.searchAll} disabled={state.disabled}/>
+            <input type="checkbox" role="switch" bind:checked={pageState.searchAll} disabled={pageState.disabled}/>
             Volltextsuche
         </label>
     
         <label>
-            <input type="checkbox" role="switch" bind:checked={state.matchText} disabled={state.disabled}/>
+            <input type="checkbox" role="switch" bind:checked={pageState.matchText} disabled={pageState.disabled}/>
             Direkter Textvergleich
         </label>
     </div>
 </Section>
 
-{#if state.working}
+{#if pageState.working}
     <Section line={false}>
-        <progress value={state.progressValue} max={state.progressMax}></progress>
+        <progress value={pageState.progressValue} max={pageState.progressMax}></progress>
     </Section>
 {:else}
     <div class="margin-bottom">
-        <SelectionList items={state.items} />
+        <SelectionList items={pageState.items} />
     </div>
 {/if}
 
 <Section line={false}>
-    {#if state.errorMessage}
-        <IconText type="error" text={state.errorMessage}/>
+    {#if pageState.errorMessage}
+        <IconText type="error" text={pageState.errorMessage}/>
     {/if}
 
-    <StopWatch measurements={state.stopWatchState.measurements}/>
+    <StopWatch measurements={pageState.stopWatchState.measurements}/>
 </Section>
 
 <style>

@@ -65,5 +65,8 @@ Startseite mit Auswahl und Suche von Textseiten.
     #page {
         flex: 1;
         overflow: auto;
+
+        display: flex;
+        flex-direction: column;
     }
 </style>
