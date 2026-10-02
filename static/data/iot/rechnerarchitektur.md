@@ -10,7 +10,7 @@ Nahezu jedes Computersystem besteht aus folgenden Grundkomponenten:
 3) Hauptspeicher
 4) I/O-Ports
 5) Taktgeber
-6) Resetschalter
+6) Reset-Schalter
 7) Stromversorgung
 8) Adresskodierung
 

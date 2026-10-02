@@ -41,10 +41,40 @@
                 "title": "Die Idee hinter dem World Wide Web",
                 "file": "webprog/idee.md",
                 "language": "de"
-            },{
+            },
+            {
                 "title": "Die Bestandteile des World Wide Web",
                 "file": "webprog/bestandteile.md",
                 "language": "de"
+            }
+        ]
+    },{
+        "category": "English Pages",
+        "pages": [
+            {
+                "title": "Deriving the System Architecture",
+                "file": "english/architecture.md",
+                "language": "en"
+            },
+            {
+                "title": "What Makes Up a Computer?",
+                "file": "english/computer-architecture.md",
+                "language": "en"
+            },
+            {
+                "title": "Embedded Systems",
+                "file": "english/embedded-system.md",
+                "language": "en"
+            },
+            {
+                "title": "Internet of Things",
+                "file": "english/internet-of-things.md",
+                "language": "en"
+            },
+            {
+                "title": "The Idea Behind the World Wide Web",
+                "file": "english/www-idea.md",
+                "language": "en"
             }
         ]
     }
