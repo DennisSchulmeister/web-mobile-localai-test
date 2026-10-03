@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Local AI Test</string>
+    <string name="title_activity_main">Local AI Test</string>
+    <string name="package_name">de.wpvs.localai_test</string>
+    <string name="custom_url_scheme">de.wpvs.localai_test</string>
+</resources>

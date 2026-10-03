@@ -13,7 +13,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 import path  from "path";
 import shell from "shelljs";
 
-for (let dir of process.env.npm_package_config_clean_dirs?.split(" : ") || []) {
+for (let dir of process.argv.slice(2)) {
     dir = path.normalize(path.join(__dirname, "..", dir));
     shell.rm("-rf", dir);
 }

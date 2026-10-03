@@ -106,6 +106,18 @@ SPA-Routing ermöglicht.
         align-items: stretch;
     }
 
+    :global(html.native-app body) {
+        padding: 0;
+        height: 100dvh;
+    }
+
+    :global(html.native-app) #app-container {
+        width: 100%;
+        max-width: none;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
     main {
         flex: 1;
 

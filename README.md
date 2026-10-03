@@ -4,9 +4,9 @@ Web/Mobile-Test für lokale KI
 1. [Beschreibung](#beschreibung)
 1. [Vorbereitungen](#vorbereitungen)
 1. [Start der Anwendung](#start-der-anwendung)
+1. [Android App bauen](#android-app-bauen)
 1. [Technische Umsetzung](#technische-umsetzung)
 1. [Künftige Web APIs](#künftige-web-apis)
-1. [Weitere Ideen](#weitere-ideen)
 1. [Lessons Learned](#lessons-learned)
 1. [Fazit](#fazit)
 1. [Copyright](#copyright)
@@ -99,6 +99,24 @@ kann dann über http://localhost:8888 im Browser aufgerufen werden.
 Für ein statisches Deployment, kann die Anwendung mit `npm run build` gebaut werden.
 Die Inhalte des `static`-Verzeichnisses können dann auf einen Webserver geschoben werden.
 
+Android App bauen
+-----------------
+
+Die Anwendung kann optional auch mit [Capacitor](https://capacitorjs.com/) als installierbares
+APK-File für Android verpackt werden. Hierfür muss die Anwendung, wie oben beschrieben,
+initialisiert und mindestens einemal während der lokalen Entwicklung gebaut worden sein.
+
+Danach können die Quelldateien für Android mit folgendem Befehl aktualisiert werden. Dies
+muss immer gemacht werden, wenn sie die Webquellen oder die Inhalte im `static/`-Verzeichnis
+verändert werden.
+
+```sh
+npm run android:sync
+```
+
+Zum Bauen öffnet man am besten das Verzeichnis `android/` in Android Studio und wählt dort
+_Build → Generate Signed App Bundle or APK_ zum Bauen der Anwendung.
+
 Technische Umsetzung
 --------------------
 
@@ -119,6 +137,11 @@ Die Anwendung nutzt die high-level Pipeline API von transformers.js, da diese f�
 Modellart die typischen Verarbeitungsschritte kapselt. Bei Bedarf könnte aber auf die
 low-lever `Model`/`Tokenizer`/…-Klassen gewechselt werden, durch Anpassung der Methode
 `loadModel()` der Klasse `ModelState`.
+
+Zusätzlich kann die App als Android App gepackt werden. Hierfür werden genutzt:
+
+* **Capacitor:** https://capacitorjs.com/
+* **Android SDK:** https://developer.android.com/
 
 Künftige Web APIs
 -----------------

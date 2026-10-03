@@ -7,6 +7,7 @@
  */
 
 import {mount}           from "svelte";
+import {Capacitor}       from "@capacitor/core";
 
 import ApplicationFrame  from "./components/app-frame/ApplicationFrame.svelte";
 import modelState        from "./state/ModelState.svelte.js";
@@ -17,5 +18,7 @@ import "bootstrap-icons/font/bootstrap-icons.min.css";
 
 await modelState.reloadModelConfiguration();
 await textPageState.reloadCategories();
+
+document.documentElement.classList.toggle("native-app", Capacitor.isNativePlatform());
 
 mount(ApplicationFrame, {target: document.body});

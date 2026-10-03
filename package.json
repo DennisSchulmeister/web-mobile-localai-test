@@ -6,19 +6,25 @@
     "private": "true",
     "type": "module",
     "scripts": {
-        "clean": "node bin/clean.js",
-        "build": "npm run clean && node bin/esbuild/bundle.js",
+        "clean": "npm run clean:bundle && npm run clean:data && npm run clean:models",
+        "clean:bundle": "node bin/clean.js static/_bundle",
+        "clean:data": "node bin/clean.js static/_generated/preprocessed static/_generated/embeddings",
+        "clean:models": "node bin/clean.js static/_generated/models",
+        "build": "npm run clean:bundle && node bin/esbuild/bundle.js",
         "start": "node bin/esbuild/serve.js",
         "watch": "node bin/esbuild/serve.js",
         "init": "npm run init:download && npm run init:preprocess && npm run init:embeddings",
         "init:download": "node bin/init/download.js static/config.json",
         "init:preprocess": "node bin/init/preprocess.js static/config.json",
-        "init:embeddings": "node bin/init/embeddings.js static/config.json"
-    },
-    "config": {
-        "clean_dirs": "static/_bundle:static/_generated"
+        "init:embeddings": "node bin/init/embeddings.js static/config.json",
+        "android:add": "npx cap init 'Local AI Test' 'de.wpvs.localai_test' --web-dir static && npx cap add android",
+        "android:sync": "npm run build && npx cap sync android",
+        "android:open": "npx cap open android"
     },
     "devDependencies": {
+        "@capacitor/android": "^8.5.2",
+        "@capacitor/cli": "^8.5.2",
+        "@capacitor/core": "^8.5.2",
         "@huggingface/transformers": "^4.3.0",
         "@picocss/pico": "^2.1.1",
         "bootstrap-icons": "^1.13.1",
