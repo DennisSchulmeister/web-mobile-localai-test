@@ -115,7 +115,15 @@ npm run android:sync
 ```
 
 Zum Bauen öffnet man am besten das Verzeichnis `android/` in Android Studio und wählt dort
-_Build → Generate Signed App Bundle or APK_ zum Bauen der Anwendung.
+_Build → Generate App Bundles or APKs_ zum Bauen der Anwendung.
+
+Aktuell kommt es aber noch zu folgendem Fehler während dem Build:
+
+```text
+Zip32 cannot place CD entry 'assets/public/_generated/models/teapotai/teapotllm/onnx/encoder_model_q4.onnx' payload at 4319573958 (MAX=4294967295)
+```
+
+Sieht so aus, als dürften wir die Modelle nicht in das APK packen, da es dadurch zu groß wird.
 
 Technische Umsetzung
 --------------------
