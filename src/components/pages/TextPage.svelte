@@ -14,6 +14,7 @@ Ausgewählte Textseite
 <script>
     import {onMount}             from "svelte";
     
+    import ChatPage              from "./common/ChatPage.svelte";
     import QuestionAnsweringPage from "./textpage/QuestionAnsweringPage.svelte";
     import SummaryPage           from "./textpage/SummaryPage.svelte";
     import TextContentPage       from "./textpage/TextContentPage.svelte";
@@ -58,7 +59,13 @@ Ausgewählte Textseite
                 icon:   "bi-translate",
                 label:  "Übersetzen",
                 url:    `#/page/${textPageId}/translation`,
-            }
+            },
+            {
+                id:     "chat",
+                icon:   "bi-chat-dots",
+                label:  "Chat",
+                url:    `#/page/${textPageId}/chat`,
+            },
         ];
     });
 </script>
@@ -72,6 +79,8 @@ Ausgewählte Textseite
         <QuestionAnsweringPage/>
     {:else if subPageId === "translation"}
         <TranslationPage/>
+    {:else if subPageId === "chat"}
+        <ChatPage textPage={true}/>
     {/if}
 </div>
 
@@ -79,5 +88,8 @@ Ausgewählte Textseite
     #page {
         flex: 1;
         overflow: auto;
+
+        display: flex;
+        flex-direction: column;
     }
 </style>

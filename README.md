@@ -384,6 +384,8 @@ Lessons Learned
   auch, die deutschen Antworten scheinen aber besser als bei Qwen zu sein. Die Antworten
   beider Modell sind (in allen Sprachen) ausführlicher als bei den anderen Modellen.
 
+* Qwen scheint auch ganz gute Antworten mit Bezug auf eine Textseite als Kontext zu liefern.
+
 * [onnx-community/SmolLM2-135M-Instruct-ONNX](https://huggingface.co/onnx-community/SmolLM2-135M-Instruct-ONNX)
   hat eine gute Geschwindigkeit. Das Modell ist auch sehr klein (ca. 200 MB).  Die Qualität
   der Antworten schwank stark, von gut bis mehr oder weniger Blödsinn. Getestet mit "What is HTML?".

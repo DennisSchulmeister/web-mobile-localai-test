@@ -22,9 +22,16 @@ KI-Anwendungsfall: Freier LLM-Chat
     
     import navigationState   from "../../../state/NavigationState.svelte.js";
     import pageState         from "./ChatPage.svelte.js";
-    
+
+    let {textPage = false} = $props();
+
+    let messagesPane = $state();
+    let buttonText   = $derived(pageState.working ? "⏹️" : "✨");
+    let md           = new MarkdownIt();
+
     onMount(() => {
-        navigationState.pageTitle = "Freier Chat";
+        navigationState.pageTitle = textPage ? "Chat zur Seite" : "Freier Chat";
+        pageState.textPage        = textPage;
     });
 
     async function onSubmit(event) {
@@ -36,10 +43,6 @@ KI-Anwendungsfall: Freier LLM-Chat
         event.preventDefault();
         pageState.reset();
     }
-
-    let messagesPane = $state();
-    let buttonText   = $derived(pageState.working ? "⏹️" : "✨");
-    let md           = new MarkdownIt();
 
     /**
      * Bei neuen oder aktualisierten Nachrichten immer nach unten scrollen.

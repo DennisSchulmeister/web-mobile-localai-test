@@ -17,7 +17,7 @@ routes.set(/^\/(search|chat)?$/, wrap({
 }));
 
 // Textseite mit Unterseiten
-routes.set(/^\/page\/(.*)\/(content|summary|qa|translation)$/, wrap({
+routes.set(/^\/page\/(.*)\/(content|summary|qa|translation|chat)$/, wrap({
     asyncComponent: () => import("./pages/TextPage.svelte"),
 }));
 

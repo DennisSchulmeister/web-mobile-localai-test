@@ -10,6 +10,7 @@ import {TextStreamer}                  from "@huggingface/transformers";
 
 import modelState                      from "../../../state/ModelState.svelte";
 import StopWatchState                  from "../../../state/StopWatchState.svelte.js";
+import textPageState                   from "../../../state/TextPageState.svelte.js";
 import {randomId}                      from "../../../utils/id.js";
 
 /**
@@ -29,15 +30,22 @@ class ChatPageState {
     temperature       = $state(0.3);
     repetitionPenalty = $state(1.1);
 
-    messages = $derived.by(() => {
+    /**
+     * Notwendig, damit die Array reaktiv sind. `$derived(... [])` gibt keine
+     * reaktiven Array zurück.
+     */
+    #cb = () => {
         modelState.loadedModel.modelId;
         this.stopWatchState.reset();
 
-        // Damit die Array-Einträge reaktive Proxies sind.
-        // $derived(... ? [] : []) würde das Array direkt (nicht-reaktiv) zurückgeben.
         let messages = $state([]);
         return messages;
-    });
+    };
+
+    textPage          = $state(false);
+    messagesHome      = $derived.by(this.#cb);
+    messagesTextPage  = $derived.by(() => {textPageState.currentPage.file; return this.#cb()});
+    messages          = $derived(this.textPage ? this.messagesTextPage : this.messagesHome);
 
     /**
      * Textaufgabe generieren
@@ -54,6 +62,15 @@ class ChatPageState {
             await new Promise(resolve => window.setTimeout(resolve, 500));
 
             let question = this.question.trim();
+            let context  = this.textPage ? textPageState.currentPage.simplified : "";
+
+            if (modelState.loadedModel.config?.prefix?.question) {
+                question = `${modelState.loadedModel.config.prefix.question} ${question}`;
+            }
+
+            if (modelState.loadedModel.config?.prefix?.context) {
+                context = `${modelState.loadedModel.config.prefix.context} ${context}`;
+            }
 
             this.messages.push({id: randomId(), role: "user", content: question});
             this.messages.push({id: randomId(), role: "assistant", content: ""});
@@ -79,13 +96,19 @@ class ChatPageState {
                 // Seq2Seq-Modelle wie die T5-Familie sind in der Regel nicht Instruction Tuned.
                 input = [
                     {role: "system", content: modelState.loadedModel.config?.systemPrompt || "Du bist ein hilfreicher Assistent."},
-                    {role: "user",   content: question},
+                    {role: "user",   content: question}
                 ];
-            } else if (modelState.loadedModel.config?.prefix?.question) {
-                input = `${modelState.loadedModel.config.prefix.question} ${question}`;
+
+                if (context) {
+                    input[0].content += `\n\n${context}`;
+                }
+            } else if (context) {
+                input = `${context}\n\n${question}`;
             } else {
                 input = question;
             }
+
+            console.log(input);
 
             output = await modelState.model(input, {
                 tokenizer_encode_kwargs: modelState.loadedModel.config?.tokenizerArgs || null,
