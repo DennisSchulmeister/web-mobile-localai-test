@@ -87,18 +87,18 @@ export default class TextGenerationStatsState {
      * kann mit `recalc` gesteuert werden, ob nur die internen Zähle aktualisiert oder
      * alle Kennzahlen vollständig neu gerechnet werden.
      * 
-     * @param {Array} tokens Zwischenzeitlich generierte Tokens
+     * @param {Array} numTokens Anzahl der zwischenzeitlich generierten Tokens
      * @param {boolean} recalc Kennzahlen vollständig neu rechnen
      * @returns {this} Fluent API
      */
-    update(tokens, recalc) {
+    update(numTokens, recalc) {
         let now = performance.now();
 
-        if (tokens.length) {
+        if (numTokens) {
             if (this.firstTokenAt == 0) this.firstTokenAt = now;
 
             this.lastTokenAt  = now;
-            this.tokenCount  += tokens.length;
+            this.tokenCount  += numTokens;
         }
 
         if (recalc) this.#recalc();

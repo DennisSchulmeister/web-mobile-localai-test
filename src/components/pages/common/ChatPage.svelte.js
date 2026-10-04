@@ -96,7 +96,7 @@ class ChatPageState {
             let streamer = new TextStreamer(modelState.model.tokenizer, {
                 skip_prompt:         true,
                 skip_special_tokens: true,
-                token_callback_function: (tokens) => response.stats.update(tokens, true),
+                token_callback_function: (tokens) => response.stats.update(tokens.length, true),
                 callback_function:       (text)   => response.content += text,
             });
 
