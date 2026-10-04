@@ -142,8 +142,12 @@ KI-Anwendungsfall: Freier LLM-Chat
                 <input type="number" step="0.1" bind:value={pageState.temperature} disabled={pageState.disabled}/>
             </label>
             <label>
-                Keine Wiederholungen
+                Keine Wiederholung
                 <input type="number" step="0.1" bind:value={pageState.repetitionPenalty} disabled={pageState.disabled}/>
+            </label>
+            <label>
+                Sample
+                <input type="checkbox" role="switch" bind:checked={pageState.doSample} disabled={pageState.disabled}/>
             </label>
         </article>
     </details>

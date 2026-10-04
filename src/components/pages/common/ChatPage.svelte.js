@@ -29,6 +29,7 @@ class ChatPageState {
     maxNewTokens      = $state(0);
     temperature       = $state(0.3);
     repetitionPenalty = $state(1.1);
+    doSample          = $state(true);
 
     /**
      * Notwendig, damit die Array reaktiv sind. `$derived(... [])` gibt keine
@@ -62,7 +63,7 @@ class ChatPageState {
             await new Promise(resolve => window.setTimeout(resolve, 500));
 
             let question = this.question.trim();
-            let context  = this.textPage ? textPageState.currentPage.simplified : "";
+            let context  = this.textPage ? textPageState.currentPage.content : "";
 
             if (modelState.loadedModel.config?.prefix?.question) {
                 question = `${modelState.loadedModel.config.prefix.question} ${question}`;
@@ -108,13 +109,11 @@ class ChatPageState {
                 input = question;
             }
 
-            console.log(input);
-
             output = await modelState.model(input, {
                 tokenizer_encode_kwargs: modelState.loadedModel.config?.tokenizerArgs || null,
                 max_new_tokens:          this.maxNewTokens || null,
                 max_length:              null,
-                do_sample:               true,
+                do_sample:               this.doSample,
                 temperature:             this.temperature,
                 repetition_penalty:      this.repetitionPenalty,
                 streamer:                streamer,

@@ -23,8 +23,16 @@ UI-Komponente zur Darstellung eines `StopWatchState`.
             {#if measurement.name}
                 <span>{measurement.name}:</span>
             {/if}
-
-            <span class="value">{measurement.formatted}</span>
+            
+            <span class="value">
+                {#if measurement.status === "running"}
+                    Läuft seit
+                {:else if measurement.status === "stopped"}
+                    Beendet in
+                {/if}
+                
+                {measurement.formatted}
+            </span>
         </div>
     {/each}
 </div>

@@ -77,6 +77,7 @@ export default class StopWatchState {
             stopped:   0,
             runtime:   0,
             formatted: "",
+            status:    "running",       // running | stopped
         });
 
         if (!this.#intervalId) {
@@ -96,6 +97,7 @@ export default class StopWatchState {
         if (!this.running) return;
         this.running = false;
 
+        this.measurements.at(-1).status = "stopped";
         this.#updateCurrentMeasurement();
     }
 
@@ -112,7 +114,7 @@ export default class StopWatchState {
      */
     #updateCurrentMeasurement() {
         if (this.measurements.length > 0) {
-            let lastMeasurement = this.measurements[this.measurements.length - 1];
+            let lastMeasurement = this.measurements.at(-1);
 
             lastMeasurement.stopped   = Date.now();
             lastMeasurement.runtime   = lastMeasurement.stopped - lastMeasurement.started;
