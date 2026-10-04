@@ -9,6 +9,9 @@
 // Debug-Logs für ONNX/Transformers.js
 window.ENABLE_DEBUG_LOGS = false;
 
+// In der Android-Version fehlende Modelle aus dem HuggingFace Hub laden
+window.ALLOW_REMOTE_MODELS = Capacitor.isNativePlatform();
+
 import {mount}           from "svelte";
 import {Capacitor}       from "@capacitor/core";
 

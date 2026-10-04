@@ -16,6 +16,8 @@ Startseite mit Auswahl und Suche von Textseiten.
     import ChatPage           from "./common/ChatPage.svelte";
     import ChoosePage         from "./home/ChoosePage.svelte";
     import SemanticSearchPage from "./home/SemanticSearchPage.svelte";
+
+    import modelState         from "../../state/ModelState.svelte.js";
     import navigationState    from "../../state/NavigationState.svelte.js";
 
     let {params = []} = $props()
@@ -35,19 +37,19 @@ Startseite mit Auswahl und Suche von Textseiten.
                 label:  "Übersicht",
                 url:    "#/",
             },
-            {
+            modelState.config.enabledFeatures.semanticSearch ? {
                 id:     "search",
                 icon:   "bi-search",
                 label:  "Suche",
                 url:    "#/search",
-            },
-            {
+            } : null,
+            modelState.config.enabledFeatures.chat ? {
                 id:     "chat",
                 icon:   "bi-chat-dots",
                 label:  "Chat",
                 url:    "#/chat",
-            },
-        ];
+            } : null,
+        ].filter(e => e !== null);
     });
 </script>
 

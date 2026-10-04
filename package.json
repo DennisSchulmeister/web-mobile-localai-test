@@ -17,8 +17,8 @@
         "init:download": "node bin/init/download.js static/config.json",
         "init:preprocess": "node bin/init/preprocess.js static/config.json",
         "init:embeddings": "node bin/init/embeddings.js static/config.json",
-        "android:add": "npx cap init 'Local AI Test' 'de.wpvs.localai_test' --web-dir static && npx cap add android",
-        "android:sync": "npm run build && npx cap sync android",
+        "android:add": "npx cap init 'Local AI Test' 'de.wpvs.localai_test' --web-dir .capacitor/www && npx cap add android",
+        "android:sync": "npm run build && node bin/android/prepare.js && npx cap sync android",
         "android:open": "npx cap open android"
     },
     "devDependencies": {

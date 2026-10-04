@@ -1,3 +1,4 @@
 node_modules/
 static/_bundle/
 static/_generated/
+.capacitor/

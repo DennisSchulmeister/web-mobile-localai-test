@@ -74,7 +74,7 @@ class ModelState {
 
         transformers.env.localModelPath    = this.config.models.downloadDir;
         transformers.env.allowLocalModels  = true;
-        transformers.env.allowRemoteModels = false;
+        transformers.env.allowRemoteModels = window.ALLOW_REMOTE_MODELS;
     }
 
     /**

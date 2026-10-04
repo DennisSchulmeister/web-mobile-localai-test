@@ -117,13 +117,18 @@ npm run android:sync
 Zum Bauen öffnet man am besten das Verzeichnis `android/` in Android Studio und wählt dort
 _Build → Generate App Bundles or APKs_ zum Bauen der Anwendung.
 
-Aktuell kommt es aber noch zu folgendem Fehler während dem Build:
+Damit das APK nicht die Größenlimits des ZIP32-Formats überschreitet, bereitet `android:sync`
+nach dem Web-Build ein separates Verzeichnis `.capacitor/www/` vor. Dieses ist in der Datei
+`capacitor.config.ts` als `webDir` konfiguriert und enthält alle Web Assets, aber nur vorab
+heruntergeladene Modelle, die in der Datei `static/models/index.json` mit
+`"android": {"include": true}` gekennzeichnet wurden.
 
-```text
-Zip32 cannot place CD entry 'assets/public/_generated/models/teapotai/teapotllm/onnx/encoder_model_q4.onnx' payload at 4319573958 (MAX=4294967295)
-```
+Die ausgewählten Modelle müssen vor dem Sync mit `npm run init:download` heruntergeladen worden
+sein. Das Staging-Verzeichnis wird bei jedem Sync neu erstellt, damit keine veralteten Modelle
+übernommen werden.
 
-Sieht so aus, als dürften wir die Modelle nicht in das APK packen, da es dadurch zu groß wird.
+Fehlende Modelle werden in der Android-App vom HuggingFace Hub geladen. Um dies zu unterbinden
+können in der Datei `static/config.json` die betroffenen Features deaktiviert werden.
 
 Technische Umsetzung
 --------------------

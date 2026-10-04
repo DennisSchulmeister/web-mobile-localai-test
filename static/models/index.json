@@ -42,7 +42,10 @@
     "feature-extraction": [
         {
             "modelId": "sentence-transformers/all-MiniLM-L6-v2",
-            "dtypes": ["fp32"]
+            "dtypes": ["fp32"],
+            "android": {
+                "include": true
+            }
         }
     ],
     "text-generation": [
@@ -50,7 +53,10 @@
             "modelId": "onnx-community/SmolLM2-135M-Instruct-ONNX",
             "dtypes": ["q4"],
             "instructionTuned": true,
-            "systemPrompt": "You are a helpful assistant."
+            "systemPrompt": "You are a helpful assistant.",
+            "android": {
+                "include": true
+            }
         },
         {
             "modelId": "onnx-community/Qwen3-0.6B-ONNX",
@@ -59,6 +65,9 @@
             "systemPrompt": "You are a helpful assistant.",
             "tokenizerArgs": {
                 "enable_thinking": false
+            },
+            "android": {
+                "include": true
             }
 
         },

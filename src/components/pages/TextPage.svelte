@@ -20,6 +20,7 @@ Ausgewählte Textseite
     import TextContentPage       from "./textpage/TextContentPage.svelte";
     import TranslationPage       from "./textpage/TranslationPage.svelte";
 
+    import modelState            from "../../state/ModelState.svelte.js";
     import navigationState       from "../../state/NavigationState.svelte.js";
     import textPageState         from "../../state/TextPageState.svelte.js";
 
@@ -42,31 +43,31 @@ Ausgewählte Textseite
                 label:  "Inhalt",
                 url:    `#/page/${textPageId}/content`,
             },
-            {
+            modelState.config.enabledFeatures.summary ? {
                 id:     "summary",
                 icon:   "bi-list-ol",
                 label:  "Kürzen",
                 url:    `#/page/${textPageId}/summary`,
-            },
-            {
+            } : null,
+            modelState.config.enabledFeatures.qa ? {
                 id:     "qa",
                 icon:   "bi-chat",
                 label:  "Fragen",
                 url:    `#/page/${textPageId}/qa`,
-            },
-            {
+            } : null,
+            modelState.config.enabledFeatures.translation ? {
                 id:     "translation",
                 icon:   "bi-translate",
                 label:  "Übersetzen",
                 url:    `#/page/${textPageId}/translation`,
-            },
-            {
+            } : null,
+            modelState.config.enabledFeatures.chat ? {
                 id:     "chat",
                 icon:   "bi-chat-dots",
                 label:  "Chat",
                 url:    `#/page/${textPageId}/chat`,
-            },
-        ];
+            } : null,
+        ].filter(e => e !== null);
     });
 </script>
 

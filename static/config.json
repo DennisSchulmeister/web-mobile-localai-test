@@ -8,6 +8,13 @@
         "preprocessDir": "_generated/preprocessed",
         "embeddingsDir": "_generated/embeddings"
     },
+    "enabledFeatures": {
+        "semanticSearch": true,
+        "chat": true,
+        "summary": true,
+        "qa": true,
+        "translation": true
+    },
     "semanticSearch": {
         "fitThreshold": 0.5
     },
