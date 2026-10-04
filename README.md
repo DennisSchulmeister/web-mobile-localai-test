@@ -51,6 +51,13 @@ Folgende Anwendungsfälle sollen hier getestet werden:
             </a>
         </td>
     </tr>
+    <tr>
+        <td colspan="4">
+            <a href="./doc/android-studio.png">
+                <img src="./doc/android-studio.png" width="400" alt="Screenshot: Ausführung im Android Emulator">
+            </a>
+        </td>
+    </tr>
 </table>
 
 Vorbereitungen
@@ -195,6 +202,22 @@ Lessons Learned
 
 * Manchmal kann es aber auch einfach vorkommen, dass der Browser nicht genügend Speicher
   allozieren kann: `Error: Can't create a session. ERROR_CODE: 6, ERROR_MESSAGE: std::bad_alloc`.
+
+### Android
+
+* Der Android Emulator stürzt ab, wenn die Capacitor-App das Qwen-Modell lädt (ca. 885,2 MB).
+
+* WebGPU scheint im Android Emulator nicht zu funktionieren. Wird zwar erkannt, aber beim
+  Laden eines Modells (SmolLM2) kommt die Meldung:
+  
+  ```text
+  Error: no available backend found.
+  ERR: [webgpu] Error: Failed to get GPU adapter.
+  You may need to enable flag "--enable-unsafe-webgpu" if you are using Chrome.
+  ```
+
+  Interessanterweise kommt die Meldung auch beim Versuch, ein Modell für die CPU-Ausführung
+  mit Web Assembly zu laden.
 
 ### transformers.js und HuggingFace
 
