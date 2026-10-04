@@ -448,11 +448,9 @@ Lessons Learned
   sprechen auch deutsch. Bei Qwen sind die Antworten auf deutsche Fragen aber inhaltlich
   wesentlich schlechter (redet Blödsinn) als auf englische Fragen. Bei LiquidAI vermutlich
   auch, die deutschen Antworten scheinen aber besser als bei Qwen zu sein. Die Antworten
-  beider Modell sind (in allen Sprachen) ausführlicher als bei den anderen Modellen.
+  beider Modelle sind (in allen Sprachen) ausführlicher als bei den anderen Modellen.
 
 * Qwen scheint auch ganz gute Antworten mit Bezug auf eine Textseite als Kontext zu liefern.
-  Erstes Token nach 0,8 Sekunden, 3,9 Tokens/Sekunde (auf meinem Laptop). Das Modell ist
-  an Ansätzen auch mehrsprachig, produziert auf Deutsch aber nicht immer korrekte Grammatik.
   Insgesamt schneidet es von den getesteten Mini-LLM am besten ab.
 
 * [onnx-community/SmolLM2-135M-Instruct-ONNX](https://huggingface.co/onnx-community/SmolLM2-135M-Instruct-ONNX)
