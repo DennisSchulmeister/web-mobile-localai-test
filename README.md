@@ -405,7 +405,7 @@ Lessons Learned
   mit unterschiedlichen Pipelines genutzt werden müssen:
 
   * T5-Style: [`text2text-generation`-Pipeline](https://huggingface.co/docs/transformers.js/main/en/api/pipelines?utm_source=chatgpt.com#module_pipelines.Text2TextGenerationPipeline)
-  * GPT-Style (CasualLM): [`text-generation`-Pipeline](https://huggingface.co/docs/transformers.js/main/en/api/pipelines?utm_source=chatgpt.com#module_pipelines.TextGenerationPipeline)
+  * GPT-Style (CausalLM): [`text-generation`-Pipeline](https://huggingface.co/docs/transformers.js/main/en/api/pipelines?utm_source=chatgpt.com#module_pipelines.TextGenerationPipeline)
 
 * Die `text2text-generation`-Pipeline erwartet die Eingabenachricht einfals String,
   oder ein String-Array mit mehreren Nachrichten.
