@@ -423,12 +423,13 @@ Lessons Learned
   beider Modell sind (in allen Sprachen) ausführlicher als bei den anderen Modellen.
 
 * Qwen scheint auch ganz gute Antworten mit Bezug auf eine Textseite als Kontext zu liefern.
-  Erstes Token nach 0,8 Sekunden, 3,9 Tokens/Sekunde (auf meinem Laptop).
+  Erstes Token nach 0,8 Sekunden, 3,9 Tokens/Sekunde (auf meinem Laptop). Das Modell ist
+  an Ansätzen auch mehrsprachig, produziert auf Deutsch aber nicht immer korrekte Grammatik.
+  Insgesamt schneidet es von den getesteten Mini-LLM am besten ab.
 
 * [onnx-community/SmolLM2-135M-Instruct-ONNX](https://huggingface.co/onnx-community/SmolLM2-135M-Instruct-ONNX)
   hat eine gute Geschwindigkeit. Das Modell ist auch sehr klein (ca. 200 MB).  Die Qualität
-  der Antworten schwank stark, von gut bis mehr oder weniger Blödsinn. Getestet mit "What is HTML?".
-  Erstes Token nach 0,29 Sekunden, 9,76 Tokens/Sekunde (auf meinem Laptop).
+  der Antworten schwank stark, von gut bis mehr oder weniger Blödsinn.
 
 * [Xenova/LaMini-Flan-T5-783M](https://huggingface.co/Xenova/LaMini-Flan-T5-783M) generiert
   sehr kurze Antworten. Dennoch ist es sehr langsam.
@@ -437,7 +438,12 @@ Lessons Learned
   nur Fragen zu einem gegebenen Kontext zu beantworten. Die Frage muss dafür in einer eigenen
   Zeile, getrennt durch eine Leerzeile, unter dem Kontext stehen. Ohne Kontext antwortet das Modell
   aber aus seinem internen Wissen heraus, wenn auch noch kürzer als 
-  [Xenova/LaMini-Flan-T5-783M](https://huggingface.co/Xenova/LaMini-Flan-T5-783M).
+  [Xenova/LaMini-Flan-T5-783M](https://huggingface.co/Xenova/LaMini-Flan-T5-783M). Mit Kontext
+  liefert es längere und bessere Antworten, in Summe aber trotzdem nicht befriedigend.
+
+* Die getesteten `text2text-generation`-Modelle schneiden allesamt schlechter ab, als die
+  LLM-artigen `text-generation`-Modelle. Die Antworten sind kurz (nur ein/zwei Sätze) und
+  brauchen lange für die Generierung.
 
 #### Testfall: "What is HTML?"
 
@@ -495,10 +501,11 @@ geöffnet. Die Anfrage an das Modell lautet: „Please summarize.”
 
 ### Alle Modelle
 
-* Anders als bei den meisten LLMs, sind die hier verwendeten kleinen Modelle nicht gut darin,
-  Markdown-Syntax zu verarbeiten oder zu erzeugen.
+Anders als bei den meisten LLMs, sind die hier verwendeten kleinen Modelle nicht gut darin,
+Markdown-Syntax zu verarbeiten oder zu erzeugen. Von den getesteten LLM kommen alle damit
+zurecht, außer [teapotai/teapotllm](https://huggingface.co/teapotai/teapotllm)
 
-* Die Modelle lassen sich in drei Grundarchitekturen einordnen, gemäß untenstehender Tabelle.
+Die Modelle lassen sich in drei Grundarchitekturen einordnen, gemäß untenstehender Tabelle.
 
 | Modellarchitektur         | High-Level Pipelines                                   | Low-Level AutoModel           |
 |---------------------------|--------------------------------------------------------|-------------------------------|
@@ -506,15 +513,59 @@ geöffnet. Die Anfrage an das Modell lautet: „Please summarize.”
 | Encoder-decoder / Seq2Seq | `text2text-generation`, `translation`, `summarization` | `AutoModelForSeq2SeqLM`       |
 | Decoder-only / Causal LM  | `text-generation`                                      | `AutoModelForCausalLM`        |
 
+Die Performance eines Modells hängt nicht nur von seiner Größe. Entscheidend ist auch,
+ob das Modell (bzw. dessen ONNX-Export) effizient auf der GPU ausgeführt werden kann,
+wie die folgende Tabelle zeigt:
+
+| Modell                                    | Größe (q4) | Tokens/Sec |
+|-------------------------------------------|-----------:|-----------:|
+| onnx-community/SmolLM2-135M-Instruct-ONNX |   175,6 MB |     ~ 8,91 |
+| onnx-community/Qwen3-0.6B-ONNX            |   885,2 MB |     ~ 9,80 |
+| BananaMind/BananaMind-2-Medium-Chat-ONNX  |    54,9 MB |     ~ 0,80 |
+
+Obwohl Qwen das größte Modell ist, läuft es schnellsten, da es im Vergleich zui SmolLM2
+eine sehr optimierte Architektur besitzt: Weniger Nodes und auch höherwertige Nodes, die
+in einem Schritt komplexe Berechnungen bündeln.
+
+Das Problem bei BananaMind ist, dass es nach jedem Attention Layer explizite `IsNaN`-Prüfungen
+enthält, welche die ONNX-Runtime nur auf der CPU ausführen kann. Das heißt, nach jedem Attention
+Layer gibt es explizite Datentransfers von GPU nach CPU und wieder zurück. Diese verbrauchen
+wesentlich mehr Zeit als die restlichen Berechnungen auf der GPU. Mit WASM ausgeführt, steigt
+die Leistung auf ca. 6,3 Token/Sekunden. Der Browser friert dabei aber komplett ein (wie bei
+allen auf WASM ausgeführten Modellen).
+
+Zahlen ermittelt mit den Debug Logs beim Laden der Modell und Copilot. Die Logs liegen unter
+`logs/**/debug-loading.log`. Getestet mit Firefox 157 unter Fedora Linux.
+
+| Graph-Knoten              | SmolLM2 | Qwen3 | BananaMind |
+|---------------------------|--------:|------:|-----------:|
+| Transformer Layer         |      30 |    28 |         12 |
+| Knoten Gesamt             |    2668 |   376 |       1646 |
+| WebGPU-Knoten             |    1987 |   369 |       1027 |
+| CPU-Knoten                |     681 |     7 |        619 |
+| CPU → GPU Datentransfer   |       5 |     2 |         28 |
+| GPU → CPU Datentransfer   |       0 |     0 |         13 |
+| CPU IsNaN-Knoten          |       0 |     0 |         12 |
+| Fused attention Knoten    |       0 |    28 |          0 |
+
 Fazit
 -----
 
 Kleinere Anwendungsfälle, die mit Modellen zwischen 300 und 500 MB auskommen, lassen sich
-auf mobilen Geräten innerhalb einer Webawendung lokal ausführen. Allerdings nur mit
-Einschränkungen:
+auf mobilen Geräten innerhalb einer Webawendung lokal ausführen. Allerdings mit Einschränkungen:
 
-* Es funktioniert nicht mit jedem Browser. Chrome hat bisher am besten funktioniert.
-  Firefox am schlechtesten (Abstürze, keine WASM SIMD-Unterstützen auf älteren Geräten, ... ).
+* Das Ökosystem entwickelt sich schnell weiter. Aber in Folge daraus, ist es auch nicht
+  immer stabil, was die durch ONNX 1.25 ausgelösten Fehlermeldungen zeigen, die monatelang
+  in Transformers.js nicht gefixt wurden.
+
+* Es funktioniert nicht mit jedem Browser. Chrome Mobile hat bisher am besten funktioniert.
+  Firefox Mobile am schlechtesten (Abstürze, keine WASM SIMD-Unterstützen auf älteren Geräten, ... ).
+
+* Unter Desktop Linux ist es aktuell genau andersrum: Firefox 155+ schneidet wesentlich
+  besser ab als Chromium 154, da WebGPU nahezu vollständig unterstützt wird. In Chromium
+  muss der WebGPU-Support aktuell noch unter [chrome://flags](chrome://flags) `Unsafe WebGPU Support`
+  aktiviert werden. Die Performance ist aber unterirdisch (nur 0,2 Token/Sekunde im Verlgleich
+  zui 9 Token/Sekunde unter Firefox).
 
 * Speicher ist sehr knapp. Mehrere Modelle können daher nicht praktikabel im Speicher
   gehalten werden, sondern die Modelle regelmäßig neu geladen werden. Neben der Wartezeit
@@ -525,21 +576,9 @@ Einschränkungen:
   Die Ausführung auf der CPU macht daher nur bei sehr kleinen Modelle, wie z.B. bei der
   semantische Suche Sinn.
 
-* Dadurch, dass nur sehr kleine Modelle ausführbar sind, lassen sich auch keine
-  Anwendungsfälle lokal umsetzen, die man heute mit einem LLM assoziieren würde.
-  Die Ergebnisse der kleinen Modelle sind schlicht unbrauchbar für Übersetzungen,
-  Zusammenfassungen und so weiter.
-
-* Am aussichtsreichsten ist tatsächlich noch, LLM zu finden (siehe Tabelle der
-  Modellarchitekturen oben), die klein genug für die lokale Ausführung im Web sind
-  und den gewünschten Anwendungsfall noch am besten unterstützen. Aktuell ist die
-  Technik aber noch nicht so weit, dass dies wirklich praktikabel wäre.
-
-* Das Ökosystem entwickelt sich schnell weiter. Aber in Folge daraus, ist es auch nicht
-  sehr stabil, was die durch ONNX 1.25 ausgelösten Fehlermeldungen zeigen, die über
-  Monate hinweg nicht gefixt werden. Aber auch anhand der unvollständigen und fehlerhaften
-  Dokumentation zu transformers.js, obwohl die Bibliothek immerhin schon in Version
-  4.3.0 vorliegt.
+* Die getesteten, kleinen Modelle für spezielle Anwendungen (Übersetzung, Zusammenfassung,
+  Fragen beantworten) sind vergleichsweise langsam und liefern keine befriedigenden
+  Ergebnisse. Die getesteten kleinen LLM waren hier sowohl schneller aus auch besser.
 
 * Fine Tuning oder die Entwicklung eigener Modelle wären die nächsten logischen Schritte,
   um kleine Modelle für spezialisierte Anforderungen zu erstellen. Das Ziel müsste vermutlich
@@ -550,13 +589,6 @@ Einschränkungen:
 * Interessante Ansätze in diese Richtung könnten 1,5bit-Modelle sein, da sie deutlich
   kompakter als die herkömmlichen Modelle sind, z.B.
   [Bonsai-27B-mlx-1bit](https://huggingface.co/prism-ml/Bonsai-27B-mlx-1bit)
-
-* Auf der anderen Seite stehen "herkömmliche" Mini-LLM wie
-  [teapotai/teapotllm](https://huggingface.co/teapotai/teapotllm), die sich speziell
-  für RAG eignen, da sie darauf trainiert sind, Antworten nur anhand des Kontextes
-  zu geben und sonst mit "ich weiß es nicht" zu antworten. Dies könnte eine bessere
-  Alternative zu den hier getesteten "Question Answering" Modellen sein. Leider ist
-  TeapotLLM aber nur auf englisch trainiert.
 
 * Generell sind die kleineren, offenen Modelle in der großen Mehrzahl auf englisch
   trainiert. Explizit deutschsprachige Modelle sind selten und die Qualität ist auch

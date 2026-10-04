@@ -6,6 +6,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+// Debug-Logs für ONNX/Transformers.js
+window.ENABLE_DEBUG_LOGS = false;
+
 import {mount}           from "svelte";
 import {Capacitor}       from "@capacitor/core";
 

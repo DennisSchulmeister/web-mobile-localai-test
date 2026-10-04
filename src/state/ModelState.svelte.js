@@ -9,6 +9,31 @@
 import * as transformers from '@huggingface/transformers';
 
 /**
+ * Optionale Debug-Logs zum Untersuchen von Performance-Problemen.
+ * 
+ * Sowohl beim Laden aus auch bei der Ausführung werden durch die
+ * ONNX-Runtime umfangreiche Logs geschrieben, die Hinweise darauf
+ * geben können, warum ein bestimmtes Modell nur sehr langsam läuft.
+ * 
+ * Hierfür sichert man die Browser Logs in eine Textdatei und nutzt
+ * z.B. Copilot zur Auswertung.
+ */
+let sessionOptions = {};
+
+if (window.ENABLE_DEBUG_LOGS) {
+    transformers.env.logLevel = transformers.LogLevel.DEBUG;
+    
+    transformers.env.backends.onnx.webgpu.profiling = {
+        mode: "default",
+    };
+
+    sessionOptions = {
+        logSeverityLevel:  0,  // Verbose
+        logVerbosityLevel: 1,
+    };
+}
+
+/**
  * Konfigurierte KI-Modelle.
  */
 class ModelState {
@@ -98,6 +123,7 @@ class ModelState {
                 this.model = await transformers.pipeline(task, modelId, {
                     dtype:  dtype,
                     device: device,
+                    session_options: { ...sessionOptions },
                 });
 
                 this.loadedModel.task    = task;

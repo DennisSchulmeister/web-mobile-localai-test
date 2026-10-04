@@ -67,12 +67,6 @@
             "dtypes": ["q4"],
             "instructionTuned": true,
             "systemPrompt": "You are a helpful assistant."
-        },
-        {
-            "modelId": "BananaMind/BananaMind-2-Medium-Chat-ONNX",
-            "dtypes": ["q4"],
-            "instructionTuned": true,
-            "systemPrompt": "You are a helpful assistant."
         }
     ],
     "text2text-generation": [
