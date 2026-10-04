@@ -8,6 +8,7 @@ Web/Mobile-Test für lokale KI
 1. [Technische Umsetzung](#technische-umsetzung)
 1. [Künftige Web APIs](#künftige-web-apis)
 1. [Lessons Learned](#lessons-learned)
+1. [Testfragen](#testfragen)
 1. [Fazit](#fazit)
 1. [Copyright](#copyright)
 
@@ -266,9 +267,6 @@ Lessons Learned
 
   [Space: Convert to ONNX](https://huggingface.co/spaces/onnx-community/convert-to-onnx)
 
-* Firefox 156 / Linux / WebGPU scheint keine Ausgaben zu generieren.
-  Ausnahme: Chat
-
 ### Semantische Suche
 
 * Viele moderne Sprachmodelle besitzen einen Transformer-Encoder, der aus
@@ -398,6 +396,10 @@ Lessons Learned
   zu verhalten. Bei großen Texten liefert es teilweise gar keine Übersetzung oder nur sinnlose
   Zeichenketten. Bei kleinen Texten kommt eine Übersetzung, diese ist grammatikalisch aber
   falsch und enthält viele Rechtschreibfehler.
+
+* Firefox 157 unter Linux generiert keine Antwort, wenn das Modell auf der GPU ausgeführt
+  wird. Anscheinend fließen nie Daten zurück an die CPU, so dass diese nicht erkennt, wenn
+  das Modell fertig ist.
 
 ### Chat
 
@@ -573,6 +575,34 @@ Zahlen ermittelt mit den Debug Logs beim Laden der Modell und Copilot. Die Logs 
 | GPU → CPU Datentransfer   |       0 |     0 |         13 |
 | CPU IsNaN-Knoten          |       0 |     0 |         12 |
 | Fused attention Knoten    |       0 |    28 |          0 |
+
+Testfragen
+----------
+
+Gute Testfragen zum Prüfen von Halluzinationen (und davon gibt es einige bei den kleinen LLM):
+
+1. What is HTML?
+2. What is the Internet of Things?
+3. How did the Yamaha DX7 work?
+4. What happened to the rock band Dire Straits?
+
+Da wird der DX7 schon mal zu einer winzigen E-Gitarre (Qwen) 🤣:
+
+> The Yamaha DX7 is an electric guitar that was designed by Yama, a Japanese musician known for 
+> is musical style and production of music in Japan. It was created to be used as a companion
+> instrument in the band "Yama" during their time on the road. The DX7 has a unique design with
+> a small, rectangular body and a 60mm (24cm) scale. Its sound is characterized by its low, resonant
+> tone and a bright, clear vibrato effect.
+>
+> In terms of playing, the DX7 is played using either a standard tuning system or a modified one
+> where the tuning is adjusted to match the player's preference. The instrument is often used in
+> pop and rock genres, especially with the addition of a small, portable speaker to enhance the
+> listening experience. The DX7 has been widely popular since its release in the early 1980s, even
+> though it was later replaced by other models like the DX5 and DX6.
+>
+> If you have any specific questions about how the DX7 works or its features, feel free to ask!
+
+Großer Unsinn selbstsicher vorgetragen.
 
 Fazit
 -----

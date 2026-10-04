@@ -21,12 +21,6 @@ Auswahl eines KI-Modells
         disabled = false,        // Keine Auswahl zulassen, z.B. weil das geladene Modell gerade genutzt wird
     } = $props();
 
-    let text_device = {
-        "wasm":   "WASM",
-        "webgpu": "WebGPU",
-        "webnn":  "WebNN"
-    };
-
     let available_tasks = $derived(Array.isArray(task) ? task : [task]);
 
     let available_models = $derived.by(() => {
@@ -46,9 +40,9 @@ Auswahl eines KI-Modells
     let selected_task       = $derived(available_models[selected_index]?.task || "");
     let selected_dtypes     = $derived(available_models[selected_index]?.dtypes || []);
     let selected_dtype      = $derived(available_models[selected_index]?.dtypes?.[0] || "");
-    let selected_device     = $state(navigator.ml ? "webnn" : navigator.gpu ? "webgpu" : "wasm");
-    let loaded_device_text  = $derived(text_device[modelState.loadedModel.device])
-    let loaded_device_color = $derived(modelState.loadedModel.device === "wasm" ? "darkred" : "darkgreen");
+    let selected_device     = $state(modelState.devices[0]?.device);
+    let loaded_device_text  = $derived(modelState.devices.find(e => e.device === modelState.loadedModel.device)?.label || modelState.loadedModel.device);
+    let loaded_device_color = $derived(modelState.loadedModel.device.includes("wasm") ? "darkred" : "darkgreen");
 
     async function onLoadClicked() {
         await modelState.loadModel({
@@ -120,14 +114,9 @@ Auswahl eines KI-Modells
                 <label>
                     <span>Ausführumgebung</span>
                     <select bind:value={selected_device} {disabled}>
-                        <option value="wasm">{text_device["wasm"]}</option>
-
-                        {#if navigator.gpu}
-                            <option value="webgpu">{text_device["webgpu"]}</option>
-                        {/if}
-                        {#if navigator.ml}
-                            <option value="webnn">{text_device["webnn"]}</option>
-                        {/if}
+                        {#each modelState.devices as device}
+                            <option value={device.device}>{device.label}</option>
+                        {/each}
                     </select>
                 </label>
             </div>

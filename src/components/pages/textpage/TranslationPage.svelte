@@ -46,7 +46,7 @@ KI-Anwendungsfall: Translation
     <form onsubmit={onSubmit} class="grid">
         <label>
             Von
-            <select value={pageState.src_language} disabled>
+            <select value={pageState.sourceLanguage} disabled>
                 {#each Object.keys(modelState.config.translation.languages) as language}
                     <option value={language}>{modelState.config.translation.languages[language]}</option>
                 {/each}
@@ -54,13 +54,13 @@ KI-Anwendungsfall: Translation
         </label>
         <label>
             Nach
-            <select bind:value={pageState.dst_language} disabled={pageState.disabled}>
+            <select bind:value={pageState.targetLanguage} disabled={pageState.disabled}>
                 {#each modelState.loadedModel?.config?.languages as language}
                     <option value={language}>{modelState.config.translation.languages[language]}</option>
                 {/each}
             </select>
         </label>
-        <input type="submit" value="Start" disabled={pageState.disabled || !pageState.dst_language}/>
+        <input type="submit" value="Start" disabled={pageState.disabled || !pageState.targetLanguage}/>
     </form>
 </Section>
 

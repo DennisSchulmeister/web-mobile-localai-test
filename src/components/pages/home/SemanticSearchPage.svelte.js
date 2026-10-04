@@ -60,7 +60,7 @@ class SemanticSearchPageState {
             this.stopWatchState.start("Embedding", "bi-text-center");
     
             let queryLower = this.query.toLowerCase();
-            let queryEmbedding = (await modelState.model(this.query, {pooling: "mean", normalize: true})).data;
+            let queryEmbedding = await modelState.loadedModel.backend.runEmbeddingPipeline(this.query);
     
             // Index durchsuchen
             this.stopWatchState.start("Suche", "bi-search");

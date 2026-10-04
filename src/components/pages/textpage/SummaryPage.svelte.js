@@ -6,8 +6,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import {TextStreamer} from "@huggingface/transformers";
-
 import modelState     from "../../../state/ModelState.svelte";
 import StopWatchState from "../../../state/StopWatchState.svelte.js";
 import textPageState  from "../../../state/TextPageState.svelte.js";
@@ -36,36 +34,17 @@ class SummaryPageState {
     
             this.stopWatchState.start("Antwort", "bi-pen");
 
-            this.working     = true;
+            this.working      = true;
             this.answer       = "";
             this.errorMessage = "";
 
             // Kleine Pause, damit wenigstens der Loading-State im UI erscheint!
             await new Promise(resolve => window.setTimeout(resolve, 500));
 
-            let prompt = textPageState.currentPage.simplified;
-
-            if (modelState.loadedModel.config?.prefix) {
-                prompt = `${modelState.loadedModel.config?.prefix} ${prompt}`;
-            }
-
-            let streamer = new TextStreamer(modelState.model.tokenizer, {
-                skip_prompt: true,
-                callback_function: (text) => this.answer += text,
+            this.answer = await modelState.loadedModel.backend.runSummaryPipeline({
+                input:        textPageState.currentPage.simplified,
+                maxNewTokens: this.maxNewTokens,
             });
-
-            let answer = await modelState.model(prompt, {
-                max_new_tokens: this.maxNewTokens,
-                do_sample:      false,
-                streamer:       streamer,
-            });
-
-            this.answer = answer?.[0]?.summary_text || "";
-
-            if (!this.answer) {
-                console.error("Ungültige Antwort des Modells", answer);
-                this.errorMessage = "Das Modell hat keinen Text erzeugt";
-            }
 
             this.stopWatchState.stop();
             this.working = false;

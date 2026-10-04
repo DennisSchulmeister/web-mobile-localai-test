@@ -6,32 +6,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import * as transformers from '@huggingface/transformers';
-
-/**
- * Optionale Debug-Logs zum Untersuchen von Performance-Problemen.
- * 
- * Sowohl beim Laden aus auch bei der Ausführung werden durch die
- * ONNX-Runtime umfangreiche Logs geschrieben, die Hinweise darauf
- * geben können, warum ein bestimmtes Modell nur sehr langsam läuft.
- * 
- * Hierfür sichert man die Browser Logs in eine Textdatei und nutzt
- * z.B. Copilot zur Auswertung.
- */
-let sessionOptions = {};
-
-if (window.ENABLE_DEBUG_LOGS) {
-    transformers.env.logLevel = transformers.LogLevel.DEBUG;
-    
-    transformers.env.backends.onnx.webgpu.profiling = {
-        mode: "default",
-    };
-
-    sessionOptions = {
-        logSeverityLevel:  0,  // Verbose
-        logVerbosityLevel: 1,
-    };
-}
+import backends from "../backends/index.js";
 
 /**
  * Konfigurierte KI-Modelle.
@@ -48,6 +23,16 @@ class ModelState {
     models = $state({});
 
     /**
+     * Verfügbare Ausführumgebungen: Liste mit `{device: "", label: ""}`
+     */
+    devices = $state([]);
+
+    /**
+     * Mapping des internen Device-Strings auf ein Backend. 
+     */
+    #backendsByDevice = {};
+
+    /**
      * Metadaten des aktuell geladenen Modells
      */
     loadedModel = $state({
@@ -58,12 +43,8 @@ class ModelState {
         status:  "not-loaded",  // "not-loaded", "loading", "ready", "error"
         message: "",            // Fehlermeldung bei status "error",
         config:  {},            // JSON-Konfiguration aus der Datei `models.json`
+        backend: null,          // Inferenz-Backend mit den Methoden zur Nutzung des Modells
     });
-
-    /**
-     * Aktuell geladenes KI-Modell.
-     */
-    model = null;
 
     /**
      * Datei `models/index.json` mit den konfigurierten KI-Modellen einlesen.
@@ -72,9 +53,20 @@ class ModelState {
         this.config = await(await fetch("config.json")).json();
         this.models = await (await fetch(this.config.models.config)).json();
 
-        transformers.env.localModelPath    = this.config.models.downloadDir;
-        transformers.env.allowLocalModels  = true;
-        transformers.env.allowRemoteModels = window.ALLOW_REMOTE_MODELS;
+        this.#backendsByDevice = {};
+        this.devices = [];
+        let i = 0;
+
+        for (let backend of backends) {
+            backend.setConfig({config: this.config, models: this.models});
+
+            for (let device of backend.devices) {
+                let deviceId = `${i}::${device.device}`;
+
+                this.devices.push({device: deviceId, label: device.label});
+                this.#backendsByDevice[deviceId] = backend;
+            }
+        }
     }
 
     /**
@@ -117,21 +109,23 @@ class ModelState {
     async loadModel({task, modelId, dtype, device} = {}) {
         try {
             if (modelId) {
-                this.loadedModel.status = "loading";
+                this.loadedModel.status  = "loading";
                 this.loadedModel.message = "";
-    
-                this.model = await transformers.pipeline(task, modelId, {
-                    dtype:  dtype,
-                    device: device,
-                    session_options: { ...sessionOptions },
-                });
+                this.loadedModel.config  = this.models[task].find(e => e.modelId === modelId);
+                this.loadedModel.backend = this.#backendsByDevice[device];
 
+                if (!this.loadedModel.backend) {
+                    throw new Error(`Kein Backend für Device ${device} vorhanden!`);
+                }
+
+                let [_, backendDevice] = device.split("::");
+                await this.loadedModel.backend.loadModel({task, modelId, dtype, device: backendDevice, config: this.loadedModel.config});
+    
                 this.loadedModel.task    = task;
                 this.loadedModel.modelId = modelId;
                 this.loadedModel.dtype   = dtype;
                 this.loadedModel.device  = device;
                 this.loadedModel.status  = "ready";
-                this.loadedModel.config  = this.models[task].find(e => e.modelId === modelId);
             }
         } catch (error) {
             this.loadedModel.status  = "error";

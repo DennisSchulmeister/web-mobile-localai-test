@@ -6,11 +6,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import {TextStreamer}    from "@huggingface/transformers";
-
-import modelState        from "../../../state/ModelState.svelte";
-import StopWatchState    from "../../../state/StopWatchState.svelte.js";
-import textPageState     from "../../../state/TextPageState.svelte.js";
+import modelState     from "../../../state/ModelState.svelte";
+import StopWatchState from "../../../state/StopWatchState.svelte.js";
+import textPageState  from "../../../state/TextPageState.svelte.js";
 
 /**
  * Gesicherter Zustand für die "Übersetzen" Seite, damit dieser bei der
@@ -22,8 +20,8 @@ class TranslationPageState {
     errorMessage    = $state("");
     stopWatchState  = new StopWatchState();
 
-    src_language    = $derived(textPageState.currentPage.language);
-    dst_language    = $state("");
+    sourceLanguage  = $derived(textPageState.currentPage.language);
+    targetLanguage  = $state("");
     result          = $derived(textPageState.currentPage.file ? "" : "");
 
     /**
@@ -42,23 +40,11 @@ class TranslationPageState {
             // Kleine Pause, damit wenigstens der Loading-State im UI erscheint!
             await new Promise(resolve => window.setTimeout(resolve, 500));
 
-            let streamer = new TextStreamer(modelState.model.tokenizer, {
-                skip_prompt: true,
-                callback_function: (text) => this.result += text,
+            this.result = await modelState.loadedModel.backend.runTranslationPipeline({
+                input:          textPageState.currentPage.simplified,
+                sourceLanguage: this.sourceLanguage,
+                targetLanguage: this.targetLanguage,
             });
-
-            let answer = await modelState.model(textPageState.currentPage.simplified, {
-                src_lang: this.src_language,
-                tgt_lang: this.dst_language,
-                streamer: streamer,
-            });
-
-            this.result = answer?.[0]?.translation_text || answer?.translation_text || "";
-
-            if (!this.result) {
-                console.error("Ungültige Antwort des Modells", answer);
-                this.errorMessage = "Das Modell hat keinen Text erzeugt";
-            }
 
             this.stopWatchState.stop();
             this.working = false;

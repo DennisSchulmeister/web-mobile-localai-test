@@ -76,7 +76,7 @@ KI-Anwendungsfall: Freier LLM-Chat
                     <b>Beachte:</b>
                     Ich beantworte zwar deine Fragen, merke mir aber den Inhalt unseres
                     Gesprächs nicht. Das heißt, jede Frage muss ohne Bezug zu den vorherigen
-                    Nachrichten beantwortbar sein. Außerdem kann ich schnell Fehler machen.
+                    Nachrichten beantwortbar sein. Außerdem mache ich viele Fehler.
                     Prüfe daher alle meine Antworten. Manchmal erzähle ich auch Unsinn.
                     In diesem Fall stelle dieselbe Frage einfach nochmal. 🙃
                 </p>

@@ -6,11 +6,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import {TextStreamer}    from "@huggingface/transformers";
-
-import modelState        from "../../../state/ModelState.svelte";
-import StopWatchState    from "../../../state/StopWatchState.svelte.js";
-import textPageState     from "../../../state/TextPageState.svelte.js";
+import modelState     from "../../../state/ModelState.svelte";
+import StopWatchState from "../../../state/StopWatchState.svelte.js";
+import textPageState  from "../../../state/TextPageState.svelte.js";
 
 /**
  * Gesicherter Zustand für die "Fragen beantworten" Seite, damit dieser bei der
@@ -44,30 +42,7 @@ class QuestionAnsweringPageState {
 
             let question = this.question.trim();
             let context  = textPageState.currentPage.simplified;
-
-            if (modelState.loadedModel.config?.prefix?.question) {
-                question = `${modelState.loadedModel.config.prefix.question} ${question}`;
-            }
-
-            if (modelState.loadedModel.config?.prefix?.context) {
-                context = `${modelState.loadedModel.config.prefix.context} ${context}`;
-            }
-
-            let streamer = new TextStreamer(modelState.model.tokenizer, {
-                skip_prompt: true,
-                callback_function: (text) => this.answer += text,
-            });
-
-            let answer = await modelState.model(question, context, {
-                streamer: streamer,
-            });
-
-            this.answer = answer?.answer || "";
-
-            if (!this.answer) {
-                console.error("Ungültige Antwort des Modells", answer);
-                this.errorMessage = "Das Modell hat keinen Text erzeugt";
-            }
+            this.answer  = await modelState.loadedModel.backend.runQuestionAnsweringPipeline({question, context});
 
             this.stopWatchState.stop();
             this.working = false;
