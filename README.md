@@ -529,7 +529,7 @@ geöffnet. Die Anfrage an das Modell lautet: „Please summarize.”
 
 Anders als bei den meisten LLMs, sind die hier verwendeten kleinen Modelle nicht gut darin,
 Markdown-Syntax zu verarbeiten oder zu erzeugen. Von den getesteten LLM kommen alle damit
-zurecht, außer [teapotai/teapotllm](https://huggingface.co/teapotai/teapotllm)
+zurecht, außer [teapotai/teapotllm](https://huggingface.co/teapotai/teapotllm).
 
 Die Modelle lassen sich in drei Grundarchitekturen einordnen, gemäß untenstehender Tabelle.
 
@@ -577,8 +577,8 @@ Zahlen ermittelt mit den Debug Logs beim Laden der Modell und Copilot. Die Logs 
 Fazit
 -----
 
-Kleinere Anwendungsfälle, die mit Modellen zwischen 300 und 500 MB auskommen, lassen sich
-auf mobilen Geräten innerhalb einer Webawendung lokal ausführen. Allerdings mit Einschränkungen:
+Kleinere Anwendungsfälle, die mit Modellen unter 1 GB auskommen, lassen sich auf mobilen Geräten
+innerhalb einer Webawendung lokal ausführen. Allerdings mit Einschränkungen:
 
 * Das Ökosystem entwickelt sich schnell weiter. Aber in Folge daraus, ist es auch nicht
   immer stabil, was die durch ONNX 1.25 ausgelösten Fehlermeldungen zeigen, die monatelang
