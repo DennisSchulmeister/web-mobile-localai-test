@@ -184,6 +184,13 @@ Lessons Learned
   Rendering statt. Deshalb scheint unsere Stoppuhr nicht zu laufen und auch die gestreamten
   Texte werden nicht angezeigt. Getestet mit Firefox Desktop und Chrome Desktop.
 
+* Memory Preasure: Die Performance bricht drastisch ein, wenn ein Modell nicht vollständig in den
+  RAM geladen werden kann und das Betriebssystem auf Swap Space ausweichen muss. Dies kann auch
+  passieren, wenn man in einer Session zwischen mehreren Modellen wechselt.
+
+* Manchmal kann es aber auch einfach vorkommen, dass der Browser nicht genügend Speicher
+  allozieren kann: `Error: Can't create a session. ERROR_CODE: 6, ERROR_MESSAGE: std::bad_alloc`.
+
 ### transformers.js und HuggingFace
 
 * transformers.js benötigt die Modelle im ONNX-Format, da es sich um Grunde genommen um
@@ -416,10 +423,12 @@ Lessons Learned
   beider Modell sind (in allen Sprachen) ausführlicher als bei den anderen Modellen.
 
 * Qwen scheint auch ganz gute Antworten mit Bezug auf eine Textseite als Kontext zu liefern.
+  Erstes Token nach 0,8 Sekunden, 3,9 Tokens/Sekunde (auf meinem Laptop).
 
 * [onnx-community/SmolLM2-135M-Instruct-ONNX](https://huggingface.co/onnx-community/SmolLM2-135M-Instruct-ONNX)
   hat eine gute Geschwindigkeit. Das Modell ist auch sehr klein (ca. 200 MB).  Die Qualität
   der Antworten schwank stark, von gut bis mehr oder weniger Blödsinn. Getestet mit "What is HTML?".
+  Erstes Token nach 0,29 Sekunden, 9,76 Tokens/Sekunde (auf meinem Laptop).
 
 * [Xenova/LaMini-Flan-T5-783M](https://huggingface.co/Xenova/LaMini-Flan-T5-783M) generiert
   sehr kurze Antworten. Dennoch ist es sehr langsam.
@@ -429,6 +438,60 @@ Lessons Learned
   Zeile, getrennt durch eine Leerzeile, unter dem Kontext stehen. Ohne Kontext antwortet das Modell
   aber aus seinem internen Wissen heraus, wenn auch noch kürzer als 
   [Xenova/LaMini-Flan-T5-783M](https://huggingface.co/Xenova/LaMini-Flan-T5-783M).
+
+#### Testfall: "What is HTML?"
+
+Um einen wiederholbaren Test zu erhalten, wird der Browser für jedes Modells neugestartet
+und es wird nur die Chat-Seite für einen freien Chat ohne Kontext geöffnet und das Modell
+geladen. Danach werden folgende Nachrichten eingegeben.
+
+1. What is HTML?
+2. What is CSS?
+3. What is JavaScript?
+
+Es wird nur die Performance gemessen, nicht die Qualität der Antwort. Die Parameter sind:
+
+* Max Tokens: Unbegrenzt
+* Temperator: 0,3
+* Strafe für Widerholungen: 1,1
+* Sampling: Aktiv
+* Ausführung: WebGPU
+* Quantisierung: q4
+
+Hier die Messergebnisse, gemessen unter Fedora Linux mit Firefox 157 auf einem Lenovo E580
+mit folgender Ausstattung: 4x Intel(R) Core(TM) i7-8550U CPU @ 1.80GHz (mit Hypethreading),
+16 GB RAM, 2 GB GPU, Baujahr 2018.
+
+| Art       | Modell                                    | Größe    | Frage | Tokens |Erstes Token | Tokens/Sek | Dauer  |
+|-----------|-------------------------------------------|---------:|------:|-------:|------------:|-----------:|-------:|
+| Text-Gen  | onnx-community/SmolLM2-135M-Instruct-ONNX | 175,6 MB |     1 |    323 |       0,31s |       8,79 | 37,06s |
+|           |                                           |          |     2 |    351 |       0,23s |       9,25 | 38,16s |
+|           |                                           |          |     3 |    312 |       0,21s |       8,69 | 36,12s |
+|           | onnx-community/Qwen3-0.6B-ONNX            | 885,2 MB |     1 |    116 |       0,45s |       9,94 | 12,12s |
+|           |                                           |          |     2 |    103 |       0,38s |       9,47 | 11,27s |
+|           |                                           |          |     3 |    254 |       0,47s |       9,91 | 25,81s |
+|           | LiquidAI/LFM2.5-1.2B-Instruct-ONNX        | 814,0 MB |     1 |    114 |       0,83s |       7,65 | 15,74s |
+|           |                                           |          |     2 |    147 |       0,73s |       9,35 | 16,46s |
+|           |                                           |          |     3 |    173 |       0,73s |       9,69 | 18,58s |
+| Text2Text | Xenova/LaMini-Flan-T5-783M                | 702,6 MB |     1 |     25 |       1,02s |       2,52 | 10,94s |
+|           |                                           |          |     2 |     49 |       0,86s |       2,52 | 20,30s |
+|           |                                           |          |     3 |     20 |       0,95s |       2,47 |  9,06s |
+|           | teapotai/teapotllm                        | 702,7 MB |     1 |     20 |       0,94s |       2,46 |  9,05s |
+|           |                                           |          |     2 |     25 |       0,93s |       2,60 | 10,54s |
+|           |                                           |          |     3 |     18 |       0,76s |       2,49 |  7,99s |
+
+#### Testfall: Text zusammenfassen
+
+Gleiche Testbedingungen wie oben. Es wird jedoch die Seite "English / Internet of Things"
+geöffnet. Die Anfrage an das Modell lautet: „Please summarize.”
+
+| Art       | Modell                                    | Tokens |Erstes Token | Tokens/Sek | Dauer  |
+|-----------|-------------------------------------------|-------:|------------:|-----------:|-------:|
+| Text-Gen  | onnx-community/SmolLM2-135M-Instruct-ONNX |    204 |       1,14s |       8,71 | 24,57s |
+|           | onnx-community/Qwen3-0.6B-ONNX            |     91 |       2,71s |       5,93 | 18,07s |
+|           | LiquidAI/LFM2.5-1.2B-Instruct-ONNX        |     97 |       7,30s |       6,74 | 21,69s |
+| Text2Text | Xenova/LaMini-Flan-T5-783M                |     29 |       2,16s |       2,33 | 14,61s |
+|           | teapotai/teapotllm                        |     82 |       2,00s |       2,38 | 36,44s |
 
 ### Alle Modelle
 
@@ -444,7 +507,7 @@ Lessons Learned
 | Decoder-only / Causal LM  | `text-generation`                                      | `AutoModelForCausalLM`        |
 
 Fazit
-----
+-----
 
 Kleinere Anwendungsfälle, die mit Modellen zwischen 300 und 500 MB auskommen, lassen sich
 auf mobilen Geräten innerhalb einer Webawendung lokal ausführen. Allerdings nur mit

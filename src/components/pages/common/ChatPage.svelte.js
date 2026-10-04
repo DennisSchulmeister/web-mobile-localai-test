@@ -10,6 +10,7 @@ import {TextStreamer}                  from "@huggingface/transformers";
 
 import modelState                      from "../../../state/ModelState.svelte";
 import StopWatchState                  from "../../../state/StopWatchState.svelte.js";
+import TextGenerationStatsState        from "../../../state/TextGenerationStatsState.svelte.js";
 import textPageState                   from "../../../state/TextPageState.svelte.js";
 import {randomId}                      from "../../../utils/id.js";
 
@@ -22,7 +23,6 @@ class ChatPageState {
     working           = $state(false);
     disabled          = $derived(this.working || modelState.loadedModel.status !== "ready" || !this.TASKS.includes(modelState.loadedModel.task))
     errorMessage      = $state("");
-    stopWatchState    = new StopWatchState();
     stoppingCriteria  = new InterruptableStoppingCriteria();
     
     question          = $state("");
@@ -32,12 +32,11 @@ class ChatPageState {
     doSample          = $state(true);
 
     /**
-     * Notwendig, damit die Array reaktiv sind. `$derived(... [])` gibt keine
-     * reaktiven Array zurück.
+     * Notwendig, damit die Arrays reaktiv sind. `$derived(... [])` gibt keine
+     * reaktiven Arrays zurück.
      */
     #cb = () => {
         modelState.loadedModel.modelId;
-        this.stopWatchState.reset();
 
         let messages = $state([]);
         return messages;
@@ -52,10 +51,11 @@ class ChatPageState {
      * Textaufgabe generieren
      */
     async execute() {
+        let response;
+
         try {
             if (this.disabled) return;
    
-            this.stopWatchState.start("Text-Generierung", "bi-pen");
             this.stoppingCriteria.reset();
             this.working = true;
 
@@ -73,17 +73,31 @@ class ChatPageState {
                 context = `${modelState.loadedModel.config.prefix.context} ${context}`;
             }
 
-            this.messages.push({id: randomId(), role: "user", content: question});
-            this.messages.push({id: randomId(), role: "assistant", content: ""});
+            this.messages.push({
+                id:        randomId(),
+                role:      "user",
+                content:   question,
+                stopWatch: null,
+                stats:     null
+            });
+
+            this.messages.push({
+                id:        randomId(),
+                role:      "assistant",
+                content:   "",
+                stopWatch: new StopWatchState().start("Antwort", "bi-pen"),
+                stats:     new TextGenerationStatsState().start()
+            });
 
             let input    = null;
             let output   = null;
-            let response = this.messages.at(-1);
+            response     = this.messages.at(-1);
 
             let streamer = new TextStreamer(modelState.model.tokenizer, {
                 skip_prompt:         true,
                 skip_special_tokens: true,
-                callback_function:   (text) => response.content += text,
+                token_callback_function: (tokens) => response.stats.update(tokens, true),
+                callback_function:       (text)   => response.content += text,
             });
 
             if (modelState.loadedModel.config.instructionTuned) {
@@ -131,14 +145,20 @@ class ChatPageState {
                 this.errorMessage = "Das Modell hat keinen Text erzeugt";
             }
 
-            this.stopWatchState.stop();
+            response.stopWatch.stop();
+            response.stats.stop();
+
             this.working  = false;
             this.question = "";
         } catch (error) {
             this.errorMessage = error.toString();
             this.working      = false;
 
-            this.stopWatchState.stop();
+            if (response) {
+                response.stopWatch.stop();
+                response.stats.stop();
+            }
+            
             throw error;
         }
     }
@@ -157,7 +177,6 @@ class ChatPageState {
      */
     reset() {
         this.messages.splice(0);
-        this.stopWatchState.reset();
     }
 }
 

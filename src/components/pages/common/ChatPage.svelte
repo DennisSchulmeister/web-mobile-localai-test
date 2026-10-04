@@ -98,20 +98,28 @@ KI-Anwendungsfall: Freier LLM-Chat
                 <div class="content">
                     {@html md.render(message.content)}
                 </div>
+
+                <div class="stats">
+                    {#if message.stats}
+                        <StopWatch measurements={message.stats.values}/>
+                    {/if}
+    
+                    {#if message.stopWatch}
+                        <StopWatch measurements={message.stopWatch.measurements}/>
+                    {/if}
+                </div>
             </div>
         {/each}
 
-        {#if pageState.errorMessage || pageState.stopWatchState.measurements.length}
+        {#if pageState.errorMessage || pageState.messages.length}
             <div class="status">
                 {#if pageState.errorMessage}
                     <IconText type="error" text={pageState.errorMessage}/>
                 {/if}
         
-                <div class="inner">
-                    <StopWatch measurements={pageState.stopWatchState.measurements}/>
-    
+                <div>
                     {#if !pageState.working}
-                        <a href="#reset" onclick={onReset}>Zurücksetzen</a>
+                        <a href="#reset" onclick={onReset}>Neuer Chat</a>
                     {/if}
                 </div>
             </div>
@@ -142,11 +150,11 @@ KI-Anwendungsfall: Freier LLM-Chat
                 <input type="number" step="0.1" bind:value={pageState.temperature} disabled={pageState.disabled}/>
             </label>
             <label>
-                Keine Wiederholung
+                Keine Wdh.
                 <input type="number" step="0.1" bind:value={pageState.repetitionPenalty} disabled={pageState.disabled}/>
             </label>
             <label>
-                Sample
+                Sampling
                 <input type="checkbox" role="switch" bind:checked={pageState.doSample} disabled={pageState.disabled}/>
             </label>
         </article>
@@ -209,19 +217,20 @@ KI-Anwendungsfall: Freier LLM-Chat
             color: var(--color3);
         }
 
-        :global(.content p:last-child) {
+        /* :global(.content p:last-child) {
             margin-bottom: 0;
+        } */
+
+        .stats {
+            margin-top: 1em;
+            display: flex;
+            justify-content: space-between;
         }
     }
 
     .status {
         padding: 1em;
         background: var(--color5);
-
-        .inner {
-            display: flex;
-            justify-content: space-between;
-        }
     }
 
     .options {

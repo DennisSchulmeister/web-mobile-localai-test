@@ -6,6 +6,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+import {formatSeconds} from "../utils/formatter.js";
+
 /**
  * Eine einfache Stoppuhr, mit der die Ausführung eines oder mehrerer
  * Schritte gemessen werden kann. Die dazugehörige `StoppWatch`-Komponente
@@ -40,11 +42,6 @@ export default class StopWatchState {
     #intervalId = null;
 
     /**
-     * Formatierung der Zeitwerte
-     */
-    #formatter = new Intl.NumberFormat("de-DE", {minimumFractionDigits: 2, maximumFractionDigits: 2});
-
-    /**
      * Konstruktor.
      * @param {number} interval Intervall für UI-Updates in Millisekunden (Default: 100)
      */
@@ -61,6 +58,7 @@ export default class StopWatchState {
      * @param {string} name Name der Messung
      * @param {string} icon Icon der Messung
      * @param {number?} interval Update-Intervall für das UI (default 100ms)
+     * @returns {this} Fluent API
      */
     start(name, icon) {
         if (!this.running) {
@@ -73,7 +71,7 @@ export default class StopWatchState {
         this.measurements.push({
             name:      name || "",
             icon:      icon || "",
-            started:   Date.now(),
+            started:   performance.now(),
             stopped:   0,
             runtime:   0,
             formatted: "",
@@ -83,10 +81,13 @@ export default class StopWatchState {
         if (!this.#intervalId) {
             this.#intervalId = window.setInterval(() => this.#updateCurrentMeasurement(), this.interval);
         }
+
+        return this;
     }
 
     /**
      * Messungen stoppen.
+     * @returns {this} Fluent API
      */
     stop() {
         if (this.#intervalId) {
@@ -99,13 +100,17 @@ export default class StopWatchState {
 
         this.measurements.at(-1).status = "stopped";
         this.#updateCurrentMeasurement();
+
+        return this;
     }
 
     /**
      * Messungen löschen.
+     * @returns {this} Fluent API
      */
     reset() {
         this.measurements = []; //.splice(0);
+        return this;
     }
 
     /**
@@ -116,20 +121,9 @@ export default class StopWatchState {
         if (this.measurements.length > 0) {
             let lastMeasurement = this.measurements.at(-1);
 
-            lastMeasurement.stopped   = Date.now();
+            lastMeasurement.stopped   = performance.now();
             lastMeasurement.runtime   = lastMeasurement.stopped - lastMeasurement.started;
-            lastMeasurement.formatted = this.#format(lastMeasurement.runtime);
+            lastMeasurement.formatted = formatSeconds(lastMeasurement.runtime);
         }
-    }
-
-    /**
-     * Hilfsmethode zum Formatieren eines Zeitwerts.
-     * 
-     * @param {number} time Millisekunden
-     * @returns {string} Sekunden mit zwei Nachkommastellen
-     */
-    #format(time) {
-        let seconds = Math.round(time / 10) / 100.0;
-        return `${this.#formatter.format(seconds)}s`;
     }
 }

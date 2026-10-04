@@ -24,13 +24,7 @@ UI-Komponente zur Darstellung eines `StopWatchState`.
                 <span>{measurement.name}:</span>
             {/if}
             
-            <span class="value">
-                {#if measurement.status === "running"}
-                    Läuft seit
-                {:else if measurement.status === "stopped"}
-                    Beendet in
-                {/if}
-                
+            <span class="value">                
                 {measurement.formatted}
             </span>
         </div>
@@ -44,7 +38,7 @@ UI-Komponente zur Darstellung eines `StopWatchState`.
         display: flex;
         justify-content: start;
         align-items: center;
-        gap: var(--content-padding);
+        gap: 0.5em;
 
         .measurement {
             display: inline-flex;
