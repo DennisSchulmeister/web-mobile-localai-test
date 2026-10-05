@@ -35,12 +35,18 @@ Auswahl eines KI-Modells
         return result;
     });
 
+    // TODO: Devices filtern, so dass nur Backends berücksichtigt werden, die
+    // die Task-Typen ausführen können. Das Backend muss zusätzlich die Chance
+    // bekommen, für jedes einzelne Modell zu entscheiden, ob es ausführbar ist.
+    // Wegen `"android": {"natrive": true}` im Modellkatalog. Braucht aber eine
+    // kleine API-Änderung in den Backends.
+
     let selected_modelId    = $derived(available_models[0]?.modelId || "");
     let selected_index      = $derived(available_models.findIndex(e => e.modelId === selected_modelId));
     let selected_task       = $derived(available_models[selected_index]?.task || "");
     let selected_dtypes     = $derived(available_models[selected_index]?.dtypes || []);
     let selected_dtype      = $derived(available_models[selected_index]?.dtypes?.[0] || "");
-    let selected_device     = $state(modelState.devices[0]?.device); // Nur devices von Backends mit Support für Type/Pipeline-Art
+    let selected_device     = $state(modelState.devices[0]?.device);
     let loaded_device_text  = $derived(modelState.devices.find(e => e.device === modelState.loadedModel.device)?.label || modelState.loadedModel.device);
     let loaded_device_color = $derived(modelState.loadedModel.device.includes("wasm") ? "darkred" : "darkgreen");
 
