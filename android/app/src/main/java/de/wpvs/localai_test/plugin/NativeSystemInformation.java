@@ -1,4 +1,4 @@
-package de.wpvs.localai_test;
+package de.wpvs.localai_test.plugin;
 
 import android.app.ActivityManager;
 import android.content.Context;
@@ -15,9 +15,13 @@ import android.os.Process;
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.WebView;
+import ai.onnxruntime.OrtEnvironment;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import java.util.Locale;
+
+import de.wpvs.localai_test.BuildConfig;
+import de.wpvs.localai_test.inference.InferenceDevice;
 
 /**
  * Systemdiagnose für den Vergleich von Browser- und nativer Inferenz.
@@ -30,6 +34,33 @@ final class NativeSystemInformation {
      * Instanziierung der statischen Hilfsklasse verhindern.
      */
     private NativeSystemInformation() {}
+
+    /**
+     * Versionen von ONNX Runtime und ONNX Runtime GenAI sowie die verfügbaren
+     * Execution Provider ergänzen.
+     *
+     * @param information Liste, an die die Einträge angehängt werden
+     */
+    private static void addRuntimeInformation(JSArray information) {
+        add(information, "bi-box", "ONNX Runtime",       BuildConfig.ONNXRUNTIME_VERSION);
+        add(information, "bi-box", "ONNX Runtime GenAI", BuildConfig.ONNXRUNTIME_GENAI_VERSION);
+
+        try {
+            add(information, "bi-gpu-card", "Execution Provider", OrtEnvironment.getAvailableProviders().toString());
+        } catch (Throwable throwable) {
+            Log.w(TAG, "Execution Provider konnten nicht ermittelt werden.", throwable);
+            add(information, "bi-gpu-card", "Execution Provider", "Nicht ermittelbar: " + throwable.getMessage());
+        }
+
+        StringBuilder devices = new StringBuilder();
+
+        for (InferenceDevice device : InferenceDevice.available()) {
+            if (devices.length() > 0) devices.append(", ");
+            devices.append(device.label);
+        }
+
+        add(information, "bi-cpu", "Native Inferenz-Geräte", devices.toString());
+    }
 
     /**
      * Geräte-, Betriebssystem-, Speicher- und Grafikdiagnose zusammenstellen.
@@ -45,7 +76,7 @@ final class NativeSystemInformation {
 
         // Backend und Gerätehardware
         add(information, "bi-terminal",    "Backend-Typ",         "Android (Native)");
-        add(information, "bi-info-circle", "Native Inferenz",     "Noch nicht implementiert");
+        addRuntimeInformation(information);
         add(information, "bi-phone",       "Hersteller / Modell", Build.MANUFACTURER + " / " + Build.MODEL);
         add(information, "bi-cpu",         "Hardware / Board",    Build.HARDWARE + " / " + Build.BOARD);
 

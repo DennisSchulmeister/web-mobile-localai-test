@@ -10,11 +10,21 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField "String", "ONNXRUNTIME_VERSION", "\"$onnxruntimeVersion\""
+        buildConfigField "String", "ONNXRUNTIME_GENAI_VERSION", "\"$onnxruntimeGenAIVersion\""
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
              // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
+    }
+    androidResources {
+        // Mitgelieferte Modelle unkomprimiert ablegen, damit sie schneller kopiert und
+        // nach einem App-Update anhand ihrer Größe wiedererkannt werden können
+        noCompress += ["onnx", "onnx_data"]
+    }
+    buildFeatures {
+        buildConfig = true
     }
     buildTypes {
         release {
@@ -31,7 +41,10 @@ dependencies {
     implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
     implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
     implementation project(':capacitor-android')
+    implementation "com.microsoft.onnxruntime:onnxruntime-android:$onnxruntimeVersion"
+    implementation "microsoft:onnxruntime-genai-android:$onnxruntimeGenAIVersion@aar"
     testImplementation "junit:junit:$junitVersion"
+    testImplementation "org.json:json:$orgJsonVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
     implementation project(':capacitor-cordova-android-plugins')

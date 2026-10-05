@@ -40,7 +40,7 @@ Auswahl eines KI-Modells
     let selected_task       = $derived(available_models[selected_index]?.task || "");
     let selected_dtypes     = $derived(available_models[selected_index]?.dtypes || []);
     let selected_dtype      = $derived(available_models[selected_index]?.dtypes?.[0] || "");
-    let selected_device     = $state(modelState.devices[0]?.device);
+    let selected_device     = $state(modelState.devices[0]?.device); // Nur devices von Backends mit Support für Type/Pipeline-Art
     let loaded_device_text  = $derived(modelState.devices.find(e => e.device === modelState.loadedModel.device)?.label || modelState.loadedModel.device);
     let loaded_device_color = $derived(modelState.loadedModel.device.includes("wasm") ? "darkred" : "darkgreen");
 

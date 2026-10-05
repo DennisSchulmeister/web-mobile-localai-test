@@ -2,23 +2,35 @@
     "summarization": [
         {
             "modelId": "onnx-community/t5-small-german-ONNX",
-            "dtypes": ["q4", "int8"]
+            "dtypes": ["q4", "int8"],
+            "android": {
+                "native": false
+            }
         },
         {
             "modelId": "onnx-community/bart-german-ONNX",
-            "dtypes": ["q4", "int8"]
+            "dtypes": ["q4", "int8"],
+            "android": {
+                "native": false
+            }
         }
     ],
     "translation": [
         {
             "modelId": "huggingworld/m2m100_418M",
             "dtypes": ["q8"],
-            "languages": ["de", "en", "es", "fr", "it"]
+            "languages": ["de", "en", "es", "fr", "it"],
+            "android": {
+                "native": false
+            }
         },
         {
             "modelId": "casawolice/small100-onnx",
             "dtypes": ["fp32"],
-            "languages": ["de", "en", "es", "fr", "it"]
+            "languages": ["de", "en", "es", "fr", "it"],
+            "android": {
+                "native": false
+            }
         }
     ],
     "question-answering": [
@@ -28,6 +40,9 @@
             "prefix": {
                 "question": "",
                 "context": ""
+            },
+            "android": {
+                "native": false
             }
         },
         {
@@ -36,6 +51,9 @@
             "prefix": {
                 "question": "",
                 "context": ""
+            },
+            "android": {
+                "native": false
             }
         }
     ],
@@ -44,7 +62,8 @@
             "modelId": "sentence-transformers/all-MiniLM-L6-v2",
             "dtypes": ["fp32"],
             "android": {
-                "include": true
+                "include": true,
+                "native": true
             }
         }
     ],
@@ -55,7 +74,8 @@
             "instructionTuned": true,
             "systemPrompt": "You are a helpful assistant.",
             "android": {
-                "include": true
+                "include": true,
+                "native": true
             }
         },
         {
@@ -67,7 +87,8 @@
                 "enable_thinking": false
             },
             "android": {
-                "include": true
+                "include": true,
+                "native": true
             }
 
         },
@@ -75,7 +96,10 @@
             "modelId": "LiquidAI/LFM2.5-1.2B-Instruct-ONNX",
             "dtypes": ["q4"],
             "instructionTuned": true,
-            "systemPrompt": "You are a helpful assistant."
+            "systemPrompt": "You are a helpful assistant.",
+            "android": {
+                "native": true
+            }
         }
     ],
     "text2text-generation": [
@@ -85,6 +109,9 @@
             "prefix": {
                 "question": "",
                 "context": ""
+            },
+            "android": {
+                "native": false
             }
         },
         {
@@ -93,6 +120,9 @@
             "prefix": {
                 "question": "",
                 "context": ""
+            },
+            "android": {
+                "native": false
             }
         }
     ]

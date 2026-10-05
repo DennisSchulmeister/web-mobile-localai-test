@@ -21,6 +21,21 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+
+        // ONNX Runtime GenAI für Android wird nur als AAR in den GitHub-Releases veröffentlicht
+        ivy {
+            name = "onnxruntime-genai-releases"
+            url = "https://github.com/microsoft/onnxruntime-genai/releases/download/"
+            patternLayout {
+                artifact "v[revision]/[module]-[revision].[ext]"
+            }
+            metadataSources {
+                artifact()
+            }
+            content {
+                includeModule "microsoft", "onnxruntime-genai-android"
+            }
+        }
     }
 }
 

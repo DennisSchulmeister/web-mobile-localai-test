@@ -1,4 +1,4 @@
-package de.wpvs.localai_test;
+package de.wpvs.localai_test.plugin;
 
 import static org.junit.Assert.assertEquals;
 

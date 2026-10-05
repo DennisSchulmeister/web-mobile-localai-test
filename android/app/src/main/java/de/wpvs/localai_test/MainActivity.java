@@ -3,6 +3,8 @@ package de.wpvs.localai_test;
 import android.os.Bundle;
 import com.getcapacitor.BridgeActivity;
 
+import de.wpvs.localai_test.plugin.NativeInferencePlugin;
+
 /**
  * Start-Aktivität
  */

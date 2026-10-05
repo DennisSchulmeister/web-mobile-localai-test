@@ -164,20 +164,10 @@ Zusätzlich kann die App als Android App gepackt werden. Hierfür werden genutzt
 * **Capacitor:** https://capacitorjs.com/
 * **Android SDK:** https://developer.android.com/
 
-Das native Capacitor-Plugin meldet für den Vergleich mit der Browser-Ausführung
-Android-Version und API-Level, Hersteller/Modell, Hardware, ABIs, Prozessarchitektur,
-CPU-Nebenläufigkeit und Speicherinformationen. RAM-Verfügbarkeit, Java-/nativer
-Heap und Prozess-PSS sind Momentaufnahmen; PSS berücksichtigt anteilig gemeinsam
-genutzte Speicherseiten des App-Prozesses, nicht separat laufende WebView-Prozesse.
-Das Java-Heap-Maximum ist kein Limit für native Modellallokationen.
-
-GPU-Anbieter, Renderer, OpenGL-ES-Version und maximale Texturgröße werden in einem
-temporären OpenGL-ES-Kontext abgefragt. Dabei kann auch ein Software-Renderer
-(z.B. im Emulator) gemeldet werden. Diese Daten belegen keine KI-Beschleunigung:
-GPU-Anzahl, VRAM und TPU/NPU-Verfügbarkeit werden nicht ermittelt. Scheitert die
-GPU-Abfrage, wird der Fehler in den Diagnoseinformationen und im Android-Log sichtbar,
-während die übrigen Systemdaten weiterhin zurückgegeben werden. Eine native
-Inferenz-Runtime ist noch nicht implementiert.
+Für die native Inferenz unter Android wird direkt die ONNX-Runtime genutzt, um das Verhalten
+der relevanten transformers.js-Pipelines nachzubilden. Code Code ist aber alles andere als
+trivial und konnte so nur mit Hilfe von Copilot erstellt werden. Es gibt leider noch keinen
+Port von HuggingFace Transformers auf Android.
 
 Künftige Web APIs
 -----------------
@@ -222,6 +212,9 @@ Lessons Learned
 ### Android
 
 * Der Android Emulator stürzt ab, wenn die Capacitor-App das Qwen-Modell lädt (ca. 885,2 MB).
+  Auch mit der nativen Runtime wird die App im Emulator mit 2 GB RAM vom Low Memory Killer
+  beendet: Beim Laden des Modells benötigt die ONNX Runtime kurzzeitig ca. 2,2 GB. Ohne
+  Graph-Optimierungen wären es nur ca. 1,5 GB, die Generierung ist dann aber ca. 6x langsamer.
 
 * WebGPU scheint im Android Emulator nicht zu funktionieren. Wird zwar erkannt, aber beim
   Laden eines Modells (SmolLM2) kommt die Meldung:
@@ -234,6 +227,21 @@ Lessons Learned
 
   Interessanterweise kommt die Meldung auch beim Versuch, ein Modell für die CPU-Ausführung
   mit Web Assembly zu laden.
+
+* Es gibt leider noch keinen Port der Transformers-Bibliothek auf Android. Als Folge daraus musste
+  die Kernfunktionalität mit Copilot nachimplementiert werden, was rund 3000 LoC ausmacht!
+  Die Implementierung läuft auch nur auf der CPU, weil die ONNX Runtime für Android noch keinen
+  stabilen GPU/TPU-Support hat.
+
+* Auf Geräten mit Qualcomm Snapdragon könnte `ennxruntime-android-qnn` zusammen mit Speziell
+  für diese Runtime compilierten Modellen genutzt werden, um die Modelle zu beschleunigen.
+  Das ist aber keine allgemeine Lösung.
+
+* ONNX GenAI muss aktuell aus den Quellcodes gebaut werden. Die API ist auch noch im Fluss.
+
+* Die Java-Schnittstelle von ONNX Runtime GenAI stürzt ab, wenn bei `applyChatTemplate()`
+  `null` für das Template übergeben wird. Ein leerer String verwendet das Template des Modells.
+
 
 ### transformers.js und HuggingFace
 
