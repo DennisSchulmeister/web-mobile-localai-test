@@ -164,6 +164,21 @@ Zusätzlich kann die App als Android App gepackt werden. Hierfür werden genutzt
 * **Capacitor:** https://capacitorjs.com/
 * **Android SDK:** https://developer.android.com/
 
+Das native Capacitor-Plugin meldet für den Vergleich mit der Browser-Ausführung
+Android-Version und API-Level, Hersteller/Modell, Hardware, ABIs, Prozessarchitektur,
+CPU-Nebenläufigkeit und Speicherinformationen. RAM-Verfügbarkeit, Java-/nativer
+Heap und Prozess-PSS sind Momentaufnahmen; PSS berücksichtigt anteilig gemeinsam
+genutzte Speicherseiten des App-Prozesses, nicht separat laufende WebView-Prozesse.
+Das Java-Heap-Maximum ist kein Limit für native Modellallokationen.
+
+GPU-Anbieter, Renderer, OpenGL-ES-Version und maximale Texturgröße werden in einem
+temporären OpenGL-ES-Kontext abgefragt. Dabei kann auch ein Software-Renderer
+(z.B. im Emulator) gemeldet werden. Diese Daten belegen keine KI-Beschleunigung:
+GPU-Anzahl, VRAM und TPU/NPU-Verfügbarkeit werden nicht ermittelt. Scheitert die
+GPU-Abfrage, wird der Fehler in den Diagnoseinformationen und im Android-Log sichtbar,
+während die übrigen Systemdaten weiterhin zurückgegeben werden. Eine native
+Inferenz-Runtime ist noch nicht implementiert.
+
 Künftige Web APIs
 -----------------
 

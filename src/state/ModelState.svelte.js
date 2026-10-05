@@ -60,12 +60,14 @@ class ModelState {
         for (let backend of backends) {
             backend.setConfig({config: this.config, models: this.models});
 
-            for (let device of backend.devices) {
+            for (let device of await backend.devices) {
                 let deviceId = `${i}::${device.device}`;
 
                 this.devices.push({device: deviceId, label: device.label});
                 this.#backendsByDevice[deviceId] = backend;
             }
+
+            i++;
         }
     }
 

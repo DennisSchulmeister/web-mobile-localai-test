@@ -110,8 +110,13 @@ class ChatPageState {
     /**
      * Laufende Generierung stoppen.
      */
-    stop() {
-        modelState.loadedModel.backend.stopTextGeneration();
+    async stop() {
+        try {
+            await modelState.loadedModel.backend.stopTextGeneration();
+        } catch (error) {
+            this.errorMessage = error.toString();
+            throw error;
+        }
     }
 
     /**

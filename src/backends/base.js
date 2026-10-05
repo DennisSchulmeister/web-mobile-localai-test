@@ -40,7 +40,8 @@ export default class BaseBackend {
      * Unterstützte Ausführumgebungen als Name/Wert-Paare. Der Wert wird der Methode
      * `loadModel()` im Parameter `device` übergeben, wenn ein Modell geladen wird.
      * 
-     * @returns {Array} Liste mit `{device: "", label: ""}`-Objekten
+     * Aufrufer müssen das Ergebnis mit `await` auswerten.
+     * @returns {Array|Promise<Array>} Liste mit `{device: "", label: ""}`-Objekten
      */
     get devices() {
         return [];
@@ -49,7 +50,8 @@ export default class BaseBackend {
     /**
      * Abfragen, ob eine bestimmte Modellart vom Backend unterstützt wird.
      * @param {string} task Art des Modells
-     * @returns {boolean} Modellart wird unterstützt
+     * Aufrufer müssen das Ergebnis mit `await` auswerten.
+     * @returns {boolean|Promise<boolean>} Modellart wird unterstützt
      */
     supports(task) {
         return false;

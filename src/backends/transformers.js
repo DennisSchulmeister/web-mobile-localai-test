@@ -45,25 +45,18 @@ export default class TransformersBackend extends BaseBackend {
     #stoppingCriteria = new InterruptableStoppingCriteria();
 
     /**
-     * @override
-     * Anzeigename des Backends.
+     * Textgenerierung läuft
      */
+    #running = false;
+
     get name() {
         return "Transformers.js";
     }
 
-    /**
-     * @override
-     * Unterstützung auf aktuellem Gerät prüfen.
-     */
     get isSupported() {
         return true;
     }
 
-    /**
-     * @override
-     * Unterstützte Ausführumgebungen.
-     */
     get devices() {
         return [
             navigator.ml  ? {device: "webnn",  label: "WebNN"}  : null,
@@ -72,18 +65,10 @@ export default class TransformersBackend extends BaseBackend {
         ].filter(e => e !== null);
     }
 
-    /**
-     * @override
-     * Unterstützung für eine Modellart prüfen.
-     */
     supports(task) {
         return true;
     }
 
-    /**
-     * @override
-     * Diagnoseinformationen des Backends.
-     */
     async getInformation() {
         let devices = ["Web Assembly (CPU)"];
 
@@ -197,10 +182,6 @@ export default class TransformersBackend extends BaseBackend {
         ];
     }
 
-    /**
-     * @override
-     * Konfiguration setzen.
-     */
     setConfig({config, models} = {}) {
         super.setConfig({config, models});
 
@@ -227,10 +208,6 @@ export default class TransformersBackend extends BaseBackend {
         }
     }
 
-    /**
-     * @override
-     * KI-Modell laden.
-     */
     async loadModel({task, modelId, dtype, device, config} = {}) {
         this.#model = await transformers.pipeline(task, modelId, {
             dtype:  dtype,
@@ -241,18 +218,10 @@ export default class TransformersBackend extends BaseBackend {
         this.#modelConfig = config;
     }
 
-    /**
-     * @override
-     * KI-Inferenz: Normaliserte Worteinbettungen für Cosinus-Vergleich.
-     */
     async runEmbeddingPipeline(input) {
         return (await this.#model(input, {pooling: "mean", normalize: true})).data;
     }
 
-    /**
-     * @override
-     * KI-Inferenz: Frage zu Text beantworten
-     */
     async runQuestionAnsweringPipeline({question, context} = {}) {
         if (this.#modelConfig.prefix?.question) {
             question = `${this.#modelConfig.prefix.question} ${question}`;
@@ -273,10 +242,6 @@ export default class TransformersBackend extends BaseBackend {
         return result;
     }
 
-    /**
-     * @override
-     * KI-Inferenz: Text zusammenfassen
-     */
     async runSummaryPipeline({input, maxNewTokens} = {}) {
         if (this.#modelConfig.prefix) {
             input = `${this.#modelConfig.prefix} ${input}`;
@@ -297,10 +262,6 @@ export default class TransformersBackend extends BaseBackend {
         return result;
     }
 
-    /**
-     * @override
-     * KI-Inferenz: Text übersetzen
-     */
     async runTranslationPipeline({input, sourceLanguage, targetLanguage} = {}) {
         let output = await this.#model(input, {
             src_lang: sourceLanguage,
@@ -317,86 +278,89 @@ export default class TransformersBackend extends BaseBackend {
         return result;
     }
 
-    /**
-     * @override
-     * KI-Inferenz: Textgenerierung / Chat
-     */
     async runTextGenerationPipeline({question, context, tokenCallback, textCallback,
                                      maxNewTokens, maxLength, doSample, temperature, repetitionPenalty
                                     } = {}) {
-        this.#stoppingCriteria.reset();
-
-        if (this.#modelConfig.prefix?.question) {
-            question = `${this.#modelConfig.prefix.question} ${question}`;
+        
+        if (this.#running) {
+            throw new Error("Textgenerierung läuft bereits");
         }
+        
+        try {
+            this.#stoppingCriteria.reset();
+            this.#running = true;
 
-        if (this.#modelConfig.prefix?.context) {
-            context = `${this.#modelConfig.prefix.context} ${context}`;
-        }
-
-        let input  = null;
-        let output = null;
-
-        let streamer = new TextStreamer(this.#model.tokenizer, {
-            skip_prompt:             true,
-            skip_special_tokens:     true,
-            token_callback_function: tokenCallback || null,
-            callback_function:       textCallback  || null,
-        });
-
-        if (this.#modelConfig.instructionTuned) {
-            // Chat-Modelle: Diese enden oft auf `-instruct`, da sie "instruction tuned" sind.
-            // Das heißt, sie vervollständigen nicht einfach nur einen Eingabetext, sondern der
-            // Eingabetext muss ein spezielles Format besitzen, um eine Chat-Struktur abzubilden.
-            // Das Modell liefert dann ein Chat-Template mit, so dass eine Liste von Chat-Nachrichten
-            // in die richtige Nur-Text-Form umgewandelt werden kann.
-            //
-            // In der Regel handelt es sich hier um CausalLM (Decoder-Only) Modelle, wie die GPT-Familie.
-            // Seq2Seq-Modelle wie die T5-Familie sind in der Regel nicht Instruction Tuned.
-            input = [
-                {role: "system", content: this.#modelConfig.systemPrompt || "Du bist ein hilfreicher Assistent."},
-                {role: "user",   content: question}
-            ];
-
-            if (context) {
-                input[0].content += `\n\n${context}`;
+            if (this.#modelConfig.prefix?.question) {
+                question = `${this.#modelConfig.prefix.question} ${question}`;
             }
-        } else if (context) {
-            input = `${context}\n\n${question}`;
-        } else {
-            input = question;
+
+            if (this.#modelConfig.prefix?.context) {
+                context = `${this.#modelConfig.prefix.context} ${context}`;
+            }
+
+            let input  = null;
+            let output = null;
+
+            let streamer = new TextStreamer(this.#model.tokenizer, {
+                skip_prompt:             true,
+                skip_special_tokens:     true,
+                token_callback_function: tokenCallback || null,
+                callback_function:       textCallback  || null,
+            });
+
+            if (this.#modelConfig.instructionTuned) {
+                // Chat-Modelle: Diese enden oft auf `-instruct`, da sie "instruction tuned" sind.
+                // Das heißt, sie vervollständigen nicht einfach nur einen Eingabetext, sondern der
+                // Eingabetext muss ein spezielles Format besitzen, um eine Chat-Struktur abzubilden.
+                // Das Modell liefert dann ein Chat-Template mit, so dass eine Liste von Chat-Nachrichten
+                // in die richtige Nur-Text-Form umgewandelt werden kann.
+                //
+                // In der Regel handelt es sich hier um CausalLM (Decoder-Only) Modelle, wie die GPT-Familie.
+                // Seq2Seq-Modelle wie die T5-Familie sind in der Regel nicht Instruction Tuned.
+                input = [
+                    {role: "system", content: this.#modelConfig.systemPrompt || "Du bist ein hilfreicher Assistent."},
+                    {role: "user",   content: question}
+                ];
+
+                if (context) {
+                    input[0].content += `\n\n${context}`;
+                }
+            } else if (context) {
+                input = `${context}\n\n${question}`;
+            } else {
+                input = question;
+            }
+
+            output = await this.#model(input, {
+                tokenizer_encode_kwargs: this.#modelConfig.tokenizerArgs || null,
+                max_new_tokens:          maxNewTokens || null,
+                max_length:              maxLength    || null,
+                do_sample:               doSample,
+                temperature:             temperature,
+                repetition_penalty:      repetitionPenalty,
+                streamer:                streamer,
+                stopping_criteria:       [this.#stoppingCriteria],
+            });
+
+            let generatedText = output?.[0]?.generated_text || output?.generated_text || ""; 
+
+            let result = Array.isArray(generatedText)
+                            ? generatedText.at(-1)?.content ?? "" 
+                            : generatedText;
+
+            if (!result) {
+                console.error("Ungültige Antwort des Modells", output);
+                this.errorMessage = "Das Modell hat keinen Text erzeugt";
+            }
+
+            return result;
+        } finally {
+            this.#running = false;
         }
-
-        output = await this.#model(input, {
-            tokenizer_encode_kwargs: this.#modelConfig.tokenizerArgs || null,
-            max_new_tokens:          maxNewTokens || null,
-            max_length:              maxLength    || null,
-            do_sample:               doSample,
-            temperature:             temperature,
-            repetition_penalty:      repetitionPenalty,
-            streamer:                streamer,
-            stopping_criteria:       [this.#stoppingCriteria],
-        });
-
-        let generatedText = output?.[0]?.generated_text || output?.generated_text || ""; 
-
-        let result = Array.isArray(generatedText)
-                        ? generatedText.at(-1)?.content ?? "" 
-                        : generatedText;
-
-        if (!result) {
-            console.error("Ungültige Antwort des Modells", output);
-            this.errorMessage = "Das Modell hat keinen Text erzeugt";
-        }
-
-        return result;
     }
 
-    /**
-     * @override
-     * Laufende Textgenerierung abbrechen.
-     */
     stopTextGeneration() {
         this.#stoppingCriteria.interrupt();
+        this.#running = false;
     }
 }
