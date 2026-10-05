@@ -11,6 +11,7 @@ import {TextStreamer}                  from "@huggingface/transformers";
 import * as transformers               from '@huggingface/transformers';
 
 import BaseBackend                     from "./base.js";
+import {formatNumber}                  from "../utils/formatter.js";
 
 /**
  * Inferenz-Backend basierend auf Transformers.js (ONNX) im Browser. Dies ist
@@ -70,10 +71,11 @@ export default class TransformersBackend extends BaseBackend {
     }
 
     async getInformation() {
-        let devices = ["Web Assembly (CPU)"];
+        let devices = [];
 
-        if (navigator.gpu) devices.push("WebGPU");
-        if (navigator.ml)  devices.push("WebNN");
+        for (let device of this.devices) {
+            devices.push(device.label);
+        }
 
         let userAgentData = "Nicht verfügbar";
 
@@ -104,7 +106,7 @@ export default class TransformersBackend extends BaseBackend {
         }
 
         let platform            = navigator.platform || navigator.userAgentData?.platform || "Nicht verfügbar";
-        let deviceMemory        = typeof navigator.deviceMemory === "number" ? `ca. ${navigator.deviceMemory} GiB`  : "Nicht verfügbar";
+        let deviceMemory        = typeof navigator.deviceMemory === "number" ? `ca. ${formatNumber(navigator.deviceMemory)} GiB`  : "Nicht verfügbar";
         let hardwareConcurrency = typeof navigator.hardwareConcurrency === "number" ? String(navigator.hardwareConcurrency) : "Nicht verfügbar";
 
         let adapter      = null;
@@ -121,10 +123,10 @@ export default class TransformersBackend extends BaseBackend {
         let gpuCount = !navigator.gpu
             ? "Nicht verfügbar (WebGPU wird nicht unterstützt)"
             : adapter
-                ? "1 WebGPU-Adapter (physische Anzahl nicht verfügbar)"
+                ? "1 WebGPU-Adapter"
                 : adapterError
                     ? `Nicht verfügbar (${adapterError})`
-                    : "0 zugängliche WebGPU-Adapter";
+                    : "0 WebGPU-Adapter";
 
         let gpuDescription = "Nicht verfügbar";
         let maxBufferSize = "Nicht verfügbar";
@@ -157,11 +159,11 @@ export default class TransformersBackend extends BaseBackend {
             }
 
             if (typeof adapter.limits?.maxBufferSize === "number") {
-                maxBufferSize = `${adapter.limits.maxBufferSize} Bytes`;
+                maxBufferSize = `${formatNumber(adapter.limits.maxBufferSize / 1024 / 1024 / 1024.0)} GiB`;
             }
 
             if (typeof adapter.limits?.maxStorageBufferBindingSize === "number") {
-                maxStorageBufferBindingSize = `${adapter.limits.maxStorageBufferBindingSize} Bytes`;
+                maxStorageBufferBindingSize = `${formatNumber(adapter.limits.maxStorageBufferBindingSize / 1024 / 1024 / 1024.0)} GiB`;
             }
         } else if (adapterError) {
             maxBufferSize = `Nicht verfügbar (${adapterError})`;

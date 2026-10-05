@@ -12,7 +12,7 @@ const routes = new Map();
 export default routes;
 
 // Home mit Unterseiten
-routes.set(/^\/(search|chat)?$/, wrap({
+routes.set(/^\/(search|chat|info)?$/, wrap({
     asyncComponent: () => import("./pages/HomePage.svelte"),
 }));
 
