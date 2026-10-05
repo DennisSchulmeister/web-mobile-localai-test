@@ -550,6 +550,16 @@ geöffnet. Die Anfrage an das Modell lautet: „Please summarize.”
 | Text2Text | Xenova/LaMini-Flan-T5-783M                |     29 |       2,16s |       2,33 | 14,61s |
 |           | teapotai/teapotllm                        |     82 |       2,00s |       2,38 | 36,44s |
 
+#### Linux vs. Windows
+
+Unter Windows fällt auf, dass Firefox einen langsamen Kaltstart hat. Die erste Anfrage an ein Modell
+braucht vergleichsweise lang (ca. 5 Sekunden bei Qwen3, 1,5 Sekunden für die semantische Suche).
+Ab der zweiten Anfrage ist die Performance ähnlich wie unter Linux, aber ein klein wenig langsamer
+(Qwen3 ca. 6 Token/Sekunde).
+
+Chrome unter Windows hat die Kaltsstartprobleme nicht und läuft teilweise sogar etwas schneller
+als Firefox unter Linux (Qwen3 ca. 10 Token/Sekunde).
+
 ### Alle Modelle
 
 Anders als bei den meisten LLMs, sind die hier verwendeten kleinen Modelle nicht gut darin,
@@ -626,6 +636,11 @@ Da wird der DX7 schon mal zu einer winzigen E-Gitarre (Qwen) 🤣:
 > If you have any specific questions about how the DX7 works or its features, feel free to ask!
 
 Großer Unsinn selbstsicher vorgetragen.
+
+Testfragen zu spezifischen zu einer Seiten:
+
+* __English / Internet of Things:__ Please summarize.
+* __English / What Makes Up a Computer?:__ How does this relate to a generic laptop or PC?
 
 Fazit
 -----
