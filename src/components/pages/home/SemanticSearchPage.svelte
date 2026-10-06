@@ -24,7 +24,7 @@ KI-Anwendungsfall: Semantische Suche von Textseiten
     import pageState         from "./SemanticSearchPage.svelte.js";
     
     onMount(() => {
-        navigationState.pageTitle = "Textseite suchen";
+        navigationState.pageTitle = "Semantische Suche";
     });
 
     async function onSubmit(event) {

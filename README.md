@@ -38,22 +38,39 @@ Folgende Anwendungsfälle sollen hier getestet werden:
         </td>
         <td>
             <a href="./doc/screenshot2.png">
-                <img src="./doc/screenshot2.png" width="200" alt="Screenshot: Textseite suchen">
+                <img src="./doc/screenshot2.png" width="200" alt="Screenshot: Textseite anzeigen">
             </a>
         </td>
         <td>
             <a href="./doc/screenshot3.png">
-                <img src="./doc/screenshot3.png" width="200" alt="Screenshot: Text anzeigen">
-            </a>
-        </td>
-        <td>
-            <a href="./doc/screenshot4.png">
-                <img src="./doc/screenshot4.png" width="200" alt="Screenshot: Freier Chat">
+                <img src="./doc/screenshot3.png" width="200" alt="Screenshot: Semantische Suche">
             </a>
         </td>
     </tr>
     <tr>
-        <td colspan="4">
+        <td>
+            <a href="./doc/screenshot4.png">
+                <img src="./doc/screenshot4.png" width="200" alt="Screenshot: Einstieg in Chat">
+            </a>
+        </td>
+        <td>
+            <a href="./doc/screenshot5.png">
+                <img src="./doc/screenshot4.png" width="200" alt="Screenshot: Sprachmodell laden">
+            </a>
+        </td>
+        <td>
+            <a href="./doc/screenshot6.png">
+                <img src="./doc/screenshot4.png" width="200" alt="Screenshot: Laufender Chat">
+            </a>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <a href="./doc/screenshot7.png">
+                <img src="./doc/screenshot4.png" width="200" alt="Screenshot: Systeminformationen">
+            </a>
+        </td>
+        <td colspan="2">
             <a href="./doc/android-studio.png">
                 <img src="./doc/android-studio.png" width="400" alt="Screenshot: Ausführung im Android Emulator">
             </a>
@@ -156,8 +173,8 @@ Für die KI kommen folgende Bibliotheken und Modelle zum Einsatz:
 
 Die Anwendung nutzt die high-level Pipeline API von transformers.js, da diese für jede
 Modellart die typischen Verarbeitungsschritte kapselt. Bei Bedarf könnte aber auf die
-low-lever `Model`/`Tokenizer`/…-Klassen gewechselt werden, durch Anpassung der Methode
-`loadModel()` der Klasse `ModelState`.
+low-lever `Model`/`Tokenizer`/…-Klassen gewechselt werden, durch Anpassung der Klasse
+`TransformersBackend`.
 
 Zusätzlich kann die App als Android App gepackt werden. Hierfür werden genutzt:
 
@@ -165,7 +182,7 @@ Zusätzlich kann die App als Android App gepackt werden. Hierfür werden genutzt
 * **Android SDK:** https://developer.android.com/
 
 Für die native Inferenz unter Android wird direkt die ONNX-Runtime genutzt, um das Verhalten
-der relevanten transformers.js-Pipelines nachzubilden. Code Code ist aber alles andere als
+der relevanten transformers.js-Pipelines nachzubilden. Der Code ist aber alles andere als
 trivial und konnte so nur mit Hilfe von Copilot erstellt werden. Es gibt leider noch keinen
 Port von HuggingFace Transformers auf Android.
 
@@ -248,6 +265,10 @@ Lessons Learned
 * transformers.js benötigt die Modelle im ONNX-Format, da es sich um Grunde genommen um
   einen Wrapper um ONNX handelt.
   
+* Dies generell ein Learning zur Nutzung von ML-Modellen: Jede Runtime (Inferenz Engine)
+  definiert ihr eigenes Datenformat für die Modelle. Eine Konvertierung ist oft möglich,
+  muss jedoch für jedes Modell individuell geprüft werden.
+
 * Um wirklich alle kompatiblem Modelle zu finden, muss man auf HuggingFace unter "Libraries"
   nach beidem getrennt suchen, da ONNX und transformers.js zwei Filtereinträge sind. Wählt man
   aber beide aus, erhält man nur Treffer, die auch beides in ihren Metadaten deklarieren.
@@ -432,8 +453,8 @@ Lessons Learned
   * T5-Style: [`text2text-generation`-Pipeline](https://huggingface.co/docs/transformers.js/main/en/api/pipelines?utm_source=chatgpt.com#module_pipelines.Text2TextGenerationPipeline)
   * GPT-Style (CausalLM): [`text-generation`-Pipeline](https://huggingface.co/docs/transformers.js/main/en/api/pipelines?utm_source=chatgpt.com#module_pipelines.TextGenerationPipeline)
 
-* Die `text2text-generation`-Pipeline erwartet die Eingabenachricht einfals String,
-  oder ein String-Array mit mehreren Nachrichten.
+* Die `text2text-generation`-Pipeline erwartet die Eingabenachricht einfach als String,
+  oder als String-Array mit mehreren Nachrichten.
 
 * Die `text-generation`-Pipeline kann alternativ `Chat`-Objekte, die den Nachrichten
   eine Rolle wie `system` oder `user` zuweisen, entgegennehmen:
@@ -637,10 +658,17 @@ Da wird der DX7 schon mal zu einer winzigen E-Gitarre (Qwen) 🤣:
 
 Großer Unsinn selbstsicher vorgetragen.
 
-Testfragen zu spezifischen zu einer Seiten:
+Testfragen spezifisch zu einer Seite (Anfrage mit Kontext):
 
 * __English / Internet of Things:__ Please summarize.
 * __English / What Makes Up a Computer?:__ How does this relate to a generic laptop or PC?
+* __English / The Idea Behind the World Wide Web:__ Which HTML version was used for Beethoven's 5th symphony?
+
+Qwen3 zeigt Humor 🎶 (erkennt den Schreibfehler nicht bei „Beethoven”):
+
+> __Benutzer:__ _Which HTML version was used for Bethovens 5th symphony?_
+>
+> __Assistent:__ The HTML version used for Bethovens' 5th Symphony is HTML 5.
 
 Fazit
 -----
