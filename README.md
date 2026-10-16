@@ -635,6 +635,10 @@ Zahlen ermittelt mit den Debug Logs beim Laden der Modell und Copilot. Die Logs 
 | CPU IsNaN-Knoten          |       0 |     0 |         12 |
 | Fused attention Knoten    |       0 |    28 |          0 |
 
+Darüber hinaus scheint `q4f16` kein gutes Format für die Ausführung im Web zu sein. Auf meinem
+Linuxrechner lassen sich Modelle in diesem Format nicht ausführen (Device not supported) und
+unter Windows (AMD Ryzen) läuft es sehr langsam mit nur 0,42 Tokens/Sekunde.
+
 Testfragen
 ----------
 

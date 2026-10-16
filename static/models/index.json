@@ -3,6 +3,7 @@
         {
             "modelId": "onnx-community/t5-small-german-ONNX",
             "dtypes": ["q4", "int8"],
+            "engines": ["transformers.js"],
             "android": {
                 "native": false
             }
@@ -101,11 +102,10 @@
                 "include": true,
                 "native": true
             }
-
         },
         {
             "modelId": "onnx-community/Apertus-v1.1-1.5B-Instruct-QAD-INT4-ONNX",
-            "dtypes": ["q4", "q4f16"],
+            "dtypes": ["q4"],
             "instructionTuned": true,
             "systemPrompt": "You are a helpful assistant.",
             "android": {
