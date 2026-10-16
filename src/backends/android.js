@@ -37,8 +37,12 @@ export default class AndroidBackend extends BaseBackend {
      */
     #cancelRequested = false;
 
+    get id() {
+        return "onnx-android";
+    }
+
     get name() {
-        return "Android (Native)";
+        return "ONNX Runtime (Android native)";
     }
 
     get isSupported() {
@@ -51,14 +55,18 @@ export default class AndroidBackend extends BaseBackend {
         return nativeInference.getDevices().then(({devices}) => devices);
     }
 
-    async supports(task) {
+    async getInformation() {
+        const {information} = await nativeInference.getInformation();
+        return information;
+    }
+
+    async supportsTask(task) {
         const {supported} = await nativeInference.supports({task});
         return supported;
     }
 
-    async getInformation() {
-        const {information} = await nativeInference.getInformation();
-        return information;
+    supportsModel({task, modelId, config} = {}) {
+        return config?.engines?.["onnx-android"]?.supported || false;
     }
 
     async loadModel({task, modelId, dtype, device, config} = {}) {

@@ -3,16 +3,27 @@
         {
             "modelId": "onnx-community/t5-small-german-ONNX",
             "dtypes": ["q4", "int8"],
-            "engines": ["transformers.js"],
-            "android": {
-                "native": false
+            "engines": {
+                "transformers.js": {
+                    "supported": true
+                },
+                "onnx-android": {
+                    "supported": false,
+                    "include": false
+                }
             }
         },
         {
             "modelId": "onnx-community/bart-german-ONNX",
             "dtypes": ["q4", "int8"],
-            "android": {
-                "native": false
+            "engines": {
+                "transformers.js": {
+                    "supported": true
+                },
+                "onnx-android": {
+                    "supported": false,
+                    "include": false
+                }
             }
         }
     ],
@@ -21,16 +32,28 @@
             "modelId": "huggingworld/m2m100_418M",
             "dtypes": ["q8"],
             "languages": ["de", "en", "es", "fr", "it"],
-            "android": {
-                "native": false
+            "engines": {
+                "transformers.js": {
+                    "supported": true
+                },
+                "onnx-android": {
+                    "supported": false,
+                    "include": false
+                }
             }
         },
         {
             "modelId": "casawolice/small100-onnx",
             "dtypes": ["fp32"],
             "languages": ["de", "en", "es", "fr", "it"],
-            "android": {
-                "native": false
+            "engines": {
+                "transformers.js": {
+                    "supported": true
+                },
+                "onnx-android": {
+                    "supported": false,
+                    "include": false
+                }
             }
         }
     ],
@@ -42,8 +65,14 @@
                 "question": "",
                 "context": ""
             },
-            "android": {
-                "native": false
+            "engines": {
+                "transformers.js": {
+                    "supported": true
+                },
+                "onnx-android": {
+                    "supported": false,
+                    "include": false
+                }
             }
         },
         {
@@ -53,8 +82,14 @@
                 "question": "",
                 "context": ""
             },
-            "android": {
-                "native": false
+            "engines": {
+                "transformers.js": {
+                    "supported": true
+                },
+                "onnx-android": {
+                    "supported": false,
+                    "include": false
+                }
             }
         }
     ],
@@ -62,9 +97,14 @@
         {
             "modelId": "sentence-transformers/all-MiniLM-L6-v2",
             "dtypes": ["fp32"],
-            "android": {
-                "include": true,
-                "native": true
+            "engines": {
+                "transformers.js": {
+                    "supported": true
+                },
+                "onnx-android": {
+                    "supported": true,
+                    "include": true
+                }
             }
         }
     ],
@@ -74,9 +114,14 @@
             "dtypes": ["q4"],
             "instructionTuned": true,
             "systemPrompt": "You are a helpful assistant.",
-            "android": {
-                "include": true,
-                "native": true
+            "engines": {
+                "transformers.js": {
+                    "supported": true
+                },
+                "onnx-android": {
+                    "supported": true,
+                    "include": true
+                }
             }
         },
         {
@@ -87,9 +132,14 @@
             "tokenizerArgs": {
                 "enable_thinking": false
             },
-            "android": {
-                "include": true,
-                "native": true
+            "engines": {
+                "transformers.js": {
+                    "supported": true
+                },
+                "onnx-android": {
+                    "supported": true,
+                    "include": true
+                }
             }
 
         },
@@ -98,9 +148,14 @@
             "dtypes": ["q4"],
             "instructionTuned": true,
             "systemPrompt": "You are a helpful assistant.",
-            "android": {
-                "include": true,
-                "native": true
+            "engines": {
+                "transformers.js": {
+                    "supported": true
+                },
+                "onnx-android": {
+                    "supported": true,
+                    "include": false
+                }
             }
         },
         {
@@ -108,19 +163,29 @@
             "dtypes": ["q4"],
             "instructionTuned": true,
             "systemPrompt": "You are a helpful assistant.",
-            "android": {
-                "include": false,
-                "native": true
+            "engines": {
+                "transformers.js": {
+                    "supported": true
+                },
+                "onnx-android": {
+                    "supported": true,
+                    "include": false
+                }
             }
-
         },
         {
             "modelId": "LiquidAI/LFM2.5-1.2B-Instruct-ONNX",
             "dtypes": ["q4"],
             "instructionTuned": true,
             "systemPrompt": "You are a helpful assistant.",
-            "android": {
-                "native": true
+            "engines": {
+                "transformers.js": {
+                    "supported": true
+                },
+                "onnx-android": {
+                    "supported": true,
+                    "include": false
+                }
             }
         }
     ],
@@ -132,8 +197,14 @@
                 "question": "",
                 "context": ""
             },
-            "android": {
-                "native": false
+            "engines": {
+                "transformers.js": {
+                    "supported": true
+                },
+                "onnx-android": {
+                    "supported": false,
+                    "include": false
+                }
             }
         },
         {
@@ -143,8 +214,14 @@
                 "question": "",
                 "context": ""
             },
-            "android": {
-                "native": false
+            "engines": {
+                "transformers.js": {
+                    "supported": true
+                },
+                "onnx-android": {
+                    "supported": false,
+                    "include": false
+                }
             }
         }
     ]

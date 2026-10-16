@@ -21,44 +21,48 @@ Auswahl eines KI-Modells
         disabled = false,        // Keine Auswahl zulassen, z.B. weil das geladene Modell gerade genutzt wird
     } = $props();
 
-    let available_tasks = $derived(Array.isArray(task) ? task : [task]);
+    let available_tasks    = $derived(Array.isArray(task) ? task : [task]);
+    let selected_backendId = $derived(modelState.backends[0]?.id || "");
 
     let available_models = $derived.by(() => {
         let result = [];
 
+        let backend = modelState.backends.find(e => e.id === selected_backendId);
+        if (!backend) return result;
+
         for (let available_task of available_tasks) {
+            if (!backend.supportsTask(available_task)) continue;
+
             for (let model of modelState.models[available_task] || []) {
-                result.push({...model, task: available_task});
+                if (backend.supportsModel({
+                    task:    available_task,
+                    modelId: model.modelId,
+                    config:  model,
+                })) {
+                    result.push({...model, task: available_task});
+                }
             }
         }
 
         return result;
     });
 
-    // TODO:
-    //
-    // 1. Devices filtern, so dass nur Backends berücksichtigt werden, die
-    // die Task-Typen ausführen können.
-    // 
-    // 2. Das Backend muss zusätzlich die Chance bekommen, für jedes einzelne Modell
-    // zu entscheiden, ob es ausführbar ist. Wegen `"android": {"native": true}`
-    // im Modellkatalog. Braucht aber eine kleine API-Änderung in den Backends.
-
     let selected_modelId    = $derived(available_models[0]?.modelId || "");
     let selected_index      = $derived(available_models.findIndex(e => e.modelId === selected_modelId));
     let selected_task       = $derived(available_models[selected_index]?.task || "");
     let selected_dtypes     = $derived(available_models[selected_index]?.dtypes || []);
     let selected_dtype      = $derived(available_models[selected_index]?.dtypes?.[0] || "");
-    let selected_device     = $state(modelState.devices[0]?.device);
+    let selected_device     = $derived(modelState.devices[0]?.device);
     let loaded_device_text  = $derived(modelState.devices.find(e => e.device === modelState.loadedModel.device)?.label || modelState.loadedModel.device);
     let loaded_device_color = $derived(modelState.loadedModel.device.includes("wasm") ? "darkred" : "darkgreen");
 
     async function onLoadClicked() {
         await modelState.loadModel({
-            task:    selected_task,
-            modelId: selected_modelId,
-            dtype:   selected_dtype,
-            device:  selected_device,
+            task:      selected_task,
+            modelId:   selected_modelId,
+            backendId: selected_backendId,
+            dtype:     selected_dtype,
+            device:    selected_device,
         });
     }
 </script>
@@ -100,6 +104,17 @@ Auswahl eines KI-Modells
         </header>
         <fieldset>
             <label>
+                <span>Inferenz-Backend</span>
+                <select bind:value={selected_backendId} {disabled}>
+                    {#each modelState.backends as backend}
+                        <option value="{backend.id}">
+                            {backend.name}
+                        </option>
+                    {/each}
+                </select>
+            </label>
+
+            <label>
                 <span>Sprachmodell</span>
                 <select bind:value={selected_modelId} {disabled}>
                     {#each available_models as model}
@@ -110,7 +125,7 @@ Auswahl eines KI-Modells
                 </select>
             </label>
 
-            <div class="grid">
+            <div class="modelOptions">
                 <label>
                     <span>Datentyp</span>
                     <select bind:value={selected_dtype} {disabled}>
@@ -146,6 +161,15 @@ Auswahl eines KI-Modells
         font-size: 90%;
 
         .modelId {
+            flex: 1;
+        }
+    }
+
+    .modelOptions {
+        display: flex;
+        gap: var(--content-padding);
+
+        & > * {
             flex: 1;
         }
     }

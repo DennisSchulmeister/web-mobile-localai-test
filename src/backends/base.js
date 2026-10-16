@@ -21,6 +21,14 @@ export default class BaseBackend {
     models = {};
 
     /**
+     * Technische ID des Backends ermitteln.
+     * @returns {string} ID des Backends
+     */
+    get id() {
+        return "";
+    }
+
+    /**
      * Anzeigename des Backends ermitteln.
      * @returns {string} Name des Backends
      */
@@ -48,16 +56,6 @@ export default class BaseBackend {
     }
 
     /**
-     * Abfragen, ob eine bestimmte Modellart vom Backend unterstützt wird.
-     * @param {string} task Art des Modells
-     * Aufrufer müssen das Ergebnis mit `await` auswerten.
-     * @returns {boolean|Promise<boolean>} Modellart wird unterstützt
-     */
-    supports(task) {
-        return false;
-    }
-
-    /**
      * Diagnoseinformationen des Backends als Name/Wert-Liste zurückgeben, zum Beispiel
      * ob die Ausführung auf der GPU oder TPU unterstützt wird.
      * 
@@ -76,6 +74,29 @@ export default class BaseBackend {
     setConfig({config, models} = {}) {
         this.config = config || {};
         this.models = models || {};
+    }
+
+    /**
+     * Abfragen, ob eine bestimmte Modellart vom Backend unterstützt wird.
+     * @param {string} task Art des Modells
+     * Aufrufer müssen das Ergebnis mit `await` auswerten.
+     * @returns {boolean|Promise<boolean>} Modellart wird unterstützt
+     */
+    supportsTask(task) {
+        return false;
+    }
+
+    /**
+     * Prüfen, ob das Backend das gewünschte KI-Modell mit der gegebenen Konfiguration
+     * laden und ausführen kann.
+     * 
+     * @param {string} task Art des Modells
+     * @param {string} modelId Model ID
+     * @param {object} config Modellkonfiguration
+     * @returns {boolean} Laden und Ausführen möglich
+     */
+    supportsModel({task, modelId, config} = {}) {
+        return false;
     }
 
     /**

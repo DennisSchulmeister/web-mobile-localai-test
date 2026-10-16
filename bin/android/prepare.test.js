@@ -28,7 +28,10 @@ async function write(root, file, content) {
 async function fixture(t, downloadDir = "_generated/models", catalogPath = "models/index.json") {
     const root = await mkdtemp(path.join(os.tmpdir(), "localai-android-"));
     t.after(() => rm(root, {recursive: true, force: true}));
-    await write(root, "static/config.json", JSON.stringify({models: {downloadDir, config: catalogPath}}));
+    await write(root, "static/config.json", JSON.stringify({
+        models: {downloadDir, config: catalogPath},
+        data: {preprocessDir: "_generated/preprocessed", embeddingsDir: "_generated/embeddings"},
+    }));
     await write(root, `static/${catalogPath}`, JSON.stringify({
         "text-generation": [
             {modelId: smol, android: {include: true}},
@@ -115,7 +118,7 @@ test("reads the configured catalog, follows changed flags, and deduplicates mode
 
     const result = prepare(root);
     assert.equal(result.status, 0, result.stderr);
-    assert.equal(result.stdout.split(`Bundling Android model: ${excluded}`).length - 1, 1);
+    assert.equal(result.stdout.split(`Kopiere Android-Modell: ${excluded}`).length - 1, 1);
     assert.deepEqual(await readdir(path.join(root, ".capacitor/www/downloads/onnx-community")), [
         "bart-german-ONNX",
     ]);

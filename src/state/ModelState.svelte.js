@@ -23,14 +23,14 @@ class ModelState {
     models = $state({});
 
     /**
+     * Verfügbare Backends-Instanzen.
+     */
+    backends = $state([]);
+
+    /**
      * Verfügbare Ausführumgebungen: Liste mit `{device: "", label: ""}`
      */
     devices = $state([]);
-
-    /**
-     * Mapping des internen Device-Strings auf ein Backend. 
-     */
-    #backendsByDevice = {};
 
     /**
      * Metadaten des aktuell geladenen Modells
@@ -53,21 +53,15 @@ class ModelState {
         this.config = await(await fetch("config.json")).json();
         this.models = await (await fetch(this.config.models.config)).json();
 
-        this.#backendsByDevice = {};
-        this.devices = [];
-        let i = 0;
+        this.backends = [];
+        this.devices  = [];
 
         for (let backend of backends) {
+            if (!backend.isSupported) continue;
             backend.setConfig({config: this.config, models: this.models});
 
-            for (let device of await backend.devices) {
-                let deviceId = `${i}::${device.device}`;
-
-                this.devices.push({device: deviceId, label: device.label});
-                this.#backendsByDevice[deviceId] = backend;
-            }
-
-            i++;
+            this.backends.push(backend);
+            this.devices = backend.devices;
         }
     }
 
@@ -104,24 +98,24 @@ class ModelState {
      * selbst nutzt.
      * 
      * @param {string} task Art des Modells
-     * @param {string} modelId Model ID
+     * @param {string} modelId Modell-ID
+     * @param {string} backendId Backend-ID
      * @param {string} dtype Datentyp
      * @param {string} device Ausführumgebung
      */
-    async loadModel({task, modelId, dtype, device} = {}) {
+    async loadModel({task, modelId, backendId, dtype, device} = {}) {
         try {
             if (modelId) {
                 this.loadedModel.status  = "loading";
                 this.loadedModel.message = "";
                 this.loadedModel.config  = this.models[task].find(e => e.modelId === modelId);
-                this.loadedModel.backend = this.#backendsByDevice[device];
+                this.loadedModel.backend = this.backends.find(e => e.id === backendId);
 
                 if (!this.loadedModel.backend) {
                     throw new Error(`Kein Backend für Device ${device} vorhanden!`);
                 }
 
-                let [_, backendDevice] = device.split("::");
-                await this.loadedModel.backend.loadModel({task, modelId, dtype, device: backendDevice, config: this.loadedModel.config});
+                await this.loadedModel.backend.loadModel({task, modelId, dtype, device, config: this.loadedModel.config});
     
                 this.loadedModel.task    = task;
                 this.loadedModel.modelId = modelId;

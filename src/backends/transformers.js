@@ -50,6 +50,10 @@ export default class TransformersBackend extends BaseBackend {
      */
     #running = false;
 
+    get id() {
+        return "transformers.js";
+    }
+    
     get name() {
         return "Transformers.js";
     }
@@ -64,10 +68,6 @@ export default class TransformersBackend extends BaseBackend {
             navigator.gpu ? {device: "webgpu", label: "WebGPU"} : null,
                             {device: "wasm",   label: "WASM"},
         ].filter(e => e !== null);
-    }
-
-    supports(task) {
-        return true;
     }
 
     async getInformation() {
@@ -208,6 +208,14 @@ export default class TransformersBackend extends BaseBackend {
 
             this.#sessionOptions = {};
         }
+    }
+
+    supportsTask(task) {
+        return true;
+    }
+
+    supportsModel({task, modelId, config} = {}) {
+        return config?.engines?.["transformers.js"]?.supported || false;
     }
 
     async loadModel({task, modelId, dtype, device, config} = {}) {

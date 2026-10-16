@@ -6,28 +6,35 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import {cp, mkdir, readFile, rm} from "node:fs/promises";
+import {cp, mkdir, rm} from "node:fs/promises";
 import path from "node:path";
+import * as utils from "../utils.js";
 
-const webDir = path.resolve("static");
+const webDir    = path.resolve("static");
 const outputDir = path.resolve(".capacitor/www");
-const config = JSON.parse(await readFile(path.join(webDir, "config.json"), "utf8"));
-const catalog = JSON.parse(await readFile(path.join(webDir, config.models.config), "utf8"));
+const config    = utils.readConfig({
+    configFile: path.join(webDir, "config.json"),
+    withModels: true,
+});
+const catalog = config.models.config;
+
 const bundledModels = new Set(
     Object.values(catalog).flat()
-        .filter(model => model.android?.include === true)
+        .filter(model => model.engines?.["onnx-android"]?.include === true)
         .map(model => model.modelId),
 );
-const modelDir = path.resolve(webDir, config.models.downloadDir);
+
+const modelDir         = config.models.downloadDir;
 const relativeModelDir = path.relative(webDir, modelDir);
 
 if (!relativeModelDir || relativeModelDir.startsWith(`..${path.sep}`)
         || relativeModelDir === ".." || path.isAbsolute(relativeModelDir)) {
-    throw new Error("models.downloadDir must point to a directory inside static.");
+    throw new Error("models.downloadDir muss ein Verzeichnis innerhalb von static sein.");
 }
 
-// Skip the entire model tree before copying, rather than copying gigabytes only to delete them.
+// Nur tatsächlich relevante Modelle kopieren, statt sie nach dem Kopieren wieder zu löschen
 await rm(outputDir, {recursive: true, force: true});
+
 await cp(webDir, outputDir, {
     recursive: true,
     filter: source => source !== modelDir,
@@ -37,6 +44,6 @@ const outputModelDir = path.join(outputDir, relativeModelDir);
 await mkdir(outputModelDir, {recursive: true});
 
 for (const modelId of bundledModels) {
-    console.log(`Bundling Android model: ${modelId}`);
+    console.log(`Kopiere Android-Modell: ${modelId}`);
     await cp(path.join(modelDir, modelId), path.join(outputModelDir, modelId), {recursive: true});
 }
