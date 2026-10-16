@@ -93,6 +93,28 @@
 
         },
         {
+            "modelId": "onnx-community/Apertus-v1.1-0.5B-Instruct-QAD-INT4-ONNX",
+            "dtypes": ["q4"],
+            "instructionTuned": true,
+            "systemPrompt": "You are a helpful assistant.",
+            "android": {
+                "include": true,
+                "native": true
+            }
+
+        },
+        {
+            "modelId": "onnx-community/Apertus-v1.1-1.5B-Instruct-QAD-INT4-ONNX",
+            "dtypes": ["q4", "q4f16"],
+            "instructionTuned": true,
+            "systemPrompt": "You are a helpful assistant.",
+            "android": {
+                "include": false,
+                "native": true
+            }
+
+        },
+        {
             "modelId": "LiquidAI/LFM2.5-1.2B-Instruct-ONNX",
             "dtypes": ["q4"],
             "instructionTuned": true,

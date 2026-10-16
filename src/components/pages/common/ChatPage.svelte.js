@@ -23,7 +23,7 @@ class ChatPageState {
     errorMessage      = $state("");
     
     question          = $state("");
-    maxNewTokens      = $state(0);
+    maxNewTokens      = $state(1000);
     temperature       = $state(0.3);
     repetitionPenalty = $state(1.1);
     doSample          = $state(true);
@@ -77,7 +77,7 @@ class ChatPageState {
                 stats:     new TextGenerationStatsState().start()
             });
 
-            let response = this.messages.at(-1);
+            response = this.messages.at(-1);
 
             response.content = await modelState.loadedModel.backend.runTextGenerationPipeline({
                 question:           question,
@@ -95,6 +95,7 @@ class ChatPageState {
             this.working  = false;
             this.question = "";
         } catch (error) {
+            debugger;
             this.errorMessage = error.toString();
             this.working      = false;
 

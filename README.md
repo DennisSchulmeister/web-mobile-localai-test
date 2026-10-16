@@ -9,6 +9,7 @@ Web/Mobile-Test für lokale KI
 1. [Künftige Web APIs](#künftige-web-apis)
 1. [Lessons Learned](#lessons-learned)
 1. [Testfragen](#testfragen)
+1. [TODOs](#todos)
 1. [Fazit](#fazit)
 1. [Copyright](#copyright)
 
@@ -288,10 +289,10 @@ Lessons Learned
   auf, um die verfügbaren Datentypen abzurufen und zeigt diese auf der Konsole an.
 
 * Manchmal unterstützen die Modelle die deutsche Sprache, auch wenn dies in den Metadaten
-  nicht explizit angegeben ist. Zum Beispiel [onnx-community/text_summarization-ONNX](https://huggingface.co/onnx-community/text_summarization-ONNX).
+  nicht explizit angegeben ist. Zum Beispiel `onnx-community/text_summarization-ONNX`.
 
 * Allerdings scheinen Modelle für die deutsche Sprache insgesamt selten zu sein. Die allermeisten
-  Modelle sind auf Englisch trainiert. Zum Beispiel: [Xenova/distilbart-xsum-12-1](https://huggingface.co/Xenova/distilbart-xsum-12-1)
+  Modelle sind auf Englisch trainiert. Zum Beispiel: `Xenova/distilbart-xsum-12-1`
   generiert bei einem deutschen Text nur Müll.
 
 * transformers.js besitzt für viele Modelle, in der Dokumentation nicht erwähnte, feste
@@ -370,12 +371,10 @@ Lessons Learned
   Texten trainiert. Deutsche Texte werden daher wörtlich wiedergegeben und nach einer
   Festen länge abgebrochen.
 
-* Lediglich [Shahm/bart-german](https://huggingface.co/Shahm/bart-german) scheint auf
-  einem deutschen Datensatz trainiert zu sein. Das Repository hat aber nicht die von
-  transformers.js erwartete Struktur.
+* Lediglich `Shahm/bart-german` scheint auf einem deutschen Datensatz trainiert zu sein.
+  Das Repository hat aber nicht die von transformers.js erwartete Struktur.
 
-* In anderen Formaten als ONNX gibt es zumindest eine kleine Auswahl.
-  [deutsche-telekom/mt5-small-sum-de-en-v2](https://huggingface.co/deutsche-telekom/mt5-small-sum-de-en-v2)
+* In anderen Formaten als ONNX gibt es zumindest eine kleine Auswahl. `deutsche-telekom/mt5-small-sum-de-en-v2`
   wurde für diesen Test ins ONNX-Format konvertiert. Die FP32-Variante ist aber 1,8 GB groß.
 
   * int8: ca. 1,4 GB. In Firefox Desktop crash der Tab beim Laden.
@@ -393,9 +392,9 @@ Lessons Learned
 
   Es sieht so aus, als ob die ONNX Runtime fp16 nicht unterstützt.
 
-* [Shahm/t5-small-german](https://huggingface.co/Shahm/t5-small-german) konnte erfolgreich
-  konvertiert und getestet werden. Die besonders kleinen q4 und bnb4-Varianten erzeugen
-  allerdings keinen Text. Und die Zusammenfassungen sind dast immer nur einen Satz lang. 🙂
+* `Shahm/t5-small-german` konnte erfolgreich konvertiert und getestet werden. Die besonders
+  kleinen `q4` und `bnb4`-Varianten erzeugen allerdings keinen Text. Und die Zusammenfassungen
+  sind dast immer nur einen Satz lang. 🙂
 
 * Lässt man das Modell zu wenig Token erzeugen (zum Beispiel nur zehn), wird der Text
   abgeschnitten. Generell scheint das Modell darauf ausgelegt zu sein, eine Textstelle
@@ -403,14 +402,12 @@ Lessons Learned
 
 * Generell scheint es keine guten deutschsprachigen Modelle zu geben, oder diese sind
   für die Nutzung im Browser zu groß (1,5 GB und mehr). Von daher ist "summarization"
-  mit [Shahm/t5-small-german](https://huggingface.co/Shahm/t5-small-german) zwar machbar.
-  Die Zusammenfassung ist aber zu kurz.
+  mit `Shahm/t5-small-german` zwar machbar. Die Zusammenfassung ist aber zu kurz.
   
-  [onnx-community/bart-german-ONNX](https://huggingface.co/Shahm/t5-small-german) liefert
-  etwas längere Texte bis zu drei Sätze. Das ist immer noch zu kurz. Und das Modell streut
-  unsinnige Artefakte (falsche Wortfetzen mit technischen Begriffen ohne Bezug zum Kontext)
-  ein, die vermutlich in den Trainingsdaten enthalten waren. Dadurch wird die Lesbarkeit
-  deutlich gestört.
+  `onnx-community/bart-german-ONNX` liefert etwas längere Texte bis zu drei Sätze.
+  Das ist immer noch zu kurz. Und das Modell streut unsinnige Artefakte (falsche
+  Wortfetzen mit technischen Begriffen ohne Bezug zum Kontext) ein, die vermutlich
+  in den Trainingsdaten enthalten waren. Dadurch wird die Lesbarkeit deutlich gestört.
 
 * Beide Modelle scheinen auch nur den Anfang der Texte zu betrachten und geben diesen
   teilweise einfach wörtlich wieder.
@@ -421,22 +418,21 @@ Lessons Learned
   Frage zu beantworten scheint. Diese wird nahezu wörtlich wiedergeben, auch wenn
   es sich dabei nur um Satzschnippsel handelt.
 
-* Das kleine Modell [onnx-community/all-MiniLM-L12-v2-qa-all-ONNX](https://huggingface.co/onnx-community/all-MiniLM-L12-v2-qa-all-ONNX)
+* Das kleine Modell `onnx-community/all-MiniLM-L12-v2-qa-all-ONNX`
   schneidet relativ gut ab, liefert aber nur einen sehr kleinen Textausschnitt.
   Es scheint aber mit Umlauten und Groß-/Kleinschreibung probleme zu haben, da
   die Antworten grundsätzlich kleingeschrieben und ohne Umlaute sind.
 
-* Das größere Modell [dewdev/mdeberta-v3-base-squad2-onnx](https://huggingface.co/dewdev/mdeberta-v3-base-squad2-onnx)
+* Das größere Modell `dewdev/mdeberta-v3-base-squad2-onnx`
   liefert ungemein größere Antworten, diese passen aber oft nicht zur gestellten Frage.
 
 ### Text übersetzen
 
-* [huggingworld/m2m100_418M](https://huggingface.co/huggingworld/m2m100_418M) generiert
-  bei zu großer Eingabe nur Giberish. Gut funktioniert die Seite "Aus was besteht ein
-  Computer?", auch wenn die Übersetzung nicht perfekt ist. Die anderen Seiten sind
-  wohl zu groß. Es wiederholt sich immer dieselbe Anfangszeichenkette.
+* `huggingworld/m2m100_418M` generiert bei zu großer Eingabe nur Giberish. Gut funktioniert
+  die Seite "Aus was besteht ein Computer?", auch wenn die Übersetzung nicht perfekt ist.
+  Die anderen Seiten sind wohl zu groß. Es wiederholt sich immer dieselbe Anfangszeichenkette.
 
-* Ähnlich scheint es sich beim etwas kleineren [casawolice/small100-onnx](https://huggingface.co/casawolice/small100-onnx)
+* Ähnlich scheint es sich beim etwas kleineren `casawolice/small100-onnx`
   zu verhalten. Bei großen Texten liefert es teilweise gar keine Übersetzung oder nur sinnlose
   Zeichenketten. Bei kleinen Texten kommt eine Übersetzung, diese ist grammatikalisch aber
   falsch und enthält viele Rechtschreibfehler.
@@ -489,8 +485,7 @@ Lessons Learned
   besitzt es auch kein Chat-Template und kann folglich nur mit einem einfachen
   String als Eingabe aufgerufen werden.
 
-* [onnx-community/Qwen3-0.6B-ONNX](https://huggingface.co/onnx-community/Qwen3-0.6B-ONNX)
-  und [LiquidAI/LFM2.5-1.2B-Instruct-ONNX](https://huggingface.co/LiquidAI/LFM2.5-1.2B-Instruct-ONNX)
+* `onnx-community/Qwen3-0.6B-ONNX` und `LiquidAI/LFM2.5-1.2B-Instruct-ONNX`
   sprechen auch deutsch. Bei Qwen sind die Antworten auf deutsche Fragen aber inhaltlich
   wesentlich schlechter (redet Blödsinn) als auf englische Fragen. Bei LiquidAI vermutlich
   auch, die deutschen Antworten scheinen aber besser als bei Qwen zu sein. Die Antworten
@@ -499,19 +494,17 @@ Lessons Learned
 * Qwen scheint auch ganz gute Antworten mit Bezug auf eine Textseite als Kontext zu liefern.
   Insgesamt schneidet es von den getesteten Mini-LLM am besten ab.
 
-* [onnx-community/SmolLM2-135M-Instruct-ONNX](https://huggingface.co/onnx-community/SmolLM2-135M-Instruct-ONNX)
-  hat eine gute Geschwindigkeit. Das Modell ist auch sehr klein (ca. 200 MB).  Die Qualität
-  der Antworten schwank stark, von gut bis mehr oder weniger Blödsinn.
+* `onnx-community/SmolLM2-135M-Instruct-ONNX` hat eine gute Geschwindigkeit. Das Modell
+  ist auch sehr klein (ca. 200 MB).  Die Qualität der Antworten schwank stark, von gut
+  bis mehr oder weniger Blödsinn.
 
-* [Xenova/LaMini-Flan-T5-783M](https://huggingface.co/Xenova/LaMini-Flan-T5-783M) generiert
-  sehr kurze Antworten. Dennoch ist es sehr langsam.
+* `Xenova/LaMini-Flan-T5-783M` generiert sehr kurze Antworten. Dennoch ist es sehr langsam.
 
-* [teapotai/teapotllm](https://huggingface.co/teapotai/teapotllm) ist eigentlich darauf trainiert,
-  nur Fragen zu einem gegebenen Kontext zu beantworten. Die Frage muss dafür in einer eigenen
-  Zeile, getrennt durch eine Leerzeile, unter dem Kontext stehen. Ohne Kontext antwortet das Modell
-  aber aus seinem internen Wissen heraus, wenn auch noch kürzer als 
-  [Xenova/LaMini-Flan-T5-783M](https://huggingface.co/Xenova/LaMini-Flan-T5-783M). Mit Kontext
-  liefert es längere und bessere Antworten, in Summe aber trotzdem nicht befriedigend.
+* `teapotai/teapotllm` ist eigentlich darauf trainiert, nur Fragen zu einem gegebenen Kontext
+  zu beantworten. Die Frage muss dafür in einer eigenen Zeile, getrennt durch eine Leerzeile,
+  unter dem Kontext stehen. Ohne Kontext antwortet das Modell aber aus seinem internen Wissen
+  heraus, wenn auch noch kürzer als `Xenova/LaMini-Flan-T5-783M`. Mit Kontext liefert es
+  längere und bessere Antworten, in Summe aber trotzdem nicht befriedigend.
 
 * Die getesteten `text2text-generation`-Modelle schneiden allesamt schlechter ab, als die
   LLM-artigen `text-generation`-Modelle. Die Antworten sind kurz (nur ein/zwei Sätze) und
@@ -540,36 +533,46 @@ Hier die Messergebnisse, gemessen unter Fedora Linux mit Firefox 157 auf einem L
 mit folgender Ausstattung: 4x Intel(R) Core(TM) i7-8550U CPU @ 1.80GHz (mit Hypethreading),
 16 GB RAM, 2 GB GPU, Baujahr 2018.
 
-| Art       | Modell                                    | Größe    | Frage | Tokens |Erstes Token | Tokens/Sek | Dauer  |
-|-----------|-------------------------------------------|---------:|------:|-------:|------------:|-----------:|-------:|
-| Text-Gen  | onnx-community/SmolLM2-135M-Instruct-ONNX | 175,6 MB |     1 |    323 |       0,31s |       8,79 | 37,06s |
-|           |                                           |          |     2 |    351 |       0,23s |       9,25 | 38,16s |
-|           |                                           |          |     3 |    312 |       0,21s |       8,69 | 36,12s |
-|           | onnx-community/Qwen3-0.6B-ONNX            | 885,2 MB |     1 |    116 |       0,45s |       9,94 | 12,12s |
-|           |                                           |          |     2 |    103 |       0,38s |       9,47 | 11,27s |
-|           |                                           |          |     3 |    254 |       0,47s |       9,91 | 25,81s |
-|           | LiquidAI/LFM2.5-1.2B-Instruct-ONNX        | 814,0 MB |     1 |    114 |       0,83s |       7,65 | 15,74s |
-|           |                                           |          |     2 |    147 |       0,73s |       9,35 | 16,46s |
-|           |                                           |          |     3 |    173 |       0,73s |       9,69 | 18,58s |
-| Text2Text | Xenova/LaMini-Flan-T5-783M                | 702,6 MB |     1 |     25 |       1,02s |       2,52 | 10,94s |
-|           |                                           |          |     2 |     49 |       0,86s |       2,52 | 20,30s |
-|           |                                           |          |     3 |     20 |       0,95s |       2,47 |  9,06s |
-|           | teapotai/teapotllm                        | 702,7 MB |     1 |     20 |       0,94s |       2,46 |  9,05s |
-|           |                                           |          |     2 |     25 |       0,93s |       2,60 | 10,54s |
-|           |                                           |          |     3 |     18 |       0,76s |       2,49 |  7,99s |
+| Art       | Modell                                                    | Größe     | Frage | Tokens |Erstes Token | Tokens/Sek | Dauer     |
+|-----------|-----------------------------------------------------------|----------:|------:|-------:|------------:|-----------:|----------:|
+| Text-Gen  | `onnx-community/SmolLM2-135M-Instruct-ONNX`               |  175,6 MB |     1 |    323 |       0,31s |       8,79 |    37,06s |
+|           |                                                           |           |     2 |    351 |       0,23s |       9,25 |    38,16s |
+|           |                                                           |           |     3 |    312 |       0,21s |       8,69 |    36,12s |
+|           | `onnx-community/Qwen3-0.6B-ONNX`                          |  885,2 MB |     1 |    116 |       0,45s |       9,94 |    12,12s |
+|           |                                                           |           |     2 |    103 |       0,38s |       9,47 |    11,27s |
+|           |                                                           |           |     3 |    254 |       0,47s |       9,91 |    25,81s |
+|           | `LiquidAI/LFM2.5-1.2B-Instruct-ONNX`                      |  814,0 MB |     1 |    114 |       0,83s |       7,65 |    15,74s |
+|           |                                                           |           |     2 |    147 |       0,73s |       9,35 |    16,46s |
+|           |                                                           |           |     3 |    173 |       0,73s |       9,69 |    18,58s |
+|           | `onnx-community/Apertus-v1.1-0.5B-Instruct-QAD-INT4-ONNX` |    790 MB |     1 |    404 |       0,46s |       9,83 |    41,58s |
+|           |                                                           |           |     2 | > 3105 |       0,40s |       7,76 | < 400,00s |
+|           |                                                           |           |     2 |     78 |       0,40s |      10,05 |     8,81s |
+|           |                                                           |           |     3 | > 1007 |       0,38s |       9,88 | < 102,37s |
+|           | `onnx-community/Apertus-v1.1-1.5B-Instruct-QAD-INT4-ONNX` | 1780,9 MB |     1 |    102 |       0,84s |       5,29 |    20,14s |
+|           |                                                           |           |     2 |    301 |       0,74s |       5,28 |    57,80s |
+|           |                                                           |           |     3 |     94 |       0,73s |       5,46 |    17,96s |
+| Text2Text | `Xenova/LaMini-Flan-T5-783M`                              |  702,6 MB |     1 |     25 |       1,02s |       2,52 |    10,94s |
+|           |                                                           |           |     2 |     49 |       0,86s |       2,52 |    20,30s |
+|           |                                                           |           |     3 |     20 |       0,95s |       2,47 |     9,06s |
+|           | `teapotai/teapotllm`                                      |  702,7 MB |     1 |     20 |       0,94s |       2,46 |     9,05s |
+|           |                                                           |           |     2 |     25 |       0,93s |       2,60 |    10,54s |
+|           |                                                           |           |     3 |     18 |       0,76s |       2,49 |     7,99s |
+
+`Apertus-v1.1-0.5B-Instruct-QAD-INT4-ONNX` kommt gelegentlich nicht dazu, das Stop-Token zu generieren,
+vor allem, wenn Sampling aktiv ist. Die Tests wurden daher nach 400 Sekunden bzw. 1000 Tokens abgebrochen.
 
 #### Testfall: Text zusammenfassen
 
 Gleiche Testbedingungen wie oben. Es wird jedoch die Seite "English / Internet of Things"
 geöffnet. Die Anfrage an das Modell lautet: „Please summarize.”
 
-| Art       | Modell                                    | Tokens |Erstes Token | Tokens/Sek | Dauer  |
-|-----------|-------------------------------------------|-------:|------------:|-----------:|-------:|
-| Text-Gen  | onnx-community/SmolLM2-135M-Instruct-ONNX |    204 |       1,14s |       8,71 | 24,57s |
-|           | onnx-community/Qwen3-0.6B-ONNX            |     91 |       2,71s |       5,93 | 18,07s |
-|           | LiquidAI/LFM2.5-1.2B-Instruct-ONNX        |     97 |       7,30s |       6,74 | 21,69s |
-| Text2Text | Xenova/LaMini-Flan-T5-783M                |     29 |       2,16s |       2,33 | 14,61s |
-|           | teapotai/teapotllm                        |     82 |       2,00s |       2,38 | 36,44s |
+| Art       | Modell                                      | Tokens |Erstes Token | Tokens/Sek | Dauer  |
+|-----------|---------------------------------------------|-------:|------------:|-----------:|-------:|
+| Text-Gen  | `onnx-community/SmolLM2-135M-Instruct-ONNX` |    204 |       1,14s |       8,71 | 24,57s |
+|           | `onnx-community/Qwen3-0.6B-ONNX`            |     91 |       2,71s |       5,93 | 18,07s |
+|           | `LiquidAI/LFM2.5-1.2B-Instruct-ONNX`        |     97 |       7,30s |       6,74 | 21,69s |
+| Text2Text | `Xenova/LaMini-Flan-T5-783M`                |     29 |       2,16s |       2,33 | 14,61s |
+|           | `teapotai/teapotllm`                        |     82 |       2,00s |       2,38 | 36,44s |
 
 #### Linux vs. Windows
 
@@ -585,7 +588,7 @@ als Firefox unter Linux (Qwen3 ca. 10 Token/Sekunde).
 
 Anders als bei den meisten LLMs, sind die hier verwendeten kleinen Modelle nicht gut darin,
 Markdown-Syntax zu verarbeiten oder zu erzeugen. Von den getesteten LLM kommen alle damit
-zurecht, außer [teapotai/teapotllm](https://huggingface.co/teapotai/teapotllm).
+zurecht, außer `teapotai/teapotllm`.
 
 Die Modelle lassen sich in drei Grundarchitekturen einordnen, gemäß untenstehender Tabelle.
 
@@ -599,11 +602,13 @@ Die Performance eines Modells hängt nicht nur von seiner Größe. Entscheidend 
 ob das Modell (bzw. dessen ONNX-Export) effizient auf der GPU ausgeführt werden kann,
 wie die folgende Tabelle zeigt:
 
-| Modell                                    | Größe (q4) | Tokens/Sec |
-|-------------------------------------------|-----------:|-----------:|
-| onnx-community/SmolLM2-135M-Instruct-ONNX |   175,6 MB |     ~ 8,91 |
-| onnx-community/Qwen3-0.6B-ONNX            |   885,2 MB |     ~ 9,80 |
-| BananaMind/BananaMind-2-Medium-Chat-ONNX  |    54,9 MB |     ~ 0,80 |
+| Modell                                                    | Größe (q4) | Tokens/Sec |
+|-----------------------------------------------------------|-----------:|-----------:|
+| `onnx-community/SmolLM2-135M-Instruct-ONNX`               |   175,6 MB |     ~ 8,91 |
+| `onnx-community/Qwen3-0.6B-ONNX`                          |   885,2 MB |     ~ 9,80 |
+| `BananaMind/BananaMind-2-Medium-Chat-ONNX`                |    54,9 MB |     ~ 0,80 |
+| `onnx-community/Apertus-v1.1-0.5B-Instruct-QAD-INT4-ONNX` |   702,6 MB |     ~ 9,88 |
+| `onnx-community/Apertus-v1.1-1.5B-Instruct-QAD-INT4-ONNX` |  1780,9 MB |     ~ 5,34 |
 
 Obwohl Qwen das größte Modell ist, läuft es schnellsten, da es im Vergleich zui SmolLM2
 eine sehr optimierte Architektur besitzt: Weniger Nodes und auch höherwertige Nodes, die
@@ -660,15 +665,36 @@ Großer Unsinn selbstsicher vorgetragen.
 
 Testfragen spezifisch zu einer Seite (Anfrage mit Kontext):
 
-* __English / Internet of Things:__ Please summarize.
-* __English / What Makes Up a Computer?:__ How does this relate to a generic laptop or PC?
-* __English / The Idea Behind the World Wide Web:__ Which HTML version was used for Beethoven's 5th symphony?
+1. __English / Internet of Things:__ Please summarize.
+2. __English / What Makes Up a Computer?:__ How does this relate to a generic laptop or PC?
+3. __English / The Idea Behind the World Wide Web:__ Which HTML version was used for Beethoven's 5th symphony?
 
 Qwen3 zeigt Humor 🎶 (erkennt den Schreibfehler nicht bei „Beethoven”):
 
 > __Benutzer:__ _Which HTML version was used for Bethovens 5th symphony?_
 >
 > __Assistent:__ The HTML version used for Bethovens' 5th Symphony is HTML 5.
+
+Apertus0.5b ohne den Schreibfehler 🤖:
+
+> __Benutzer:__ _Which HTML version was used for Beethovens 5th symphony?_
+>
+> __Assistent:__ The HTML version used for Beethoven's 5th symphony is 1.0.0.
+> It was the first version of HTML that was widely used for web pages. It was
+> the foundation for the HTML 2.0, 3.0, and 4.0 versions that followed.
+
+TODOs
+-----
+
+Performance messen wie oben und zusätzlich die Qualität mit Fragen wie
+(jede davon auf einer Ordinalskala mit festen Kritieren bewertet):
+
+* Ist die Antwort inhaltlich korrekt?
+* Deckt die Antwort den Sinn der Frage ab?
+* Ist die Länge der Antwort angemessen?
+
+Die qualitative Beurteilung muss sowohl für die Fragen ohne Kontext („What is HTML?” …) als
+auch für die Fragen mit Kontext („Please summarize” …) erfolgen.
 
 Fazit
 -----
@@ -709,8 +735,7 @@ innerhalb einer Webawendung lokal ausführen. Allerdings mit Einschränkungen:
   für mobile Endgeräte und die Ausführung im Web-Browser eher unwahrscheinlich.
 
 * Interessante Ansätze in diese Richtung könnten 1,5bit-Modelle sein, da sie deutlich
-  kompakter als die herkömmlichen Modelle sind, z.B.
-  [Bonsai-27B-mlx-1bit](https://huggingface.co/prism-ml/Bonsai-27B-mlx-1bit)
+  kompakter als die herkömmlichen Modelle sind, z.B. `Bonsai-27B-mlx-1bit`
 
 * Generell sind die kleineren, offenen Modelle in der großen Mehrzahl auf englisch
   trainiert. Explizit deutschsprachige Modelle sind selten und die Qualität ist auch
