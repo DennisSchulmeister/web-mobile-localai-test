@@ -56,19 +56,19 @@ Folgende Anwendungsfälle sollen hier getestet werden:
         </td>
         <td>
             <a href="./doc/screenshot5.png">
-                <img src="./doc/screenshot4.png" width="200" alt="Screenshot: Sprachmodell laden">
+                <img src="./doc/screenshot5.png" width="200" alt="Screenshot: Sprachmodell laden">
             </a>
         </td>
         <td>
             <a href="./doc/screenshot6.png">
-                <img src="./doc/screenshot4.png" width="200" alt="Screenshot: Laufender Chat">
+                <img src="./doc/screenshot6.png" width="200" alt="Screenshot: Laufender Chat">
             </a>
         </td>
     </tr>
     <tr>
         <td>
             <a href="./doc/screenshot7.png">
-                <img src="./doc/screenshot4.png" width="200" alt="Screenshot: Systeminformationen">
+                <img src="./doc/screenshot7.png" width="200" alt="Screenshot: Systeminformationen">
             </a>
         </td>
         <td colspan="2">
