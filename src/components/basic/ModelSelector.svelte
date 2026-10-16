@@ -35,11 +35,14 @@ Auswahl eines KI-Modells
         return result;
     });
 
-    // TODO: Devices filtern, so dass nur Backends berücksichtigt werden, die
-    // die Task-Typen ausführen können. Das Backend muss zusätzlich die Chance
-    // bekommen, für jedes einzelne Modell zu entscheiden, ob es ausführbar ist.
-    // Wegen `"android": {"natrive": true}` im Modellkatalog. Braucht aber eine
-    // kleine API-Änderung in den Backends.
+    // TODO:
+    //
+    // 1. Devices filtern, so dass nur Backends berücksichtigt werden, die
+    // die Task-Typen ausführen können.
+    // 
+    // 2. Das Backend muss zusätzlich die Chance bekommen, für jedes einzelne Modell
+    // zu entscheiden, ob es ausführbar ist. Wegen `"android": {"native": true}`
+    // im Modellkatalog. Braucht aber eine kleine API-Änderung in den Backends.
 
     let selected_modelId    = $derived(available_models[0]?.modelId || "");
     let selected_index      = $derived(available_models.findIndex(e => e.modelId === selected_modelId));
