@@ -8,6 +8,14 @@
 
 /**
  * Basisklasse für alle Inferenz-Backends.
+ * 
+ * Die Parameter `device` und `dtype` beim Laden eines Modells sowie die spezifischen
+ * Pipeline-Parameter sondern eigentlich nicht fester Teil der API sein, da hier die
+ * API von transformers.js durchscheint. Stattdessen sollte jedes Backend eine dynamische
+ * Liste mit Lade- und Pipeline-Parametern definieren können, wobei jeder Parameter eine
+ * ID, Anzeigename, Datentyp und mögliche Ausprägungen besitzt. Das ist mir jetzt aber zu
+ * aufwändig, so lange keine anderen Backends außer transformers.js und ONNX Runtime
+ * genutzt werden.
  */
 export default class BaseBackend {
     /**
