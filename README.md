@@ -689,6 +689,8 @@ TODOs
 Performance messen wie oben und zusätzlich die Qualität mit Fragen wie
 (jede davon auf einer Ordinalskala mit festen Kritieren bewertet):
 
+* Ist der generiere Markdown-Code syntaktisch korrekt?
+* Ist die Antwort sprachlich korrekt (Rechtschreibung, Grammatik, Zeichensetzung)?
 * Ist die Antwort inhaltlich korrekt?
 * Deckt die Antwort den Sinn der Frage ab?
 * Ist die Länge der Antwort angemessen?
