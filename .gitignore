@@ -1,4 +1,15 @@
+# Node.js
 node_modules/
+
+# Generierte statische Dateien
 static/_bundle/
 static/_generated/
+
+# Capacitor
 .capacitor/
+
+# Django
+.venv/
+__pycache__/
+local_settings.py
+db.sqlite3

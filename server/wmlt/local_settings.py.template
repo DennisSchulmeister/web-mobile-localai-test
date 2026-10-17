@@ -1,0 +1,63 @@
+#--------------------------------------------------#
+# Vorlage für Deployment-spezifische Einstellungen #
+#--------------------------------------------------#
+
+from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Replace with your own secret key !!
+SECRET_KEY = "django-insecure-x0t%jjv2p3i)fo@9#u6p39c127wtcjt-kq2f4r9g6(0ss#n6bj"
+DEBUG = False
+ALLOWED_HOSTS = ["*"]
+
+# Needed to secure the CSRF and session cookies.
+# SECURITY: Use a sub-domain that is not shared with other applications!
+#SECURE_SSL_REDIRECT = True  # HTTP to HTTPS redirect, if not already done by reverse proxy
+CSRF_COOKIE_DOMAIN = "your-domain.com"
+SESSION_COOKIE_DOMAIN = "your-domain.com"
+
+# Built-in database engines:
+#   * "django.db.backends.postgresql"
+#   * "django.db.backends.mysql"
+#   * "django.db.backends.sqlite3"
+#   * "django.db.backends.oracle"
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "mydatabase",
+        "USER": "mydatabaseuser",
+        "PASSWORD": "mypassword",
+        "HOST": "localhost",
+        "PORT": "5432",
+    }
+}
+
+# E-Mail Settings
+# See: https://docs.djangoproject.com/en/5.0/ref/settings/#std-setting-EMAIL_BACKEND
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+# DEFAULT_FROM_EMAIL   = "noreply@example.com"
+# EMAIL_SUBJECT_PREFIX = "[OpenBook] "
+# EMAIL_HOST           = "localhost"
+# EMAIL_PORT           = 25
+# EMAIL_HOST_USER      = ""
+# EMAIL_HOST_PASSWORD  = ""
+# EMAIL_TIMEOUT        = 30
+
+# Static files
+# Run `manage.py collectstatic` to copy the files first!
+STATIC_DIR = "/srv/www/mysite.de/static"
+STATIC_URL = "static/"
+
+# Uploaded media files
+MEDIA_DIR = "/srv/www/mysite.de/media"
+MEDIA_URL = "media/"
+
+# i18n, l10n settings
+USE_TZ = True
+TIME_ZONE = "Europe/Berlin"
+
+LANGUAGE_CODE = "de-de"
+USE_THOUSAND_SEPARATOR = True
+
+SITE_ID = 1

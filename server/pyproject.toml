@@ -1,0 +1,22 @@
+[project]
+name = "wmlt-server"
+version = "1.0.0"
+description = "Backend-Server zum Aufzeichnen der Testfälle"
+authors = [
+    {name = "Dennis Schulmeister-Zimolong",email = "dennis@windows3.de"}
+]
+license = {text = "BSD-3-Clause"}
+requires-python = ">=3.14,<4.0"
+dependencies = [
+    "django (>=6.1.2,<7.0.0)",
+    "djangorestframework (>=3.18.3,<4.0.0)",
+    "django-unfold (>=0.110.0,<0.111.0)",
+    "django-crispy-forms (>=2.7,<3.0)"
+]
+
+[tool.poetry]
+package-mode = false
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
