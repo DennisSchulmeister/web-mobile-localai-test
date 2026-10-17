@@ -10,3 +10,11 @@ from rest_framework import viewsets
 class TestRunViewSet(viewsets.ModelViewSet):
     queryset         = models.TestRun.objects.all()
     serializer_class = serializers.TestRunSerializer
+
+    def get_queryset(self):
+        access_code = getattr(self.request, "access_code", None)
+
+        if access_code is not None:
+            return models.TestRun.objects.filter(access_code__access_code = access_code)
+        else:
+            return models.TestRun.objects.all()

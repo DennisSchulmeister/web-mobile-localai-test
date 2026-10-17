@@ -8,5 +8,12 @@ from .              import models, serializers
 from rest_framework import viewsets
 
 class AccessCodeViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset         = models.AccessCode.objects.all()
     serializer_class = serializers.AccessCodeSerializer
+
+    def get_queryset(self):
+        access_code = getattr(self.request, "access_code", None)
+
+        if access_code is not None:
+            return models.AccessCode.objects.filter(access_code = access_code)
+        else:
+            return models.AccessCode.objects.all()

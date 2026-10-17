@@ -106,10 +106,12 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTH_USER_MODEL = "wmlt_auth.User"
 
 REST_FRAMEWORK = {
-    # Use Django's standard `django.contrib.auth` permissions,
-    # or allow read-only access for unauthenticated users.
+    # NOTE: This list works different than the Django auth backends. Django auth
+    # backends are chained, so that a failed check falls through to the next auth
+    # backend. DRF permissions are ANDed, however. They all must return True for
+    # the permission to be granted.
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.DjangoModelPermissions",
+        "wmlt.auth.permissions.IsValidAccessCode",
     ]
 }
 

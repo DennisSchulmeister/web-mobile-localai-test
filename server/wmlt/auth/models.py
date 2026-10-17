@@ -4,15 +4,16 @@
 # This source code is licensed under the BSD 3-Clause License found in the
 # LICENSE file in the root directory of this source tree.
 
-import datetime, string, random
+import datetime, random, string
 
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import Group as DjangoGroup
 from django.db                  import models
+from django.utils               import timezone
 from django.utils.translation   import gettext_lazy as _
 
 def default_valid_until():
-    return datetime.datetime.now() + datetime.timedelta(days=7)
+    return timezone.now() + datetime.timedelta(days=7)
 
 def random_access_code():
     alphabet = string.ascii_uppercase + string.digits
@@ -42,11 +43,24 @@ class User(AbstractUser):
 
 class AccessCode(models.Model):
     """API Access code"""
-    access_code = models.CharField(_("Access Code"), max_length=10, default=random_access_code)
-    valid_from  = models.DateTimeField(_("Valid From"), auto_now_add=True)
+    access_code = models.CharField(_("Access Code"), max_length=10, default=random_access_code, unique=True)
+    valid_from  = models.DateTimeField(_("Valid From"), default=timezone.now)
     valid_until = models.DateTimeField(_("Valid Until"), default=default_valid_until)
+    remarks     = models.CharField(_("Remarks"), max_length=255, blank=True)
     
     class Meta:
         verbose_name        = _("Access Code")
         verbose_name_plural = _("Access Codes")
         ordering            = ["-valid_from", "valid_until", "access_code"]
+
+        indexes = [
+            models.Index(fields=["access_code"])
+        ]
+
+        constraints = [
+            models.CheckConstraint(
+                condition = models.Q(valid_until__gt=models.F("valid_from")),
+                name      = "access_code_valid_until_after_valid_from",
+                violation_error_message = _("Valid Until must be later than Valid From."),
+            ),
+        ]
