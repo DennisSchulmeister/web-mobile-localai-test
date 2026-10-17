@@ -17,6 +17,7 @@ register_auth_api_routes(api_router, "auth")
 register_testlogs_api_routes(api_router, "testlogs")
 
 urlpatterns = [
-    path("api/",   include(api_router.urls)),
-    path("admin/", admin_site.urls),
+    path("api/",      include(api_router.urls)),
+    path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
+    path("admin/",    admin_site.urls),
 ]
