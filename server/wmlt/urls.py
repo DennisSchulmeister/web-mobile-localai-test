@@ -9,10 +9,10 @@ from django.urls            import path
 from rest_framework.routers import DefaultRouter as DRFDefaultRouter
 
 from .admin                 import admin_site
-from .testlogs.routes       import register_api_routes as register_testlog_api_routes
+from .testlogs.routes       import register_api_routes as register_testlogs_api_routes
 
 api_router = DRFDefaultRouter()
-register_testlog_api_routes(api_router, "testlog")
+register_testlogs_api_routes(api_router, "testlogs")
 
 urlpatterns = [
     path("api/",   include(api_router.urls)),

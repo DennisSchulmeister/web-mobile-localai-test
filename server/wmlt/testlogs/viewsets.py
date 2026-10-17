@@ -3,3 +3,10 @@
 #
 # This source code is licensed under the BSD 3-Clause License found in the
 # LICENSE file in the root directory of this source tree.
+
+from .              import models, serializers
+from rest_framework import viewsets
+
+class TestRunViewSet(viewsets.ModelViewSet):
+    queryset         = models.TestRun.objects.all()
+    serializer_class = serializers.TestRunSerializer

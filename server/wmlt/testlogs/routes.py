@@ -5,10 +5,10 @@
 # LICENSE file in the root directory of this source tree.
 
 import typing
+from . import viewsets
 
 if typing.TYPE_CHECKING:
     from rest_framework.routers import DefaultRouter
 
 def register_api_routes(router: DefaultRouter, prefix: str) -> None:
-    #router.register(f"{prefix}/viewsetPath", MyViewSet, basename="my_view_set")
-    pass
+    router.register(f"{prefix}/test_runs", viewsets.TestRunViewSet, basename="test_run")

@@ -3,3 +3,11 @@
 #
 # This source code is licensed under the BSD 3-Clause License found in the
 # LICENSE file in the root directory of this source tree.
+
+from .              import models
+from rest_framework import serializers
+
+class TestRunSerializer(serializers.ModelSerializer):
+    class Meta:
+        model  = models.TestRun
+        fields = "__all__"
