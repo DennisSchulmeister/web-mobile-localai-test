@@ -6,6 +6,7 @@
 
 from django.db                import models
 from django.utils.translation import gettext_lazy as _
+from django.utils             import timezone
 
 class TestRun(models.Model):
     class AppType(models.TextChoices):
@@ -35,8 +36,8 @@ class TestRun(models.Model):
         SAFARI  = "SAFARI",  _("Safari")
         OTHER   = "OTHER",   _("Other")
 
+    start_date      = models.DateTimeField(_("Started at"), default=timezone.now)
     access_code     = models.ForeignKey("wmlt_auth.AccessCode", on_delete=models.SET_NULL, null=True)
-    start_date      = models.DateTimeField(_("Started at"), auto_now_add=True)
     app_type        = models.CharField(_("App Type"), max_length=25, choices=AppType)
     device_type     = models.CharField(_("Device Type"), max_length=25, choices=DeviceType)
     device_model    = models.CharField(_("Device Model"), max_length=100)
@@ -47,6 +48,9 @@ class TestRun(models.Model):
     remarks         = models.CharField(_("Remarks"), max_length=255, blank=True)
 
     class Meta:
-        verbose_name        = _("Tests Run")
+        verbose_name        = _("Test Run")
         verbose_name_plural = _("Test Runs")
         ordering            = ["-start_date"]
+
+    def __str__(self):
+        return self.id

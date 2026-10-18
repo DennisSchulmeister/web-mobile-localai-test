@@ -25,28 +25,23 @@ ALLOWED_HOSTS = []
 
 # Application definition
 INSTALLED_APPS = [
-    # Local applications
+    "admin_interface",
+    "colorfield",
+    "django.contrib.admin",
+
     "wmlt.auth",
     "wmlt.testlogs",
 
-    # Django REST Framework
     "rest_framework",
-
-    # Django Unfold (Modern Admin)
-    "unfold.apps.BasicAppConfig",            # before django.contrib.admin
-    "unfold.contrib.filters",                # optional, if special filters are needed
-    "unfold.contrib.forms",                  # optional, if special form elements are needed
-    "unfold.contrib.inlines",                # optional, if special inlines are needed
-    "crispy_forms",                          # Better forms for custom admin views
-
-    # Django built-in apps
-    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
 ]
+
+X_FRAME_OPTIONS = "SAMEORIGIN"
+SILENCED_SYSTEM_CHECKS = ["security.W019"]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -63,9 +58,14 @@ ROOT_URLCONF = "wmlt.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
-        "APP_DIRS": True,
+        "DIRS": [BASE_DIR / "wmlt" / "templates"],
+        #"APP_DIRS": True,
         "OPTIONS": {
+            "loaders": [
+                "apptemplates.Loader",
+                "django.template.loaders.filesystem.Loader",
+                "django.template.loaders.app_directories.Loader",
+            ],
             "context_processors": [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
@@ -113,37 +113,6 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "wmlt.auth.permissions.IsValidAccessCode",
     ]
-}
-
-# Read the project version. Try the following order:
-#
-#   1. Installed version via importlib
-#   2. Parsing pyproject.toml
-#   3. Using dummy string as fallback
-try:
-    from importlib.metadata import version
-    PROJECT_VERSION = version("wmlt")
-except Exception:
-    try:
-        import tomllib
-
-        with open(BASE_DIR / "pyproject.toml", "rb") as f:
-            pyproject_data = tomllib.load(f)
-            PROJECT_VERSION = pyproject_data["project"]["version"]
-    except Exception:
-        PROJECT_VERSION = "0.0.0"
-
-# Django Unfold Admin
-CRISPY_TEMPLATE_PACK = "unfold_crispy"
-CRISPY_ALLOWED_TEMPLATE_PACKS = ["unfold_crispy"]
-
-UNFOLD = {
-    "SITE_TITLE":  _(f"Test Log {PROJECT_VERSION}: Admin"),
-    "SITE_HEADER": _(f"Test Log {PROJECT_VERSION}: Admin"),
-
-    "SIDEBAR": {
-        "show_search": True,
-    },
 }
 
 # Internationalization

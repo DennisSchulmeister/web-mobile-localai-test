@@ -6,19 +6,13 @@
 
 from django.apps              import apps
 from django.conf              import settings
+from django.contrib.admin     import AdminSite
 from django.utils.translation import gettext_lazy as _
-from unfold.sites             import UnfoldAdminSite
-from unfold.admin             import ModelAdmin as UnfoldModelAdmin
 
-class CustomModelAdmin(UnfoldModelAdmin):
-    """
-    Combined base class including all Django Admin extensions.
-    """
-    save_as = True
-    warn_unsaved_form = True
-    compressed_fields = True
+from admin_interface.admin    import ThemeAdmin
+from admin_interface.models   import Theme
 
-class CustomAdminSite(UnfoldAdminSite):
+class CustomAdminSite(AdminSite):
     """
     Override dashboard ordering of apps and models.
 
@@ -88,40 +82,7 @@ class CustomAdminSite(UnfoldAdminSite):
             for model in admin_app["models"]:
                 del model["_index_"]
 
-        # Clean up menu structure by hiding  models that are shown as changelist tabs
-        # in other models. Also hide apps without remaining models.
-        changelist_tabs    = []
-        hidden_model_names = []
-        group_labels       = {}
-
-        try:
-            changelist_tabs = settings.UNFOLD["TABS"]
-        except KeyError:
-            pass
-
-        for changelist_tab in changelist_tabs:
-            hidden_model_names = [*hidden_model_names, *changelist_tab["models"][1:]]
-
-            if "ob_group_name" in changelist_tab:
-                group_labels[changelist_tab["models"][0]] = changelist_tab["ob_group_name"]
-
-        for i in reversed(range(len(app_list))):
-            admin_app = app_list[i]
-
-            for j in reversed(range(len(admin_app["models"]))):
-                model_class  = admin_app["models"][j]["model"]
-                app_label    = model_class._meta.app_label
-                model_name   = model_class._meta.model_name
-                model_string = f"{app_label}.{model_name}"
-
-                if model_string in hidden_model_names:
-                    del admin_app["models"][j]
-                elif model_string in group_labels:
-                    admin_app["models"][j]["name"] = group_labels[model_string]
-
-            if not len(admin_app["models"]):
-                del app_list[i]
-
         return app_list
 
 admin_site = CustomAdminSite()
+admin_site.register(Theme, ThemeAdmin)

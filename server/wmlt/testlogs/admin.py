@@ -7,7 +7,34 @@
 from .  import models
 from .. import admin
 
-class TestRunAdmin(admin.CustomModelAdmin):
-    model = models.TestRun
+from django.contrib.admin     import ModelAdmin
+from django.utils.translation import gettext_lazy as _
+
+class TestRunAdmin(ModelAdmin):
+    model           = models.TestRun
+    readonly_fields = ["id"]
+
+    fieldsets = [
+        (None, {
+            "fields": (
+                "id",
+                "start_date",
+                ("access_code", "app_type"),
+                
+            ),
+        }),
+        (_("Device Information"), {
+            "fields": (
+                ("device_type", "device_model"),
+                ("os_family", "os_version"),
+                ("browser_family", "browser_version"),
+            ),
+        }),
+        (_("Others"), {
+            "fields": (
+                "remarks",
+            ),
+        }),
+    ]
 
 admin.admin_site.register(models.TestRun, TestRunAdmin)

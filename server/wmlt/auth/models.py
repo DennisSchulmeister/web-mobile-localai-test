@@ -64,3 +64,6 @@ class AccessCode(models.Model):
                 violation_error_message = _("Valid Until must be later than Valid From."),
             ),
         ]
+
+    def __str__(self):
+        return self.access_code
