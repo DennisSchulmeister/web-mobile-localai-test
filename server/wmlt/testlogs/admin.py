@@ -11,13 +11,15 @@ from django.contrib.admin     import ModelAdmin
 from django.utils.translation import gettext_lazy as _
 
 class TestRunAdmin(ModelAdmin):
-    model           = models.TestRun
-    readonly_fields = ["id"]
+    model              = models.TestRun
+    list_display       = ["start_date", "app_type", "device_type", "device_model", "os_family", "os_version", "browser_family", "browser_version", "remarks"]
+    list_display_links = ["start_date", "app_type", "device_type", "device_model", "os_family", "os_version", "browser_family", "browser_version", "remarks"]
+    ordering           = ["-start_date", "-id"]
+    list_filter        = ["start_date", "app_type", "device_type", "os_family", "browser_family"]
 
     fieldsets = [
         (None, {
             "fields": (
-                "id",
                 "start_date",
                 ("access_code", "app_type"),
                 

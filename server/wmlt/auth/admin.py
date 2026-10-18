@@ -24,11 +24,12 @@ class GroupAdmin(DjangoGroupAdmin):
         return obj.user_count()
 
 class AccessCodeAdmin(ModelAdmin):
-    model               = models.AccessCode
-    list_display        = ["access_code", "valid_from", "valid_until", "remarks"]
-    list_display_links  = ["access_code", "valid_from", "valid_until", "remarks"]
-    ordering            = ["-valid_from", "-valid_until"]
-    search_fields       = ["access_code", "remarks"]
+    model              = models.AccessCode
+    list_display       = ["access_code", "valid_from", "valid_until", "remarks"]
+    list_display_links = ["access_code", "valid_from", "valid_until", "remarks"]
+    ordering           = ["-valid_from", "-valid_until"]
+    search_fields      = ["access_code", "remarks"]
+    list_filter        = ["valid_from", "valid_until"]
 
     fieldsets = [
         (None, {

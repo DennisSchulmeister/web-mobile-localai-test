@@ -53,4 +53,4 @@ class TestRun(models.Model):
         ordering            = ["-start_date"]
 
     def __str__(self):
-        return self.id
+        return str(self.id)

@@ -4,48 +4,61 @@
 {% block extrastyle %}{{ block.super }}
 <!-- DES TEST -->
 <style>
+    /* Less tiny font size */
     html {
         font-size: 115%;
     }
 
-    label {
-        display: block;
-        padding: 0;
-    }
-
-    legend {
-        float: none !important;
-        padding: 0;
-    }
-
-    .help {
-        margin-bottom: 1em;
-    }
-
-    .form-row {
-        display: flex;
-        flex-direction: row;
-        justify-content: flex-start;
-        align-items: flex-start;
-        gap: 2em;
-
-        max-width: 80em;
-    }
-
-    .form-row > * {
-        flex: 1;
-    }
-
-    .datetime {
-        display: flex;
-        align-items: first baseline;
-        gap: 1em;
-    }
-
-    select, input:not([type="submit"]) {
-        box-sizing: border-box;
-        width: calc(100% - 0.5em);
-        height: 1.875rem !important;
+    /* Cleaner change forms */
+    .change-form {
+        label {
+            display: block;
+            padding: 0;
+        }
+    
+        legend {
+            float: none !important;
+            padding: 0;
+        }
+    
+        .help {
+            margin-bottom: 1em;
+        }
+    
+        .form-row {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: flex-start;
+            gap: 2em;
+    
+            max-width: 80em;
+        }
+    
+        .form-row > * {
+            flex: 1;
+        }
+    
+        .datetime {
+            display: flex;
+            align-items: first baseline;
+            gap: 1em;
+        }
+    
+        select, input:not([type="submit"]) {
+            box-sizing: border-box;
+            width: calc(100% - 0.5em);
+            height: 1.875rem !important;
+        }
+    
+        /* Fix clock dialog width */
+        .clockbox {
+            width: 20em !important;
+        }
+    
+        .calendarbox {
+            width: 30em !important;
+        }
     }
 </style>
 {% endblock %}
