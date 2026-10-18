@@ -42,14 +42,14 @@ final class NativeSystemInformation {
      * @param information Liste, an die die Einträge angehängt werden
      */
     private static void addRuntimeInformation(JSArray information) {
-        add(information, "bi-box", "ONNX Runtime",       BuildConfig.ONNXRUNTIME_VERSION);
-        add(information, "bi-box", "ONNX Runtime GenAI", BuildConfig.ONNXRUNTIME_GENAI_VERSION);
+        add(information, "onnxRuntimeVersion", "bi-box", "ONNX Runtime",       BuildConfig.ONNXRUNTIME_VERSION);
+        add(information, "onnxRuntimeGenaiVersion", "bi-box", "ONNX Runtime GenAI", BuildConfig.ONNXRUNTIME_GENAI_VERSION);
 
         try {
-            add(information, "bi-gpu-card", "Execution Provider", OrtEnvironment.getAvailableProviders().toString());
+            add(information, "executionProviders", "bi-gpu-card", "Execution Provider", OrtEnvironment.getAvailableProviders().toString());
         } catch (Throwable throwable) {
             Log.w(TAG, "Execution Provider konnten nicht ermittelt werden.", throwable);
-            add(information, "bi-gpu-card", "Execution Provider", "Nicht ermittelbar: " + throwable.getMessage());
+            add(information, "executionProviders", "bi-gpu-card", "Execution Provider", "Nicht ermittelbar: " + throwable.getMessage());
         }
 
         StringBuilder devices = new StringBuilder();
@@ -59,7 +59,7 @@ final class NativeSystemInformation {
             devices.append(device.label);
         }
 
-        add(information, "bi-cpu", "Native Inferenz-Geräte", devices.toString());
+        add(information, "inferenceDevices", "bi-cpu", "Native Inferenz-Geräte", devices.toString());
     }
 
     /**
@@ -68,29 +68,29 @@ final class NativeSystemInformation {
      * GPU-Abfrage werden als Diagnoseeintrag zurückgegeben und protokolliert.
      *
      * @param context Android-Kontext für Systemdienste
-     * @return Liste von Diagnoseobjekten mit {@code icon}, {@code label} und {@code text}
+     * @return Liste von Diagnoseobjekten mit {@code field}, {@code icon}, {@code label} und {@code text}
      * @throws IllegalStateException wenn der ActivityManager nicht verfügbar ist
      */
     static JSArray collect(Context context) {
         JSArray information = new JSArray();
 
         // Backend und Gerätehardware
-        add(information, "bi-terminal",    "Backend-Typ",         "Android (Native)");
+        add(information, "backendType",    "bi-terminal",    "Backend-Typ",         "Android (Native)");
         addRuntimeInformation(information);
-        add(information, "bi-phone",       "Hersteller / Modell", Build.MANUFACTURER + " / " + Build.MODEL);
-        add(information, "bi-cpu",         "Hardware / Board",    Build.HARDWARE + " / " + Build.BOARD);
+        add(information, "manufacturerModel", "bi-phone", "Hersteller / Modell", Build.MANUFACTURER + " / " + Build.MODEL);
+        add(information, "hardwareBoard",      "bi-cpu",   "Hardware / Board",    Build.HARDWARE + " / " + Build.BOARD);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            add(information, "bi-cpu", "SoC", Build.SOC_MANUFACTURER + " / " + Build.SOC_MODEL);
+            add(information, "soc", "bi-cpu", "SoC", Build.SOC_MANUFACTURER + " / " + Build.SOC_MODEL);
         }
 
         // Betriebssystem und Prozessarchitektur
-        add(information, "bi-display",     "Android-Version",          Build.VERSION.RELEASE);
-        add(information, "bi-info-circle", "Android API-Level",        String.valueOf(Build.VERSION.SDK_INT));
-        add(information, "bi-info-circle", "Android Security Patch",   Build.VERSION.SECURITY_PATCH);
-        add(information, "bi-cpu",         "Unterstützte ABIs",        TextUtils.join(", ", Build.SUPPORTED_ABIS));
-        add(information, "bi-cpu",         "Prozessarchitektur",       Process.is64Bit() ? "64 Bit" : "32 Bit");
-        add(information, "bi-cpu",         "Hardware-Nebenläufigkeit", Runtime.getRuntime().availableProcessors() + " für den Prozess verfügbare CPU-Kerne");
+        add(information, "androidVersion",       "bi-display",     "Android-Version",          Build.VERSION.RELEASE);
+        add(information, "androidApiLevel",      "bi-info-circle", "Android API-Level",        String.valueOf(Build.VERSION.SDK_INT));
+        add(information, "androidSecurityPatch", "bi-info-circle", "Android Security Patch",   Build.VERSION.SECURITY_PATCH);
+        add(information, "supportedAbis",        "bi-cpu",         "Unterstützte ABIs",        TextUtils.join(", ", Build.SUPPORTED_ABIS));
+        add(information, "processArchitecture",  "bi-cpu",         "Prozessarchitektur",       Process.is64Bit() ? "64 Bit" : "32 Bit");
+        add(information, "hardwareConcurrency",  "bi-cpu",         "Hardware-Nebenläufigkeit", Runtime.getRuntime().availableProcessors() + " für den Prozess verfügbare CPU-Kerne");
 
         // Systemweiter Speicher und Low-Memory-Zustand
         ActivityManager manager = context.getSystemService(ActivityManager.class);
@@ -102,28 +102,28 @@ final class NativeSystemInformation {
         ActivityManager.MemoryInfo memory = new ActivityManager.MemoryInfo();
         manager.getMemoryInfo(memory);
 
-        add(information, "bi-memory", "System-RAM gesamt",    formatBytes(memory.totalMem));
-        add(information, "bi-memory", "System-RAM verfügbar", formatBytes(memory.availMem));
-        add(information, "bi-memory", "Low-Memory-Schwelle",  formatBytes(memory.threshold));
-        add(information, "bi-memory", "Low-Memory-Zustand",   memory.lowMemory ? "Ja" : "Nein");
-        add(information, "bi-memory", "Low-RAM-Gerät",        manager.isLowRamDevice() ? "Ja" : "Nein");
+        add(information, "totalSystemRam",     "bi-memory", "System-RAM gesamt",    formatBytes(memory.totalMem));
+        add(information, "availableSystemRam", "bi-memory", "System-RAM verfügbar", formatBytes(memory.availMem));
+        add(information, "lowMemoryThreshold", "bi-memory", "Low-Memory-Schwelle",  formatBytes(memory.threshold));
+        add(information, "lowMemory",          "bi-memory", "Low-Memory-Zustand",   memory.lowMemory ? "Ja" : "Nein");
+        add(information, "lowRamDevice",       "bi-memory", "Low-RAM-Gerät",        manager.isLowRamDevice() ? "Ja" : "Nein");
 
         // Heap-Grenzen und aktuelle Allokationen des App-Prozesses
-        add(information, "bi-memory", "Android Memory Class (Java-Heap)", manager.getMemoryClass() + " MiB");
-        add(information, "bi-memory", "Java-Heap Maximum",                formatBytes(Runtime.getRuntime().maxMemory()));
-        add(information, "bi-memory", "Java-Heap belegt",                 formatBytes(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
-        add(information, "bi-memory", "Nativer Heap belegt",              formatBytes(Debug.getNativeHeapAllocatedSize()));
+        add(information, "javaHeapMemoryClass", "bi-memory", "Android Memory Class (Java-Heap)", manager.getMemoryClass() + " MiB");
+        add(information, "javaHeapMaximum",     "bi-memory", "Java-Heap Maximum",                formatBytes(Runtime.getRuntime().maxMemory()));
+        add(information, "javaHeapAllocated",   "bi-memory", "Java-Heap belegt",                 formatBytes(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
+        add(information, "nativeHeapAllocated", "bi-memory", "Nativer Heap belegt",              formatBytes(Debug.getNativeHeapAllocatedSize()));
 
         // PSS rechnet gemeinsam genutzte Speicherseiten nur anteilig an.
         Debug.MemoryInfo processMemory = new Debug.MemoryInfo();
         Debug.getMemoryInfo(processMemory);
 
-        add(information, "bi-memory", "Prozess-RAM PSS", formatBytes(processMemory.getTotalPss() * 1024L));
+        add(information, "processRamPss", "bi-memory", "Prozess-RAM PSS", formatBytes(processMemory.getTotalPss() * 1024L));
 
         // WebView-Version für den Vergleich mit der Browser-Ausführung
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             PackageInfo webView = WebView.getCurrentWebViewPackage();
-            add(information, "bi-info-circle", "Android WebView", webView == null ? "Nicht verfügbar (noch nicht geladen)" : webView.packageName + " / " + webView.versionName);
+            add(information, "androidWebView", "bi-info-circle", "Android WebView", webView == null ? "Nicht verfügbar (noch nicht geladen)" : webView.packageName + " / " + webView.versionName);
         }
 
         // Grafikdiagnose in einem eigenen temporären Kontext
@@ -147,12 +147,14 @@ final class NativeSystemInformation {
      * Einen Diagnoseeintrag im gemeinsamen Frontend-Format anhängen.
      *
      * @param information Zieldaten für die Diagnose
+     * @param field Technischer Name des Diagnosefeldes
      * @param icon CSS-Klasse des Bootstrap-Icons
      * @param label Anzeigename des Wertes
      * @param text Darzustellender Wert
      */
-    private static void add(JSArray information, String icon, String label, String text) {
+    private static void add(JSArray information, String field, String icon, String label, String text) {
         JSObject entry = new JSObject();
+        entry.put("field", field);
         entry.put("icon",  icon);
         entry.put("label", label);
         entry.put("text",  text);
@@ -254,14 +256,14 @@ final class NativeSystemInformation {
                 throw new IllegalStateException("OpenGL-ES-Abfrage fehlgeschlagen: 0x" + Integer.toHexString(error));
             }
 
-            add(information, "bi-gpu-card", "GPU-Anbieter",      vendor);
-            add(information, "bi-gpu-card", "GPU-Renderer",      renderer);
-            add(information, "bi-gpu-card", "OpenGL-ES-Version", glVersion);
-            add(information, "bi-gpu-card", "Max Texture Size",  maxTextureSize[0] + " Pixel pro Dimension");
+            add(information, "gpuVendor",      "bi-gpu-card", "GPU-Anbieter",      vendor);
+            add(information, "gpuRenderer",    "bi-gpu-card", "GPU-Renderer",      renderer);
+            add(information, "openGlEsVersion", "bi-gpu-card", "OpenGL-ES-Version", glVersion);
+            add(information, "maxTextureSize", "bi-gpu-card", "Max Texture Size",  maxTextureSize[0] + " Pixel pro Dimension");
         } catch (RuntimeException exception) {
             // Die übrige Systemdiagnose bleibt bei Grafikfehlern verfügbar.
             Log.w(TAG, "GPU-Informationen konnten nicht ermittelt werden.", exception);
-            add(information, "bi-gpu-card", "GPU-Informationen", "Nicht verfügbar: " + exception.getMessage());
+            add(information, "gpuInformation", "bi-gpu-card", "GPU-Informationen", "Nicht verfügbar: " + exception.getMessage());
         } finally {
             // Zuerst den vorherigen Kontext wiederherstellen oder den eigenen lösen.
             if (current) {

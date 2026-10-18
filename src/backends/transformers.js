@@ -171,16 +171,16 @@ export default class TransformersBackend extends BaseBackend {
         }
 
         return [
-            {icon: "bi-terminal",    label: "Backend-Typ",                     text: "Browser"},
-            {icon: "bi-cpu",         label: "Ausführung",                      text: devices.join(", ")},
-            {icon: "bi-info-circle", label: "User Agent",                      text: userAgentData},
-            {icon: "bi-display",     label: "Plattform",                       text: platform},
-            {icon: "bi-memory",      label: "Device Memory",                   text: deviceMemory},
-            {icon: "bi-cpu",         label: "Hardware-Nebenläufigkeit",        text: hardwareConcurrency},
-            {icon: "bi-gpu-card",    label: "GPU-Adapter",                     text: gpuCount},
-            {icon: "bi-gpu-card",    label: "GPU-Beschreibung",                text: gpuDescription},
-            {icon: "bi-memory",      label: "Max Buffer Size",                 text: maxBufferSize},
-            {icon: "bi-memory",      label: "Max Storage Buffer Binding Size", text: maxStorageBufferBindingSize},
+            {field: "backendType",                 icon: "bi-terminal",    label: "Backend-Typ",                     text: "Browser"},
+            {field: "devices",                     icon: "bi-cpu",         label: "Ausführung",                      text: devices.join(", ")},
+            {field: "userAgentData",               icon: "bi-info-circle", label: "User Agent",                      text: userAgentData},
+            {field: "platform",                    icon: "bi-display",     label: "Plattform",                       text: platform},
+            {field: "deviceMemory",                icon: "bi-memory",      label: "Device Memory",                   text: deviceMemory},
+            {field: "hardwareConcurrency",         icon: "bi-cpu",         label: "Hardware-Nebenläufigkeit",        text: hardwareConcurrency},
+            {field: "gpuCount",                    icon: "bi-gpu-card",    label: "GPU-Adapter",                     text: gpuCount},
+            {field: "gpuDescription",              icon: "bi-gpu-card",    label: "GPU-Beschreibung",                text: gpuDescription},
+            {field: "maxBufferSize",               icon: "bi-memory",      label: "Max Buffer Size",                 text: maxBufferSize},
+            {field: "maxStorageBufferBindingSize", icon: "bi-memory",      label: "Max Storage Buffer Binding Size", text: maxStorageBufferBindingSize},
         ];
     }
 

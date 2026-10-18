@@ -67,7 +67,7 @@ export default class BaseBackend {
      * Diagnoseinformationen des Backends als Name/Wert-Liste zurückgeben, zum Beispiel
      * ob die Ausführung auf der GPU oder TPU unterstützt wird.
      * 
-     * @returns {Array} Liste mit `{icon: "", label: "", text: ""}`-Objekten
+     * @returns {Array} Liste mit `{field: "", icon: "", label: "", text: ""}`-Objekten
      */
     async getInformation() {
         return [];
