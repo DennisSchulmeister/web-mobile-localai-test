@@ -64,12 +64,12 @@ class Event(models.Model):
     """Actions performed during a single test run"""
     class EventType(models.TextChoices):
         START_TESTRUN    = "START_TESTRUN",    _("Start Test Run")
-        NAVIGATE_TO_PAGE = "NAVIGATE_TO_PAGE", _("Navigate to Page")
+        NAVIGATION       = "NAVIGATION",       _("Navigation")
         GET_INFORMATION  = "GET_INFORMATION",  _("Get Information")
         LOAD_MODEL       = "LOAD_MODEL",       _("Load Model")
         SEMANTIC_SEARCH  = "SEMANTIC_SEARCH",  _("Semantic Search")
-        EXECUTE_MODEL    = "EXECUTE_MODEL",    _("Execute Model")
         START_CHAT       = "START_CHAT",       _("Start Chat")
+        EXECUTE_MODEL    = "EXECUTE_MODEL",    _("Execute Model")
 
     test_run       = models.ForeignKey(TestRun, on_delete=models.CASCADE)
     timestamp      = models.DateTimeField(_("Timestamp"), default=timezone.now)
@@ -86,29 +86,52 @@ class Event(models.Model):
     def __str__(self):
         return self.event_type.label
 
-## TODO: Missing model classes for the other events
-## TODO: Admin for each model (Event = read-only)
-## TODO: REST API: serializer / viewset / route for each model
-##        - Create Event object automatically
-##        - Restrict by access code
+class EventException(models.Model):
+    """Catched exception. This is not an event in itself, but rather for any event
+    a number of exceptions can be logged."""
+    event   = models.ForeignKey(Event, on_delete=models.CASCADE)
+    number  = models.IntegerField(_("Number"))
+    name    = models.CharField(_("Name"), max_length=50)
+    message = models.CharField(_("Message"), max_length=255, blank=True)
+    stack   = models.TextField(_("Stack Trace"), blank=True)
 
-class Event_EngineInformation(models.Model):
+    class Meta:
+        verbose_name        = _("Exception")
+        verbose_name_plural = _("Exceptions")
+        ordering            = ["-event__timestamp", "-number"]
+
+    def __str__(self):
+        return self.name
+
+class NavigationEvent(models.Model):
+    event = GenericRelation(Event)
+    url   = models.CharField(_("URL"), max_length=50)
+
+    class Meta:
+        verbose_name        = _("Event: Navigation")
+        verbose_name_plural = _("Events: Navigation")
+        ordering            = ["-event__timestamp"]
+
+    def __str__(self):
+        return self.url
+
+class GetInformationEvent(models.Model):
     """Event: Get engine information (head)"""
     event       = GenericRelation(Event)
     engine_id   = models.CharField(_("Technical Id"), max_length=25)
     engine_name = models.CharField(_("Name"), max_length=25)
 
     class Meta:
-        verbose_name        = _("Get Information Event")
-        verbose_name_plural = _("Get Information Events")
+        verbose_name        = _("Event: Get Information")
+        verbose_name_plural = _("Events: Get Information")
         ordering            = ["-event__timestamp", "engine_id"]
 
     def __str__(self):
         return self.backend_name
 
-class Event_EngineInformation_Line(models.Model):
+class GetInformationEventLine(models.Model):
     """Event: Get engine information (lines)"""
-    parent = models.ForeignKey(Event_EngineInformation, on_delete=models.CASCADE)
+    parent = models.ForeignKey(GetInformationEvent, on_delete=models.CASCADE)
     number = models.IntegerField(_("Number"))
     field  = models.CharField(_("Field"), max_length=50)
     icon   = models.CharField(_("Icon"), max_length=20)
@@ -122,3 +145,47 @@ class Event_EngineInformation_Line(models.Model):
 
     def __str__(self):
         return t"{self.label}: {self.value}"
+
+class LoadModelEvent(models.Model):
+    """Event: Load Model"""
+    event     = GenericRelation(Event)
+    pipeline  = models.CharField(_("Pipeline"), max_length=50)
+    engine_id = models.CharField(_("Engine ID"), max_length=25)
+    model_id  = models.CharField(_("Model ID"), max_length=100)
+    dtype     = models.CharField(_("Quantization"), max_length=10, blank=True)
+    device    = models.CharField(_("Device"), max_length=20, blank=True)
+    loadtime  = models.DurationField(_("Loading Duration"), blank=True)
+
+    class Meta:
+        verbose_name        = _("Event: Load Model")
+        verbose_name_plural = _("Events: Load Model")
+        ordering            = ["-event__timestamp"]
+
+    def __str__(self):
+        result     = t"{self.pipeline}: {self.model}"
+        additional = ""
+
+        if self.dtype:
+            additional += t" {self.dtype}"
+
+        if self.device:
+            additional += t" {self.device}"
+
+        additional = additional.strip();
+        return t"{result} ({additional})" if additional else result
+
+
+class SemanticSearchEvent(models.Model):
+    """Event: Semantic Search"""
+
+class ExecuteModel(models.Model):
+    """Event: Execute Model"""
+
+class StartChat(models.Model):
+    """Event: Start or reset chat"""
+
+
+## TODO: Admin for each model (Event = read-only)
+## TODO: REST API: serializer / viewset / route for each model
+##        - Create Event object automatically
+##        - Restrict by access code
