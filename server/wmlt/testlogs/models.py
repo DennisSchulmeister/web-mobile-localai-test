@@ -5,6 +5,7 @@
 # LICENSE file in the root directory of this source tree.
 
 from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db                          import models
 from django.utils.translation           import gettext_lazy as _
@@ -42,6 +43,7 @@ class TestRun(models.Model):
     start_date      = models.DateTimeField(_("Started at"), default=timezone.now)
     access_code     = models.ForeignKey("wmlt_auth.AccessCode", on_delete=models.SET_NULL, null=True)
     app_type        = models.CharField(_("App Type"), max_length=25, choices=AppType)
+    installation    = models.CharField(_("Installation"), max_length=10)
     device_type     = models.CharField(_("Device Type"), max_length=25, choices=DeviceType)
     device_model    = models.CharField(_("Device Model"), max_length=100)
     os_family       = models.CharField(_("Operating System Family"), max_length=25, choices=OperatingSystemFamily)
@@ -61,7 +63,7 @@ class TestRun(models.Model):
 class Event(models.Model):
     """Actions performed during a single test run"""
     class EventType(models.TextChoices):
-        START_TESTRUN    = "START_TESTRUM",    _("Start Test Run")
+        START_TESTRUN    = "START_TESTRUN",    _("Start Test Run")
         NAVIGATE_TO_PAGE = "NAVIGATE_TO_PAGE", _("Navigate to Page")
         GET_INFORMATION  = "GET_INFORMATION",  _("Get Information")
         LOAD_MODEL       = "LOAD_MODEL",       _("Load Model")
@@ -85,17 +87,21 @@ class Event(models.Model):
         return self.event_type.label
 
 ## TODO: Missing model classes for the other events
-## TODO: Foreign key from event model to event or test run (for ordering)?
+## TODO: Admin for each model (Event = read-only)
+## TODO: REST API: serializer / viewset / route for each model
+##        - Create Event object automatically
+##        - Restrict by access code
 
 class Event_EngineInformation(models.Model):
     """Event: Get engine information (head)"""
+    event       = GenericRelation(Event)
     engine_id   = models.CharField(_("Technical Id"), max_length=25)
     engine_name = models.CharField(_("Name"), max_length=25)
 
     class Meta:
         verbose_name        = _("Get Information Event")
         verbose_name_plural = _("Get Information Events")
-        ordering            = ["engine_id"]
+        ordering            = ["-event__timestamp", "engine_id"]
 
     def __str__(self):
         return self.backend_name
