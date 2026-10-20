@@ -4,7 +4,7 @@ Web/Mobile-Test für lokale KI
 1. [Beschreibung](#beschreibung)
 1. [Vorbereitungen](#vorbereitungen)
 1. [Start der Anwendung](#start-der-anwendung)
-1. [Android App bauen](#android-app-bauen)
+1. [Android-App bauen](#android-app-bauen)
 1. [Technische Umsetzung](#technische-umsetzung)
 1. [Künftige Web APIs](#künftige-web-apis)
 1. [Lessons Learned](#lessons-learned)
@@ -16,11 +16,11 @@ Web/Mobile-Test für lokale KI
 Beschreibung
 ------------
 
-Dies ist ein Versuch, ob kleine KI-Sprachmodelle auch im Browser auf Mobilgeräten
-mit akzeptabler Performance ausgeführt werden können. Natürlich können auf diese
-Weise nur einfache Anwendungsfälle unterstützt werden, aber dafür funktionieren
-sie (in einer Progressive Web App) auch 100% offline und lokal, so dass der
-Datenschutz gewährt ist.
+Dies ist ein Versuch herauszufinden, ob kleine KI-Sprachmodelle auch im Browser auf
+Mobilgeräten mit akzeptabler Performance ausgeführt werden können. Natürlich können
+auf diese Weise nur einfache Anwendungsfälle unterstützt werden, aber dafür funktionieren
+sie (in einer Progressive Web App) auch 100 % offline und lokal, sodass der Datenschutz
+gewährt ist.
 
 Folgende Anwendungsfälle sollen hier getestet werden:
 
@@ -103,7 +103,7 @@ Bevor die Anwendung gestartet werden kann, müssen folgende Schritte ausgeführt
    unten. Da sich letztere nur ändern, wenn sich die Testdaten ändern, müssen sie
    vor Ausführung der App einmalig vorberechnet werden.
 
-Alle drei Schritte können mit `npm run init` hintereinander ausgeführt werden.
+Alle drei Schritte können mit `npm run init` am Stück ausgeführt werden.
 Alternativ können die Schritte einzeln ausgeführt werden:
 
 1. `npm run init:download`: Modelle herunterladen
@@ -111,9 +111,10 @@ Alternativ können die Schritte einzeln ausgeführt werden:
 3. `npm run init:embeddings`: Worteinbettungen berechnen
 
 Wann immer sich die Testdaten ändern, müssen die Schritte 2 und 3 ausgeführt werden.
-Wenn sich die verwendeten Modelle ändern, müssen in die Schritte 1 und 3 ausgeführt werden.
+Wenn sich die verwendeten Feature-Extraction-Modelle ändern (und nur dann), müssen
+die Schritte 1 und 3 ausgeführt werden.
 
-Da die Daten für die clientseitigen Webanwendung nutzbar sein müssen, liegen die Ergebnisse
+Da die Daten für die clientseitige Webanwendung nutzbar sein müssen, liegen die Ergebnisse
 dieser Schritte im `static`-Verzeichnis, sind aber von der Git-Versionierung ausgeschlossen.
 
 Start der Anwendung
@@ -122,19 +123,19 @@ Start der Anwendung
 Der Devserver kann mit `npm start` oder `npm run watch` gestartet werden. Die Anwendung
 kann dann über http://localhost:8888 im Browser aufgerufen werden.
 
-Für ein statisches Deployment, kann die Anwendung mit `npm run build` gebaut werden.
+Für ein statisches Deployment kann die Anwendung mit `npm run build` gebaut werden.
 Die Inhalte des `static`-Verzeichnisses können dann auf einen Webserver geschoben werden.
 
-Android App bauen
+Android-App bauen
 -----------------
 
 Die Anwendung kann optional auch mit [Capacitor](https://capacitorjs.com/) als installierbares
 APK-File für Android verpackt werden. Hierfür muss die Anwendung, wie oben beschrieben,
-initialisiert und mindestens einemal während der lokalen Entwicklung gebaut worden sein.
+initialisiert und mindestens einmal während der lokalen Entwicklung gebaut worden sein.
 
 Danach können die Quelldateien für Android mit folgendem Befehl aktualisiert werden. Dies
-muss immer gemacht werden, wenn sie die Webquellen oder die Inhalte im `static/`-Verzeichnis
-verändert werden.
+muss immer gemacht werden, wenn sich die Webquellen oder die Inhalte im `static/`-Verzeichnis
+verändern.
 
 ```sh
 npm run android:sync
@@ -145,7 +146,7 @@ _Build → Generate App Bundles or APKs_ zum Bauen der Anwendung.
 
 Damit das APK nicht die Größenlimits des ZIP32-Formats überschreitet, bereitet `android:sync`
 nach dem Web-Build ein separates Verzeichnis `.capacitor/www/` vor. Dieses ist in der Datei
-`capacitor.config.ts` als `webDir` konfiguriert und enthält alle Web Assets, aber nur vorab
+`capacitor.config.ts` als `webDir` konfiguriert und enthält alle Web-Assets, aber nur vorab
 heruntergeladene Modelle, die in der Datei `static/models/index.json` mit
 `"android": {"include": true}` gekennzeichnet wurden.
 
@@ -153,7 +154,7 @@ Die ausgewählten Modelle müssen vor dem Sync mit `npm run init:download` herun
 sein. Das Staging-Verzeichnis wird bei jedem Sync neu erstellt, damit keine veralteten Modelle
 übernommen werden.
 
-Fehlende Modelle werden in der Android-App vom HuggingFace Hub geladen. Um dies zu unterbinden
+Fehlende Modelle werden in der Android-App vom HuggingFace Hub geladen. Um dies zu unterbinden,
 können in der Datei `static/config.json` die betroffenen Features deaktiviert werden.
 
 Technische Umsetzung
@@ -173,11 +174,11 @@ Für die KI kommen folgende Bibliotheken und Modelle zum Einsatz:
 * **KI-Modelle:** Siehe [./static/models/index.json](static/models/index.json)
 
 Die Anwendung nutzt die high-level Pipeline API von transformers.js, da diese für jede
-Modellart die typischen Verarbeitungsschritte kapselt. Bei Bedarf könnte aber auf die
-low-lever `Model`/`Tokenizer`/…-Klassen gewechselt werden, durch Anpassung der Klasse
-`TransformersBackend`.
+Modellart die typischen Verarbeitungsschritte kapselt. Bei Bedarf könnte aber durch
+Anpassung der Klasse `TransformersBackend` auf die low-level
+`Model`/`Tokenizer`/…-Klassen gewechselt werden.
 
-Zusätzlich kann die App als Android App gepackt werden. Hierfür werden genutzt:
+Zusätzlich kann die App als Android-App gepackt werden. Hierfür werden genutzt:
 
 * **Capacitor:** https://capacitorjs.com/
 * **Android SDK:** https://developer.android.com/
@@ -190,7 +191,7 @@ Port von HuggingFace Transformers auf Android.
 Künftige Web APIs
 -----------------
 
-Aktuell bietet der Web-Plattform noch keine nativen APIs für die lokale Ausführung
+Aktuell bietet die Webplattform noch keine nativen APIs für die lokale Ausführung
 von Machine-Learning-Modellen. Dies könnte sich aber künftig ändern:
 
 * __W3C Web Machine Learning Group__
@@ -200,7 +201,7 @@ von Machine-Learning-Modellen. Dies könnte sich aber künftig ändern:
 
 * __Vorgeschlagene APIs (Auswahl)__
   * [Web Neural Network API](https://www.w3.org/TR/webnn/)
-  * [Danymic AI Offloading Protocol](https://github.com/webmachinelearning/daop)
+  * [Dynamic AI Offloading Protocol](https://github.com/webmachinelearning/daop)
   * [Prompt API](https://github.com/webmachinelearning/prompt-api)
   * [Writing Assistance API](https://github.com/webmachinelearning/writing-assistance-apis)
   * [WebMPC](https://github.com/webmachinelearning/webmcp)
@@ -211,8 +212,8 @@ Lessons Learned
 ### Web-Plattform
 
 * `Uint8Array.fromBase64()` wird von der Android Webview noch nicht durchgängig unterstützt.
-  Älteren Geräte, die seit einem Jahr keine Updates mehr erhalten haben (eine Pest im Android-Ökosystem!)
-  fehlen die Base64-Methoden, so dass hier auf eine kompliziertere Implementierung ausgewichen
+  Älteren Geräten, die seit einem Jahr keine Updates mehr erhalten haben (eine Pest im Android-Ökosystem!),
+  fehlen die Base64-Methoden, sodass hier auf eine kompliziertere Implementierung ausgewichen
   werden muss.
 
 * Die Ausführung großer Modelle (bereits um die 300 MB) mit Web Assembly blockiert den Browser
@@ -220,7 +221,7 @@ Lessons Learned
   Rendering statt. Deshalb scheint unsere Stoppuhr nicht zu laufen und auch die gestreamten
   Texte werden nicht angezeigt. Getestet mit Firefox Desktop und Chrome Desktop.
 
-* Memory Preasure: Die Performance bricht drastisch ein, wenn ein Modell nicht vollständig in den
+* Memory Pressure: Die Performance bricht drastisch ein, wenn ein Modell nicht vollständig in den
   RAM geladen werden kann und das Betriebssystem auf Swap Space ausweichen muss. Dies kann auch
   passieren, wenn man in einer Session zwischen mehreren Modellen wechselt.
 
@@ -251,8 +252,8 @@ Lessons Learned
   Die Implementierung läuft auch nur auf der CPU, weil die ONNX Runtime für Android noch keinen
   stabilen GPU/TPU-Support hat.
 
-* Auf Geräten mit Qualcomm Snapdragon könnte `ennxruntime-android-qnn` zusammen mit Speziell
-  für diese Runtime compilierten Modellen genutzt werden, um die Modelle zu beschleunigen.
+* Auf Geräten mit Qualcomm Snapdragon könnte `onnxruntime-android-qnn` zusammen mit speziell
+  für diese Runtime kompilierten Modellen genutzt werden, um die Modelle zu beschleunigen.
   Das ist aber keine allgemeine Lösung.
 
 * ONNX GenAI muss aktuell aus den Quellcodes gebaut werden. Die API ist auch noch im Fluss.
@@ -266,11 +267,11 @@ Lessons Learned
 * transformers.js benötigt die Modelle im ONNX-Format, da es sich um Grunde genommen um
   einen Wrapper um ONNX handelt.
   
-* Dies generell ein Learning zur Nutzung von ML-Modellen: Jede Runtime (Inferenz Engine)
+* Dies ist generell ein Learning zur Nutzung von ML-Modellen: Jede Runtime (Inferenz-Engine)
   definiert ihr eigenes Datenformat für die Modelle. Eine Konvertierung ist oft möglich,
   muss jedoch für jedes Modell individuell geprüft werden.
 
-* Um wirklich alle kompatiblem Modelle zu finden, muss man auf HuggingFace unter "Libraries"
+* Um wirklich alle kompatiblen Modelle zu finden, muss man auf HuggingFace unter "Libraries"
   nach beidem getrennt suchen, da ONNX und transformers.js zwei Filtereinträge sind. Wählt man
   aber beide aus, erhält man nur Treffer, die auch beides in ihren Metadaten deklarieren.
 
@@ -295,11 +296,11 @@ Lessons Learned
   Modelle sind auf Englisch trainiert. Zum Beispiel: `Xenova/distilbart-xsum-12-1`
   generiert bei einem deutschen Text nur Müll.
 
-* transformers.js besitzt für viele Modelle, in der Dokumentation nicht erwähnte, feste
+* transformers.js besitzt für viele Modelle feste, in der Dokumentation nicht erwähnte
   Konfigurationen im Code. Die Hoffnung ist, dass andere Modelle trotzdem nutzbar sind.
 
 * transformers.js Version 4.2.0, basierend auf ONNX Runtime 1.25+: Unter Web Assembly lassen
-  sich damit nur Modelle vom Typ FP32 laden. Der Versuch, ein quantisiertes Modell zu laden
+  sich damit nur Modelle vom Typ FP32 laden. Der Versuch, ein quantisiertes Modell zu laden,
   schlägt mit „TransposeDQWeightsForMatMulNBits Missing required scale“ fehl, weil in ONNX ein
   Optimierungsdurchlauf eingeführt wurde, der bestimmte Skalierungstensoren in quantisierten
   Modellen erwartet, die ältere quantisierte Exporte nicht bereitstellen.
@@ -320,9 +321,9 @@ Lessons Learned
   eignen sich nicht alle Sprachmodelle bzw. deren Repräsentationen gleichermaßen
   für semantische Suche. Insbesondere sind die erzeugten Token-Repräsentationen
   nicht automatisch so trainiert, dass sich daraus durch einen einfachen
-  Vektorenvergleich sinnvolle semantische Ähnlichkeiten ergeben.
+  Vektorvergleich sinnvolle semantische Ähnlichkeiten ergeben.
 
-* Sentence Transformer Modelle eignen sich besonders gut für semantische
+* Sentence-Transformer-Modelle eignen sich besonders gut für semantische
   Suche, da sie speziell darauf trainiert wurden, semantisch ähnliche Texte im
   Embedding-Raum nahe beieinander abzubilden. Dazu werden entsprechende
   Trainingsverfahren und ein für den Vergleich geeigneter Embedding-Output
@@ -358,8 +359,8 @@ Lessons Learned
 
   Vgl. [transformers.js: maths.dot()](https://huggingface.co/docs/transformers.js/api/utils/maths#module_utils/maths.dot)
 
-* Die Qualität der semantischen Suche hängt, wie zu erwarten, vom verwendeten Embedding
-  Modell ab und ob dieses Synonyme für die verwendeten Begriffe kennt. Das kleine Modell
+* Die Qualität der semantischen Suche hängt, wie zu erwarten, vom verwendeten Embedding-
+  Modell ab und davon, ob dieses Synonyme für die verwendeten Begriffe kennt. Das kleine Modell
   `sentence-transformers/all-MiniLM-L6-v2` scheint zum Beispiel `WWW` und `World Wide Web`
   als Synonyme zu kennen, `IoT` und `Internet of Things` aber nicht. Dennoch sinkt die
   Trefferwahrscheinlichkeit deutlich, wenn man `WWW` sucht, im Text aber `World Wide Web`
@@ -369,7 +370,7 @@ Lessons Learned
 
 * Die im ONNX-Format verfügbaren Modelle auf HuggingFace sind alle nur auf englischen
   Texten trainiert. Deutsche Texte werden daher wörtlich wiedergegeben und nach einer
-  Festen länge abgebrochen.
+  festen Länge abgebrochen.
 
 * Lediglich `Shahm/bart-german` scheint auf einem deutschen Datensatz trainiert zu sein.
   Das Repository hat aber nicht die von transformers.js erwartete Struktur.
@@ -377,7 +378,7 @@ Lessons Learned
 * In anderen Formaten als ONNX gibt es zumindest eine kleine Auswahl. `deutsche-telekom/mt5-small-sum-de-en-v2`
   wurde für diesen Test ins ONNX-Format konvertiert. Die FP32-Variante ist aber 1,8 GB groß.
 
-  * int8: ca. 1,4 GB. In Firefox Desktop crash der Tab beim Laden.
+  * int8: ca. 1,4 GB. In Firefox Desktop stürzt der Tab beim Laden ab.
 
   * q4f16: ca. 600 MB. Lässt sich aber nicht laden.
 
@@ -385,7 +386,7 @@ Lessons Learned
     Error: Can't create a session. ERROR_CODE: 1, ERROR_MESSAGE: Type Error: Type (tensor(float16)) of output arg (/block.0/layer.0/layer_norm/Cast_output_0) of node (/block.0/layer.0/layer_norm/Cast) does not match expected type (tensor(float)).
     ```
 
-  * fp16: ca. 817 MB. Lässt sich mit derselben Fehlermeldung nicht laden
+  * fp16: ca. 817 MB. Lässt sich mit derselben Fehlermeldung nicht laden.
 
   * q4: ca. 1,1 GB. Lässt sich laden, aber die Datei `tokenizer_config.json` fehlt.
     Die Generierung bricht daher mit `TypeError: tokenizer is not a function` ab.
@@ -394,13 +395,13 @@ Lessons Learned
 
 * `Shahm/t5-small-german` konnte erfolgreich konvertiert und getestet werden. Die besonders
   kleinen `q4` und `bnb4`-Varianten erzeugen allerdings keinen Text. Und die Zusammenfassungen
-  sind dast immer nur einen Satz lang. 🙂
+  sind fast immer nur einen Satz lang. 🙂
 
 * Lässt man das Modell zu wenig Token erzeugen (zum Beispiel nur zehn), wird der Text
   abgeschnitten. Generell scheint das Modell darauf ausgelegt zu sein, eine Textstelle
   aus der Anfrage zu extrahieren.
 
-* Generell scheint es keine guten deutschsprachigen Modelle zu geben, oder diese sind
+* Generell scheint es keine guten deutschsprachigen Modelle zu geben oder sie sind
   für die Nutzung im Browser zu groß (1,5 GB und mehr). Von daher ist "summarization"
   mit `Shahm/t5-small-german` zwar machbar. Die Zusammenfassung ist aber zu kurz.
   
@@ -415,12 +416,12 @@ Lessons Learned
 ### Fragen beantworten
 
 * Die Modelle versuchen, eine einzelne Textpassage zu finden, die die gegebene
-  Frage zu beantworten scheint. Diese wird nahezu wörtlich wiedergeben, auch wenn
-  es sich dabei nur um Satzschnippsel handelt.
+  Frage zu beantworten scheint. Diese wird nahezu wörtlich wiedergegeben, auch wenn
+  es sich dabei nur um Satzschnipsel handelt.
 
 * Das kleine Modell `onnx-community/all-MiniLM-L12-v2-qa-all-ONNX`
   schneidet relativ gut ab, liefert aber nur einen sehr kleinen Textausschnitt.
-  Es scheint aber mit Umlauten und Groß-/Kleinschreibung probleme zu haben, da
+  Es scheint aber mit Umlauten und Groß-/Kleinschreibung Probleme zu haben, da
   die Antworten grundsätzlich kleingeschrieben und ohne Umlaute sind.
 
 * Das größere Modell `dewdev/mdeberta-v3-base-squad2-onnx`
@@ -428,7 +429,7 @@ Lessons Learned
 
 ### Text übersetzen
 
-* `huggingworld/m2m100_418M` generiert bei zu großer Eingabe nur Giberish. Gut funktioniert
+* `huggingworld/m2m100_418M` generiert bei zu großer Eingabe nur Gibberish. Gut funktioniert
   die Seite "Aus was besteht ein Computer?", auch wenn die Übersetzung nicht perfekt ist.
   Die anderen Seiten sind wohl zu groß. Es wiederholt sich immer dieselbe Anfangszeichenkette.
 
@@ -438,7 +439,7 @@ Lessons Learned
   falsch und enthält viele Rechtschreibfehler.
 
 * Firefox 157 unter Linux generiert keine Antwort, wenn das Modell auf der GPU ausgeführt
-  wird. Anscheinend fließen nie Daten zurück an die CPU, so dass diese nicht erkennt, wenn
+  wird. Anscheinend fließen nie Daten zurück an die CPU, sodass diese nicht erkennt, wenn
   das Modell fertig ist.
 
 ### Chat
@@ -449,7 +450,7 @@ Lessons Learned
   * T5-Style: [`text2text-generation`-Pipeline](https://huggingface.co/docs/transformers.js/main/en/api/pipelines?utm_source=chatgpt.com#module_pipelines.Text2TextGenerationPipeline)
   * GPT-Style (CausalLM): [`text-generation`-Pipeline](https://huggingface.co/docs/transformers.js/main/en/api/pipelines?utm_source=chatgpt.com#module_pipelines.TextGenerationPipeline)
 
-* Die `text2text-generation`-Pipeline erwartet die Eingabenachricht einfach als String,
+* Die `text2text-generation`-Pipeline erwartet die Eingabenachricht einfach als String
   oder als String-Array mit mehreren Nachrichten.
 
 * Die `text-generation`-Pipeline kann alternativ `Chat`-Objekte, die den Nachrichten
@@ -480,7 +481,7 @@ Lessons Learned
   fine-tuned from the same base model!
   ```
 
-* Allerdings hängt es vom Modell ab, ob es "Instruction Tuned" ist und somit einen
+* Allerdings hängt es vom Modell ab, ob es "Instruction Tuned" ist und somit eine
   Chat-Struktur als Eingabe erwartet. Ist ein Modell nicht "Instruction Tuned",
   besitzt es auch kein Chat-Template und kann folglich nur mit einem einfachen
   String als Eingabe aufgerufen werden.
@@ -492,10 +493,10 @@ Lessons Learned
   beider Modelle sind (in allen Sprachen) ausführlicher als bei den anderen Modellen.
 
 * Qwen scheint auch ganz gute Antworten mit Bezug auf eine Textseite als Kontext zu liefern.
-  Insgesamt schneidet es von den getesteten Mini-LLM am besten ab.
+  Insgesamt schneidet es von den getesteten Mini-LLMs am besten ab.
 
 * `onnx-community/SmolLM2-135M-Instruct-ONNX` hat eine gute Geschwindigkeit. Das Modell
-  ist auch sehr klein (ca. 200 MB).  Die Qualität der Antworten schwank stark, von gut
+  ist auch sehr klein (ca. 200 MB). Die Qualität der Antworten schwankt stark, von gut
   bis mehr oder weniger Blödsinn.
 
 * `Xenova/LaMini-Flan-T5-783M` generiert sehr kurze Antworten. Dennoch ist es sehr langsam.
@@ -506,13 +507,13 @@ Lessons Learned
   heraus, wenn auch noch kürzer als `Xenova/LaMini-Flan-T5-783M`. Mit Kontext liefert es
   längere und bessere Antworten, in Summe aber trotzdem nicht befriedigend.
 
-* Die getesteten `text2text-generation`-Modelle schneiden allesamt schlechter ab, als die
+* Die getesteten `text2text-generation`-Modelle schneiden allesamt schlechter ab als die
   LLM-artigen `text-generation`-Modelle. Die Antworten sind kurz (nur ein/zwei Sätze) und
   brauchen lange für die Generierung.
 
 #### Testfall: "What is HTML?"
 
-Um einen wiederholbaren Test zu erhalten, wird der Browser für jedes Modells neugestartet
+Um einen wiederholbaren Test zu erhalten, wird der Browser für jedes Modell neu gestartet
 und es wird nur die Chat-Seite für einen freien Chat ohne Kontext geöffnet und das Modell
 geladen. Danach werden folgende Nachrichten eingegeben.
 
@@ -523,17 +524,17 @@ geladen. Danach werden folgende Nachrichten eingegeben.
 Es wird nur die Performance gemessen, nicht die Qualität der Antwort. Die Parameter sind:
 
 * Max Tokens: Unbegrenzt
-* Temperator: 0,3
-* Strafe für Widerholungen: 1,1
+* Temperatur: 0,3
+* Strafe für Wiederholungen: 1,1
 * Sampling: Aktiv
 * Ausführung: WebGPU
 * Quantisierung: q4
 
 Hier die Messergebnisse, gemessen unter Fedora Linux mit Firefox 157 auf einem Lenovo E580
-mit folgender Ausstattung: 4x Intel(R) Core(TM) i7-8550U CPU @ 1.80GHz (mit Hypethreading),
+mit folgender Ausstattung: 4x Intel(R) Core(TM) i7-8550U CPU @ 1.80GHz (mit Hyperthreading),
 16 GB RAM, 2 GB GPU, Baujahr 2018.
 
-| Art       | Modell                                                    | Größe     | Frage | Tokens |Erstes Token | Tokens/Sek | Dauer     |
+| Art       | Modell                                                    | Größe     | Frage | Tokens | Erstes Token | Tokens/Sek | Dauer     |
 |-----------|-----------------------------------------------------------|----------:|------:|-------:|------------:|-----------:|----------:|
 | Text-Gen  | `onnx-community/SmolLM2-135M-Instruct-ONNX`               |  175,6 MB |     1 |    323 |       0,31s |       8,79 |    37,06s |
 |           |                                                           |           |     2 |    351 |       0,23s |       9,25 |    38,16s |
@@ -581,20 +582,20 @@ braucht vergleichsweise lang (ca. 5 Sekunden bei Qwen3, 1,5 Sekunden für die se
 Ab der zweiten Anfrage ist die Performance ähnlich wie unter Linux, aber ein klein wenig langsamer
 (Qwen3 ca. 6 Token/Sekunde).
 
-Chrome unter Windows hat die Kaltsstartprobleme nicht und läuft teilweise sogar etwas schneller
+Chrome unter Windows hat die Kaltstartprobleme nicht und läuft teilweise sogar etwas schneller
 als Firefox unter Linux (Qwen3 ca. 10 Token/Sekunde).
 
 ### Alle Modelle
 
-Anders als bei den meisten LLMs, sind die hier verwendeten kleinen Modelle nicht gut darin,
-Markdown-Syntax zu verarbeiten oder zu erzeugen. Von den getesteten LLM kommen alle damit
+Anders als bei den meisten LLMs sind die hier verwendeten kleinen Modelle nicht gut darin,
+Markdown-Syntax zu verarbeiten oder zu erzeugen. Von den getesteten LLMs kommen alle damit
 zurecht, außer `teapotai/teapotllm`.
 
 Die Modelle lassen sich in drei Grundarchitekturen einordnen, gemäß untenstehender Tabelle.
 
 | Modellarchitektur         | High-Level Pipelines                                   | Low-Level AutoModel           |
 |---------------------------|--------------------------------------------------------|-------------------------------|
-| Encoder-only              | z.B. `feature-extraction`, `text-classification`       | `AutoModel` / task-spezifisch |
+| Encoder-only              | z. B. `feature-extraction`, `text-classification`      | `AutoModel` / task-spezifisch |
 | Encoder-decoder / Seq2Seq | `text2text-generation`, `translation`, `summarization` | `AutoModelForSeq2SeqLM`       |
 | Decoder-only / Causal LM  | `text-generation`                                      | `AutoModelForCausalLM`        |
 
@@ -610,8 +611,8 @@ wie die folgende Tabelle zeigt:
 | `onnx-community/Apertus-v1.1-0.5B-Instruct-QAD-INT4-ONNX` |   702,6 MB |     ~ 9,88 |
 | `onnx-community/Apertus-v1.1-1.5B-Instruct-QAD-INT4-ONNX` |  1780,9 MB |     ~ 5,34 |
 
-Obwohl Qwen das größte Modell ist, läuft es schnellsten, da es im Vergleich zui SmolLM2
-eine sehr optimierte Architektur besitzt: Weniger Nodes und auch höherwertige Nodes, die
+Obwohl Qwen das größte Modell ist, läuft es am schnellsten, da es im Vergleich zu SmolLM2
+eine sehr optimierte Architektur besitzt: weniger Nodes und auch höherwertige Nodes, die
 in einem Schritt komplexe Berechnungen bündeln.
 
 Das Problem bei BananaMind ist, dass es nach jedem Attention Layer explizite `IsNaN`-Prüfungen
@@ -621,7 +622,7 @@ wesentlich mehr Zeit als die restlichen Berechnungen auf der GPU. Mit WASM ausge
 die Leistung auf ca. 6,3 Token/Sekunden. Der Browser friert dabei aber komplett ein (wie bei
 allen auf WASM ausgeführten Modellen).
 
-Zahlen ermittelt mit den Debug Logs beim Laden der Modell und Copilot. Die Logs liegen unter
+Die Zahlen wurden anhand der Debug-Logs beim Laden der Modelle und mit Copilot ermittelt. Die Logs liegen unter
 `logs/**/debug-loading.log`. Getestet mit Firefox 157 unter Fedora Linux.
 
 | Graph-Knoten              | SmolLM2 | Qwen3 | BananaMind |
@@ -642,7 +643,7 @@ unter Windows (AMD Ryzen) läuft es sehr langsam mit nur 0,42 Tokens/Sekunde.
 Testfragen
 ----------
 
-Gute Testfragen zum Prüfen von Halluzinationen (und davon gibt es einige bei den kleinen LLM):
+Gute Testfragen zum Prüfen von Halluzinationen (und davon gibt es einige bei den kleinen LLMs):
 
 1. What is HTML?
 2. What is the Internet of Things?
@@ -667,7 +668,7 @@ Da wird der DX7 schon mal zu einer winzigen E-Gitarre (Qwen) 🤣:
 
 Großer Unsinn selbstsicher vorgetragen.
 
-Testfragen spezifisch zu einer Seite (Anfrage mit Kontext):
+Testfragen zu einer bestimmten Seite (Anfrage mit Kontext):
 
 1. __English / Internet of Things:__ Please summarize.
 2. __English / What Makes Up a Computer?:__ How does this relate to a generic laptop or PC?
@@ -691,9 +692,9 @@ TODOs
 -----
 
 Performance messen wie oben und zusätzlich die Qualität mit Fragen wie
-(jede davon auf einer Ordinalskala mit festen Kritieren bewertet):
+(jede davon auf einer Ordinalskala mit festen Kriterien bewertet):
 
-* Ist der generiere Markdown-Code syntaktisch korrekt?
+* Ist der generierte Markdown-Code syntaktisch korrekt?
 * Ist die Antwort sprachlich korrekt (Rechtschreibung, Grammatik, Zeichensetzung)?
 * Ist die Antwort inhaltlich korrekt?
 * Deckt die Antwort den Sinn der Frage ab?
@@ -706,51 +707,50 @@ Fazit
 -----
 
 Kleinere Anwendungsfälle, die mit Modellen unter 1 GB auskommen, lassen sich auf mobilen Geräten
-innerhalb einer Webawendung lokal ausführen. Allerdings mit Einschränkungen:
+innerhalb einer Webanwendung lokal ausführen. Allerdings mit Einschränkungen:
 
-* Das Ökosystem entwickelt sich schnell weiter. Aber in Folge daraus, ist es auch nicht
-  immer stabil, was die durch ONNX 1.25 ausgelösten Fehlermeldungen zeigen, die monatelang
+* Das Ökosystem entwickelt sich schnell weiter. Infolgedessen ist es aber auch nicht
+  immer stabil, wie die durch ONNX 1.25 ausgelösten Fehlermeldungen zeigen, die monatelang
   in Transformers.js nicht gefixt wurden.
 
 * Es funktioniert nicht mit jedem Browser. Chrome Mobile hat bisher am besten funktioniert.
-  Firefox Mobile am schlechtesten (Abstürze, keine WASM SIMD-Unterstützen auf älteren Geräten, ... ).
+  Firefox Mobile am schlechtesten (Abstürze, keine WASM-SIMD-Unterstützung auf älteren Geräten, ...).
 
 * Unter Desktop Linux ist es aktuell genau andersrum: Firefox 155+ schneidet wesentlich
   besser ab als Chromium 154, da WebGPU nahezu vollständig unterstützt wird. In Chromium
   muss der WebGPU-Support aktuell noch unter [chrome://flags](chrome://flags) `Unsafe WebGPU Support`
-  aktiviert werden. Die Performance ist aber unterirdisch (nur 0,2 Token/Sekunde im Verlgleich
-  zui 9 Token/Sekunde unter Firefox).
+  aktiviert werden. Die Performance ist aber unterirdisch (nur 0,2 Token/Sekunde im Vergleich
+  zu 9 Token/Sekunde unter Firefox).
 
-* Speicher ist sehr knapp. Mehrere Modelle können daher nicht praktikabel im Speicher
-  gehalten werden, sondern die Modelle regelmäßig neu geladen werden. Neben der Wartezeit
+* Speicher ist sehr knapp. Mehrere Modelle können daher nicht praktikabel gleichzeitig im Speicher
+  gehalten werden, sondern müssen regelmäßig neu geladen werden. Neben der Wartezeit
   erhöht dies auch den Traffic.
 
 * WASM: Der Browser friert ein, während ein Modell ausgeführt wird. Es findet kein Rendering
   und somit auch keine Aktualisierung der Anzeige statt, während ein Modell läuft.
-  Die Ausführung auf der CPU macht daher nur bei sehr kleinen Modelle, wie z.B. bei der
-  semantische Suche Sinn.
+  Die Ausführung auf der CPU macht daher nur bei sehr kleinen Modellen, wie z. B. bei der
+  semantischen Suche Sinn.
 
-* Die getesteten, kleinen Modelle für spezielle Anwendungen (Übersetzung, Zusammenfassung,
+* Die getesteten kleinen Modelle für spezielle Anwendungen (Übersetzung, Zusammenfassung,
   Fragen beantworten) sind vergleichsweise langsam und liefern keine befriedigenden
-  Ergebnisse. Die getesteten kleinen LLM waren hier sowohl schneller aus auch besser.
+  Ergebnisse. Die getesteten kleinen LLMs waren hier sowohl schneller als auch besser.
 
-* Fine Tuning oder die Entwicklung eigener Modelle wären die nächsten logischen Schritte,
+* Fine-Tuning oder die Entwicklung eigener Modelle wären die nächsten logischen Schritte,
   um kleine Modelle für spezialisierte Anforderungen zu erstellen. Das Ziel müsste vermutlich
-  sein, ein mittelgroßes LLM (17B bis 33B) so abzuspecken, dass aus auf dem Device laufen
+  sein, ein mittelgroßes LLM (17B bis 33B) so abzuspecken, dass es auf dem Device laufen
   könnte, um halbwegs zufriedenstellende Ergebnisse zu liefern. In absehbarer Zeit ist das
   für mobile Endgeräte und die Ausführung im Web-Browser eher unwahrscheinlich.
 
-* Interessante Ansätze in diese Richtung könnten 1,5bit-Modelle sein, da sie deutlich
-  kompakter als die herkömmlichen Modelle sind, z.B. `Bonsai-27B-mlx-1bit`
+* Interessante Ansätze in diese Richtung könnten 1,5-Bit-Modelle sein, da sie deutlich
+  kompakter als die herkömmlichen Modelle sind, z. B. `Bonsai-27B-mlx-1bit`.
 
-* Generell sind die kleineren, offenen Modelle in der großen Mehrzahl auf englisch
-  trainiert. Explizit deutschsprachige Modelle sind selten und die Qualität ist auch
-  nicht sehr hoch.
+* Generell sind die meisten kleineren, offenen Modelle auf Englisch trainiert.
+  Explizit deutschsprachige Modelle sind selten und die Qualität ist auch nicht sehr hoch.
 
 Copyright
 ---------
 
 **Web/Mobile-Test für lokale KI** <br>
 © 2026 Dennis Schulmeister-Zimolong <[dennis@wpvs.de](mailto:dennis@wpvs.de)> <br>
-[Quellcode Lizenziert unter BSD 3-Clause](.LICENCE) <br>
+[Quellcode lizenziert unter BSD 3-Clause](.LICENCE) <br>
 Beispieldaten lizenziert unter CC-BY 4.0, http://creativecommons.org/licenses/by/4.0/
