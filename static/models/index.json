@@ -187,6 +187,21 @@
                     "include": false
                 }
             }
+        },
+        {
+            "modelId": "onnx-community/gemma-4-E2B-it-ONNX",
+            "dtypes": ["q4"],
+            "instructionTuned": true,
+            "systemPrompt": "You are a helpful assistant.",
+            "engines": {
+                "transformers.js": {
+                    "supported": true
+                },
+                "onnx-android": {
+                    "supported": true,
+                    "include": false
+                }
+            }
         }
     ],
     "text2text-generation": [
