@@ -7,6 +7,8 @@
 from django.db                import models
 from django.utils.translation import gettext_lazy as _
 from django.utils             import timezone
+from django.core.validators   import MaxValueValidator
+from django.core.validators   import MinValueValidator
 
 class TestRun(models.Model):
     """A single testrun: Root for all other information"""
@@ -76,7 +78,7 @@ class Event(models.Model):
     class Meta:
         verbose_name        = _("Test Event")
         verbose_name_plural = _("Test Events")
-        ordering            = ["test_run", "timestamp"]
+        ordering            = ["testrun", "timestamp"]
         get_latest_by       = "timestamp"
 
     def __str__(self):
@@ -116,7 +118,7 @@ class EventException(models.Model):
     def __str__(self):
         return self.name
 
-class StartTestRunEvent(Event, EventMixin):
+class StartTestRunEvent(EventMixin, Event):
     """Event: Start Testrun"""
     class Meta:
         verbose_name        = _("Start Testrun Event")
@@ -125,7 +127,7 @@ class StartTestRunEvent(Event, EventMixin):
     def save(self, *args, **kwargs):
         return super().save(self.EventType.START_TESTRUN, *args, **kwargs)
 
-class PageNavigationEvent(Event, EventMixin):
+class PageNavigationEvent(EventMixin, Event):
     """Event: Page Navigation"""
     page_url = models.CharField(_("Page URL"), max_length=50)
 
@@ -139,7 +141,7 @@ class PageNavigationEvent(Event, EventMixin):
     def save(self, *args, **kwargs):
         return super().save(self.EventType.PAGE_NAVIGATION, *args, **kwargs)
 
-class GetInformationEvent(Event, EventMixin):
+class GetInformationEvent(EventMixin, Event):
     """Event: Get engine information (head)"""
     engine_id   = models.CharField(_("Technical Id"), max_length=25)
     engine_name = models.CharField(_("Name"), max_length=25)
@@ -172,7 +174,7 @@ class GetInformationLine(models.Model):
     def __str__(self):
         return t"{self.label}: {self.value}"
 
-class LoadModelEvent(Event, EventMixin):
+class LoadModelEvent(EventMixin, Event):
     """Event: Load Model"""
     class PipelineType(models.TextChoices):
         SUMMARIZATION        = "summarization",        _("Summarization")
@@ -209,7 +211,7 @@ class LoadModelEvent(Event, EventMixin):
     def save(self, *args, **kwargs):
         return super().save(self.EventType.LOAD_MODEL, *args, **kwargs)
 
-class SemanticSearchEvent(Event, EventMixin):
+class SemanticSearchEvent(EventMixin, Event):
     """Event: Semantic Search"""
     model                = models.ForeignKey(LoadModelEvent, on_delete=models.SET_NULL, blank=True, null=True)
     query                = models.CharField(_("Query"), max_length=255, blank=True)
@@ -228,13 +230,15 @@ class SemanticSearchEvent(Event, EventMixin):
     def save(self, *args, **kwargs):
         return super().save(self.EventType.SEMANTIC_SEARCH, *args, **kwargs)
 
+similarity_validators = [MinValueValidator(0), MaxValueValidator(100)]
+
 class SemanticSearchResult(models.Model):
     """Event: Semantic Search (Result Line)"""
     parent     = models.ForeignKey(SemanticSearchEvent, on_delete=models.CASCADE, related_name="results")
     seqnr      = models.IntegerField(_("Sequence Number"))
     page_url   = models.CharField("_Page URL", max_length=50)
     page_title = models.CharField(_("Page Title"), max_length=255)
-    similarity = models.SmallIntegerField(_("Similarity in %"), min=0, max=100)
+    similarity = models.SmallIntegerField(_("Similarity in %"), validators=similarity_validators)
 
     class Meta:
         verbose_name        = _("Result Line")
@@ -255,7 +259,7 @@ class SemanticSearchMatch(models.Model):
     seqnr      = models.IntegerField(_("Sequence Number"))
     text       = models.CharField(_("Matched Text"), max_length=255)
     text_type  = models.CharField(_("Text Type"), max_length=15, choices=TextType)
-    similarity = models.SmallIntegerField(_("Similarity in %"), min=0, max=100)
+    similarity = models.SmallIntegerField(_("Similarity in %"), validators=similarity_validators)
 
     class Meta:
         verbose_name        = _("Matched Text")
@@ -266,7 +270,7 @@ class SemanticSearchMatch(models.Model):
     def __str__(self):
         return t"{self.text}: {self.similarity}%"
 
-class RunPipelineEvent(Event, EventMixin):
+class RunPipelineEvent(EventMixin, Event):
     """Event: Run pipeline (not chat) event"""
     model           = models.ForeignKey(LoadModelEvent, on_delete=models.SET_NULL, blank=True, null=True)
     page_url        = models.CharField(_("Page URL"), max_length=50)
@@ -288,7 +292,7 @@ class RunPipelineEvent(Event, EventMixin):
     def save(self, *args, **kwargs):
         return super().save(self.EventType.RUN_PIPELINE, *args, **kwargs)
 
-class StartChatEvent(Event, EventMixin):
+class StartChatEvent(EventMixin, Event):
     """Event: Start Chat"""
     class Meta:
         verbose_name        = _("Start Chat Event")
@@ -297,7 +301,7 @@ class StartChatEvent(Event, EventMixin):
     def save(self, *args, **kwargs):
         return super().save(self.EventType.START_CHAT, *args, **kwargs)
 
-class ChatMessageEvent(Event, EventMixin):
+class ChatMessageEvent(EventMixin, Event):
     """Event: Chat Message"""
     model             = models.ForeignKey(LoadModelEvent, on_delete=models.SET_NULL, blank=True, null=True)
     chat              = models.ForeignKey(StartChatEvent, on_delete=models.CASCADE)
@@ -362,7 +366,7 @@ class QualityAssessment(models.Model):
     class Meta:
         verbose_name        = _("Quality Assessment")
         verbose_name_plural = _("Quality Assessments")
-        ordering            = ["test_run", "timestamp"]
+        ordering            = ["message__chat__testrun", "timestamp"]
         get_latest_by       = "timestamp"
 
     def __str__(self):

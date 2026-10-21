@@ -129,7 +129,7 @@ class SemanticSearchResultSerializer(ModelSerializer):
 
         # Cannot use "__all__" here because that would mark the parent attribute as required.
         # But the parent shall be invisible to the client and be added during saving, instead.
-        fields = ["seqnr", "page_url", "page_title", "similarity"]
+        fields = ["seqnr", "page_url", "page_title", "similarity", "matches"]
         read_only_fields = ["id"]
 
     # Must match the related_name of the relation

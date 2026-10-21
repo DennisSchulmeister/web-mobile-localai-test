@@ -35,9 +35,9 @@ class AccessCodeCheckingModelSerializer(ValidatingModelSerializer):
                 "access_code": _("The access code in the request header must match the access code for the requested object."),
             })
 
-        return super.validate(attrs)
+        return super().validate(attrs)
 
-class AccessCodeCheckingModelSerializer(ValidatingModelSerializer):
+class AccessCodeSerializer(AccessCodeCheckingModelSerializer):
     class Meta:
         model  = models.AccessCode
         fields = "__all__"

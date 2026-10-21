@@ -19,6 +19,8 @@ class ValidatingModelSerializer(ModelSerializer):
 
         if self.instance is not None:
             # Include existing values so partial updates are checked as a whole.
+            candidate._state.adding = False
+
             for field in candidate._meta.concrete_fields:
                 setattr(candidate, field.attname, getattr(self.instance, field.attname))
 
