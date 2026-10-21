@@ -28,7 +28,7 @@ class AbstractEventViewSet(viewsets.ModelViewSet):
 
         if access_code is not None:
             testrun = self.get_testrun_lookup_path()
-            filter  = {t"{testrun}__access_code__access_code": access_code}
+            filter  = {f"{testrun}__access_code__access_code": access_code}
 
             return self.queryset.filter(**filter)
         else:
