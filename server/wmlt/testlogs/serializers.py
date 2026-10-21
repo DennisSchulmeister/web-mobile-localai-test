@@ -8,9 +8,7 @@ from .                          import models
 from ..auth.serializers         import AccessCodeCheckingModelSerializer
 
 from django.db                  import transaction
-
 from rest_framework.serializers import ModelSerializer
-from rest_framework.serializers import ValidationError
 
 class TestRunSerializer(AccessCodeCheckingModelSerializer):
     class Meta:
@@ -25,18 +23,16 @@ class TestRunSerializer(AccessCodeCheckingModelSerializer):
 
 class AbstractEventSerializer(AccessCodeCheckingModelSerializer):
     def get_testrun(self, attrs):
-        if (testrun_pk := attrs.get("testrun", None) is not None):
-            try:
-                return models.TestRun.objects.get(pk = testrun_pk)
-            except models.TestRun.DoesNotExist as error:
-                detail = error.message_dict if hasattr(error, "message_dict") else error.messages
-                raise ValidationError(detail) from error
+        if (testrun := attrs.get("testrun", None)) is not None:
+            return testrun
+        elif self.instance is not None:
+            return self.instance.testrun
         else:
             return None
 
     def get_access_code_from_request_body(self, attrs):
-        if (testrun := self.get_testrun(attrs) is not None):
-            return testrun.access_code
+        if (testrun := self.get_testrun(attrs)) is not None and testrun.access_code is not None:
+            return testrun.access_code.access_code
         else:
             return None
 
@@ -53,16 +49,17 @@ class EventExceptionSerializer(AbstractEventSerializer):
     def get_testrun(self, attrs):
         """``EventException`` is no event in itself, but is related to an event whose testrun
         must match the access code presented in the HTTP request header."""
-        if (event_pk := attrs.get("event", None)) is not None:
-            try:
-                event = models.Event.objects.get(pk = event_pk)
-            except models.Event.DoesNotExist as error:
-                detail = error.message_dict if hasattr(error, "message_dict") else error.messages
-                raise ValidationError(detail) from error
-
+        if (event := attrs.get("event", None)) is not None:
             return event.testrun
+        elif self.instance is not None:
+            return self.instance.event.testrun
         else:
             return None
+
+class StartTestRunEventSerializer(AbstractEventSerializer):
+    class Meta:
+        model  = models.StartTestRunEvent
+        fields = "__all__"
 
 class PageNavigationEventSerializer(AbstractEventSerializer):
     class Meta:
@@ -180,6 +177,11 @@ class RunPipelineEventSerializer(AbstractEventSerializer):
         model  = models.RunPipelineEvent
         fields = "__all__"
 
+class StartChatEventSerializer(AbstractEventSerializer):
+    class Meta:
+        model  = models.StartChatEvent
+        fields = "__all__"
+
 class ChatMessageEventSerializer(AbstractEventSerializer):
     class Meta:
         model  = models.ChatMessageEvent
@@ -193,13 +195,9 @@ class QualityAssessmentSerializer(AbstractEventSerializer):
     def get_testrun(self, attrs):
         """``QualityAssessment`` is no event in itself, but is related to an event whose
         testrun must match the access code presented in the HTTP request header."""
-        if (message_pk := attrs.get("message", None)) is not None:
-            try:
-                message = models.Event.objects.get(pk = message_pk)
-            except models.Event.DoesNotExist as error:
-                detail = error.message_dict if hasattr(error, "message_dict") else error.messages
-                raise ValidationError(detail) from error
-
+        if (message := attrs.get("message", None)) is not None:
             return message.testrun
+        elif self.instance is not None:
+            return self.instance.message.testrun
         else:
             return None

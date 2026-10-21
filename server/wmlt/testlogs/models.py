@@ -4,7 +4,6 @@
 # This source code is licensed under the BSD 3-Clause License found in the
 # LICENSE file in the root directory of this source tree.
 
-from django.core.exceptions   import ValidationError
 from django.db                import models
 from django.utils.translation import gettext_lazy as _
 from django.utils             import timezone
@@ -139,7 +138,6 @@ class PageNavigationEvent(Event, EventMixin):
 
     def save(self, *args, **kwargs):
         return super().save(self.EventType.PAGE_NAVIGATION, *args, **kwargs)
-
 
 class GetInformationEvent(Event, EventMixin):
     """Event: Get engine information (head)"""
