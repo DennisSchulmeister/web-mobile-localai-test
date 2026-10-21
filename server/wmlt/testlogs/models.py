@@ -39,7 +39,7 @@ class TestRun(models.Model):
         OTHER   = "OTHER",   _("Other")
 
     start_date      = models.DateTimeField(_("Started at"), default=timezone.now)
-    access_code     = models.ForeignKey("wmlt_auth.AccessCode", on_delete=models.SET_NULL, null=True, null=True)
+    access_code     = models.ForeignKey("wmlt_auth.AccessCode", on_delete=models.SET_NULL, null=True)
     app_type        = models.CharField(_("App Type"), max_length=25, choices=AppType)
     installation    = models.CharField(_("Installation"), max_length=10)
     device_type     = models.CharField(_("Device Type"), max_length=25, choices=DeviceType)
@@ -253,7 +253,7 @@ class SemanticSearchMatch(models.Model):
         KEYWORD  = "KEYWORD",  _("Keyword")
         SENTENCE = "SENTENCE", _("Sentence")
 
-    parent     = models.ForeignKey(SemanticSearchResult, on_delete=models.CASCADE, related_name="keywords")
+    parent     = models.ForeignKey(SemanticSearchResult, on_delete=models.CASCADE, related_name="matches")
     seqnr      = models.IntegerField(_("Sequence Number"))
     text       = models.CharField(_("Matched Text"), max_length=255)
     text_type  = models.CharField(_("Text Type"), max_length=15, choices=TextType)

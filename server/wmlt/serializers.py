@@ -22,8 +22,12 @@ class ValidatingModelSerializer(ModelSerializer):
             for field in candidate._meta.concrete_fields:
                 setattr(candidate, field.attname, getattr(self.instance, field.attname))
 
+        model_field_names = {field.name for field in candidate._meta.concrete_fields}
+
         for name, value in attrs.items():
-            setattr(candidate, name, value)
+            # Exclude nested objects/lists for expanded child models
+            if name in model_field_names:
+                setattr(candidate, name, value)
 
         try:
             candidate.full_clean()

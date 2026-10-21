@@ -42,7 +42,7 @@ class AccessCodeCheckingModelSerializer(ValidatingModelSerializer):
         model  = models.AccessCode
         fields = "__all__"
 
-    def get_testrun_access_code(self, attrs):
+    def get_access_code_from_request_body(self, attrs):
         """Since this is the access code entity itself, the access code is not read from
         database but the request body here.
         """
