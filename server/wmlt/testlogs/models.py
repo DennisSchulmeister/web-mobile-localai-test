@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils             import timezone
 
 class TestRun(models.Model):
-    """A single test run: Root for all other information"""
+    """A single testrun: Root for all other information"""
     class AppType(models.TextChoices):
         ANDROID = "ANDROID", _("Android")
         BROWSER = "BROWSER", _("Browser")
@@ -61,7 +61,7 @@ class TestRun(models.Model):
 class Event(models.Model):
     """Actions performed during a single test run"""
     class EventType(models.TextChoices):
-        START_TESTRUN    = "START_TESTRUN",    _("Start Test Run")
+        START_TESTRUN    = "START_TESTRUN",    _("Start Testrun")
         PAGE_NAVIGATION  = "PAGE_NAVIGATION",  _("Page Navigation")
         GET_INFORMATION  = "GET_INFORMATION",  _("Get Information")
         LOAD_MODEL       = "LOAD_MODEL",       _("Load Model")
@@ -70,7 +70,7 @@ class Event(models.Model):
         START_CHAT       = "START_CHAT",       _("Start Chat")
         CHAT_MESSAGE     = "CHAT_MESSAGE",     _("Chat Message")
 
-    test_run   = models.ForeignKey(TestRun, on_delete=models.CASCADE)
+    testrun    = models.ForeignKey(TestRun, on_delete=models.CASCADE)
     timestamp  = models.DateTimeField(_("Timestamp"), default=timezone.now)
     event_type = models.CharField(_("Event Type"), max_length=30, choices=EventType, editable=False)
 
@@ -82,6 +82,24 @@ class Event(models.Model):
 
     def __str__(self):
         return self.event_type.label
+
+class EventMixin:
+    """Mixin-class for events to hard-code the event type during saving in those cases
+    where Django's ''save()'' method is actually being called (no bulk updates etc.)."""
+    def save(self, event_type, *args, **kwargs):
+        self.event_type = event_type
+
+        if (update_fields := kwargs.get("update_fields")) is not None:
+            update_fields = list(update_fields)
+
+            # Empty update_fields list is a no-op save in Django
+            if len(update_fields) > 0:
+                if "event_type" not in update_fields:
+                    update_fields.append("event_type")
+
+                kwargs["update_fields"] = update_fields
+
+        super().save(*args, **kwargs)
 
 class EventException(models.Model):
     """Catched exception. This is not an event in itself, but rather for any event
@@ -99,7 +117,16 @@ class EventException(models.Model):
     def __str__(self):
         return self.name
 
-class PageNavigationEvent(Event):
+class StartTestRunEvent(Event, EventMixin):
+    """Event: Start Testrun"""
+    class Meta:
+        verbose_name        = _("Start Testrun Event")
+        verbose_name_plural = _("Start Testrun Events")
+
+    def save(self, *args, **kwargs):
+        return super().save(self.EventType.START_TESTRUN, *args, **kwargs)
+
+class PageNavigationEvent(Event, EventMixin):
     """Event: Page Navigation"""
     page_url = models.CharField(_("Page URL"), max_length=50)
 
@@ -111,20 +138,10 @@ class PageNavigationEvent(Event):
         return self.page_url
 
     def save(self, *args, **kwargs):
-        self.event_type = self.EventType.PAGE_NAVIGATION
-
-        if (update_fields := kwargs.get("update_fields")) is not None:
-            update_fields = list(update_fields)
-
-            if "event_type" not in update_fields:
-                update_fields.append("event_type")
-
-            kwargs["update_fields"] = update_fields
-
-        super().save(**kwargs)
+        return super().save(self.EventType.PAGE_NAVIGATION, *args, **kwargs)
 
 
-class GetInformationEvent(Event):
+class GetInformationEvent(Event, EventMixin):
     """Event: Get engine information (head)"""
     engine_id   = models.CharField(_("Technical Id"), max_length=25)
     engine_name = models.CharField(_("Name"), max_length=25)
@@ -137,22 +154,12 @@ class GetInformationEvent(Event):
         return self.backend_name
 
     def save(self, *args, **kwargs):
-        self.event_type = self.EventType.GET_INFORMATION
-
-        if (update_fields := kwargs.get("update_fields")) is not None:
-            update_fields = list(update_fields)
-
-            if "event_type" not in update_fields:
-                update_fields.append("event_type")
-
-            kwargs["update_fields"] = update_fields
-
-        super().save(**kwargs)
+        return super().save(self.EventType.GET_INFORMATION, *args, **kwargs)
 
 class GetInformationLine(models.Model):
     """Event: Get engine information (lines)"""
     parent  = models.ForeignKey(GetInformationEvent, on_delete=models.CASCADE, related_name="lines")
-    line_nr = models.IntegerField(_("Line Number"))
+    seqnr   = models.IntegerField(_("Sequence Number"))
     field   = models.CharField(_("Field"), max_length=50)
     icon    = models.CharField(_("Icon"), max_length=20)
     label   = models.CharField(_("Label"), max_length=100)
@@ -161,11 +168,13 @@ class GetInformationLine(models.Model):
     class Meta:
         verbose_name        = _("Information Line")
         verbose_name_plural = _("Information Lines")
+        ordering            = ["parent", "seqnr"]
+        get_latest_by       = ["parent__timestamp", "seqnr"]
 
     def __str__(self):
         return t"{self.label}: {self.value}"
 
-class LoadModelEvent(Event):
+class LoadModelEvent(Event, EventMixin):
     """Event: Load Model"""
     class PipelineType(models.TextChoices):
         SUMMARIZATION        = "summarization",        _("Summarization")
@@ -200,19 +209,9 @@ class LoadModelEvent(Event):
         return t"{result} ({additional})" if additional else result
 
     def save(self, *args, **kwargs):
-        self.event_type = self.EventType.LOAD_MODEL
+        return super().save(self.EventType.LOAD_MODEL, *args, **kwargs)
 
-        if (update_fields := kwargs.get("update_fields")) is not None:
-            update_fields = list(update_fields)
-
-            if "event_type" not in update_fields:
-                update_fields.append("event_type")
-
-            kwargs["update_fields"] = update_fields
-
-        super().save(**kwargs)
-
-class SemanticSearchEvent(Event):
+class SemanticSearchEvent(Event, EventMixin):
     """Event: Semantic Search"""
     model                = models.ForeignKey(LoadModelEvent, on_delete=models.SET_NULL, blank=True, null=True)
     query                = models.CharField(_("Query"), max_length=255, blank=True)
@@ -229,21 +228,12 @@ class SemanticSearchEvent(Event):
         return self.query
 
     def save(self, *args, **kwargs):
-        self.event_type = self.EventType.SEMANTIC_SEARCH
-
-        if (update_fields := kwargs.get("update_fields")) is not None:
-            update_fields = list(update_fields)
-
-            if "event_type" not in update_fields:
-                update_fields.append("event_type")
-
-            kwargs["update_fields"] = update_fields
-
-        super().save(**kwargs)
+        return super().save(self.EventType.SEMANTIC_SEARCH, *args, **kwargs)
 
 class SemanticSearchResult(models.Model):
     """Event: Semantic Search (Result Line)"""
     parent     = models.ForeignKey(SemanticSearchEvent, on_delete=models.CASCADE, related_name="results")
+    seqnr      = models.IntegerField(_("Sequence Number"))
     page_url   = models.CharField("_Page URL", max_length=50)
     page_title = models.CharField(_("Page Title"), max_length=255)
     similarity = models.SmallIntegerField(_("Similarity in %"), min=0, max=100)
@@ -251,6 +241,8 @@ class SemanticSearchResult(models.Model):
     class Meta:
         verbose_name        = _("Result Line")
         verbose_name_plural = _("Result Lines")
+        ordering            = ["parent", "seqnr"]
+        get_latest_by       = ["parent__timestamp", "seqnr"]
 
     def __str__(self):
         return t"{self.page_title}: {self.similarity}%"
@@ -262,6 +254,7 @@ class SemanticSearchMatch(models.Model):
         SENTENCE = "SENTENCE", _("Sentence")
 
     parent     = models.ForeignKey(SemanticSearchResult, on_delete=models.CASCADE, related_name="keywords")
+    seqnr      = models.IntegerField(_("Sequence Number"))
     text       = models.CharField(_("Matched Text"), max_length=255)
     text_type  = models.CharField(_("Text Type"), max_length=15, choices=TextType)
     similarity = models.SmallIntegerField(_("Similarity in %"), min=0, max=100)
@@ -269,11 +262,13 @@ class SemanticSearchMatch(models.Model):
     class Meta:
         verbose_name        = _("Matched Text")
         verbose_name_plural = _("Matched Texts")
+        ordering            = ["parent", "seqnr"]
+        get_latest_by       = ["parent__parent__timestamp", "seqnr"]
 
     def __str__(self):
         return t"{self.text}: {self.similarity}%"
 
-class RunPipelineEvent(Event):
+class RunPipelineEvent(Event, EventMixin):
     """Event: Run pipeline (not chat) event"""
     model           = models.ForeignKey(LoadModelEvent, on_delete=models.SET_NULL, blank=True, null=True)
     page_url        = models.CharField(_("Page URL"), max_length=50)
@@ -293,22 +288,21 @@ class RunPipelineEvent(Event):
         return t"{self.page_url}: {self.model.pipeline if self.model else ''}"
 
     def save(self, *args, **kwargs):
-        self.event_type = self.EventType.RUN_PIPELINE
+        return super().save(self.EventType.RUN_PIPELINE, *args, **kwargs)
 
-        if (update_fields := kwargs.get("update_fields")) is not None:
-            update_fields = list(update_fields)
+class StartChatEvent(Event, EventMixin):
+    """Event: Start Chat"""
+    class Meta:
+        verbose_name        = _("Start Chat Event")
+        verbose_name_plural = _("Start Chat Events")
 
-            if "event_type" not in update_fields:
-                update_fields.append("event_type")
+    def save(self, *args, **kwargs):
+        return super().save(self.EventType.START_CHAT, *args, **kwargs)
 
-            kwargs["update_fields"] = update_fields
-
-        super().save(**kwargs)
-
-class ChatMessageEvent(Event):
+class ChatMessageEvent(Event, EventMixin):
     """Event: Chat Message"""
     model             = models.ForeignKey(LoadModelEvent, on_delete=models.SET_NULL, blank=True, null=True)
-    chat              = models.ForeignKey(Event, on_delete=models.CASCADE)
+    chat              = models.ForeignKey(StartChatEvent, on_delete=models.CASCADE)
     context           = models.TextField(_("Context"), blank=True, null=True)
     max_tokens        = models.IntegerField(_("Max Tokens"), blank=True)
     sampling          = models.BooleanField(_("Sampling"), blank=True)
@@ -326,22 +320,8 @@ class ChatMessageEvent(Event):
     def __str__(self):
         return self.user_message
 
-    def clean(self):
-        if self.chat is None or self.chat.event_type != Event.EventType.START_CHAT:
-            raise ValidationError(_("Field chat must reference a start chat event."))
-
     def save(self, *args, **kwargs):
-        self.event_type = self.EventType.CHAT_MESSAGE
-
-        if (update_fields := kwargs.get("update_fields")) is not None:
-            update_fields = list(update_fields)
-
-            if "event_type" not in update_fields:
-                update_fields.append("event_type")
-
-            kwargs["update_fields"] = update_fields
-
-        super().save(**kwargs)
+        return super().save(self.EventType.CHAT_MESSAGE, *args, **kwargs)
 
 class QualityAssessment(models.Model):
     """Quality evaluation of a generated chat message"""
@@ -389,7 +369,3 @@ class QualityAssessment(models.Model):
 
     def __str__(self):
         return t"{self.timestamp}: {self.judge_name}"
-
-## TODO: Admin for each model (Event = read-only)
-## TODO: REST API: serializer / viewset / route for each model
-##        - Restrict by access code

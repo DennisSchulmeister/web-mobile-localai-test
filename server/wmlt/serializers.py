@@ -5,6 +5,8 @@
 # LICENSE file in the root directory of this source tree.
 
 from django.core.exceptions     import ValidationError as DjangoValidationError
+from django.utils.translation   import gettext_lazy as _
+
 from rest_framework.serializers import ModelSerializer
 from rest_framework.serializers import ValidationError as DRFValidationError
 
@@ -25,8 +27,8 @@ class ValidatingModelSerializer(ModelSerializer):
 
         try:
             candidate.full_clean()
-        except DjangoValidationError as dve:
-            detail = dve.message_dict if hasattr(dve, "message_dict") else dve.messages
-            raise DRFValidationError(detail) from dve
+        except DjangoValidationError as error:
+            detail = error.message_dict if hasattr(error, "message_dict") else error.messages
+            raise DRFValidationError(detail) from error
 
         return attrs
