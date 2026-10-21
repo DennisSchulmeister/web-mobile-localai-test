@@ -5,10 +5,11 @@
 # LICENSE file in the root directory of this source tree.
 
 from .                        import models
+from ..drf                    import ValidatingModelSerializer
 from django.utils.translation import gettext_lazy as _
 from rest_framework           import serializers
 
-class TestRunSerializer(serializers.ModelSerializer):
+class TestRunSerializer(ValidatingModelSerializer):
     class Meta:
         model  = models.TestRun
         fields = "__all__"
@@ -34,4 +35,4 @@ class TestRunSerializer(serializers.ModelSerializer):
 
             attrs["access_code"] = access_code
 
-        return attrs
+        return super.validate(attrs)
