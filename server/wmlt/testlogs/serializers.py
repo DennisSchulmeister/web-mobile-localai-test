@@ -114,26 +114,14 @@ class LoadModelEventSerializer(AbstractEventSerializer):
         model  = models.LoadModelEvent
         fields = "__all__"
 
-class SemanticSearchMatchSerializer(ModelSerializer):
-    class Meta:
-        model  = models.SemanticSearchMatch
-
-        # Cannot use "__all__" here because that would mark the parent attribute as required.
-        # But the parent shall be invisible to the client and be added during saving, instead.
-        fields = ["seqnr", "text", "text_type", "similarity"]
-        read_only_fields = ["id"]
-
 class SemanticSearchResultSerializer(ModelSerializer):
     class Meta:
         model  = models.SemanticSearchResult
 
         # Cannot use "__all__" here because that would mark the parent attribute as required.
         # But the parent shall be invisible to the client and be added during saving, instead.
-        fields = ["seqnr", "page_url", "page_title", "similarity", "matches"]
+        fields = ["seqnr", "page_url", "page_title", "text", "text_type", "similarity", "matches"]
         read_only_fields = ["id"]
-
-    # Must match the related_name of the relation
-    matches = SemanticSearchMatchSerializer(many=True, required=False)
 
 class SemanticSearchEventSerializer(AbstractEventSerializer):
     class Meta:
@@ -146,15 +134,11 @@ class SemanticSearchEventSerializer(AbstractEventSerializer):
     @staticmethod
     def create_results(event, results_data):
         for result_data in results_data:
-            matches_data = result_data.pop("matches", [])
-            result = event.results.create(**result_data)
-
-            for match_data in matches_data:
-                result.matches.create(**match_data)
+            event.results.create(**result_data)
 
     @transaction.atomic
     def create(self, validated_data):
-        """Create nested results and matches since DRF doesn't save nested data automatically."""
+        """Create nested results since DRF doesn't save nested data automatically."""
         results_data = validated_data.pop("results", [])
         event = super().create(validated_data)
         self.create_results(event, results_data)
@@ -162,7 +146,7 @@ class SemanticSearchEventSerializer(AbstractEventSerializer):
 
     @transaction.atomic
     def update(self, instance, validated_data):
-        """Replace nested results and matches when results are provided."""
+        """Replace nested results when results are provided."""
         results_data = validated_data.pop("results", None)
         event = super().update(instance, validated_data)
 

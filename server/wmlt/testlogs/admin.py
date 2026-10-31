@@ -195,8 +195,7 @@ class ReadOnlyEventAdmin(EventAdmin):
 event_fieldsets = [
     (_("Event"), {
         "fields": (
-            "event_type",
-            "timestamp",
+            ("timestamp", "event_type"),
         ),
     }),
 ]
@@ -388,7 +387,7 @@ class GetInformationEventAdmin(EventAdmin):
     list_display_links = ["timestamp", "testrun", "engine_id", "engine_name", *testrun_display]
     ordering           = ["timestamp", "testrun", "id"]
     list_filter        = ["timestamp", "testrun", "engine_id", "engine_name", *testrun_filter]
-    inlines            = [GetInformationLineInline, EventExceptionInline]
+    inlines            = [GetInformationLineInline, *EventAdmin.inlines]
 
     fieldsets = [
         *testrun_fieldsets,
@@ -442,7 +441,7 @@ class LoadModelEventAdmin(EventAdmin):
                 ("dtype", "device"),
             ),
         }),
-        (_("Measurements"), {
+        (_("Measurement"), {
             "fields": (
                 "loadtime",
             ),
@@ -459,35 +458,29 @@ class LoadModelEventAdmin(EventAdmin):
                 ("dtype", "device"),
             ),
         }),
-        (_("Measurements"), {
+        (_("Measurement"), {
             "fields": (
                 "loadtime",
             ),
         }),
     ]
 
-class SemanticSearchMatchInline(TabularInline):
-    model = models.SemanticSearchMatch
-    fields = ("seqnr", "text", "text_type", "similarity")
-    extra = 0
-
 class SemanticSearchResultInline(TabularInline):
-    model = models.SemanticSearchResult
-    fields = ("seqnr", "page_url", "page_title", "similarity")
-    extra = 0
+    model  = models.SemanticSearchResult
+    fields = ("seqnr", "page_url", "page_title", "text", "text_type", "similarity")
+    extra  = 0
 
 class SemanticSearchEventAdmin(EventAdmin):
     model   = models.SemanticSearchEvent
-    inlines = [EventExceptionInline, SemanticSearchResultInline]
+    list_display       = ["timestamp", "testrun", "model", "query", *testrun_display]
+    list_display_links = ["timestamp", "testrun", "model", "query", *testrun_display]
+    ordering           = ["timestamp", "testrun", "id"]
+    list_filter        = ["timestamp", "testrun", "model", *testrun_filter]
+    inlines            = [SemanticSearchResultInline, *EventAdmin.inlines]
 
     fieldsets = [
-        (None, {
-            "fields": (
-                "testrun",
-                "timestamp",
-                "event_type",
-            ),
-        }),
+        *testrun_fieldsets,
+        *event_fieldsets,
         (_("Model"), {
             "fields": (
                 "model",
@@ -496,79 +489,166 @@ class SemanticSearchEventAdmin(EventAdmin):
         (_("Search Request"), {
             "fields": (
                 "query",
-                ("include_keywords", "include_sentences"),
-                ("compare_embeddings", "compare_strings"),
+                ("include_keywords", "include_sentences", "compare_embeddings", "compare_strings"),
             ),
         }),
     ]
 
-class SemanticSearchResultAdmin(admin.CustomModelAdmin):
-    model              = models.SemanticSearchResult
-    list_display       = ["parent", "seqnr", "page_title", "similarity"]
-    list_display_links = ["parent", "seqnr", "page_title", "similarity"]
-    ordering           = ["parent", "seqnr"]
-    inlines            = [SemanticSearchMatchInline]
-
-    def has_add_permission(self, request):
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-        return False
-
-    fieldsets = [
-        (_("Parent Relation"), {
+    fieldsets_add = [
+        *testrun_fieldsets_add,
+        *event_fieldsets_add,
+        (_("Model"), {
             "fields": (
-                ("parent", "seqnr"),
+                "model",
             ),
         }),
-        (_("Matched Page"), {
+        (_("Search Request"), {
             "fields": (
-                "page_url",
-                ("page_title", "similarity"),
+                "query",
+                ("include_keywords", "include_sentences", "compare_embeddings", "compare_strings"),
             ),
         }),
     ]
 
 class RunPipelineEventAdmin(EventAdmin):
-    model = models.RunPipelineEvent
+    model              = models.RunPipelineEvent
+    list_display       = ["timestamp", "testrun", "model__pipeline", "model__model_id", "query", *testrun_display]
+    list_display_links = ["timestamp", "testrun", "model__pipeline", "model__model_id", "query", *testrun_display]
+    ordering           = ["timestamp", "testrun", "id"]
+    list_filter        = ["timestamp", "testrun", "model__pipeline", "model__model_id", *testrun_filter]
+    
+    readonly_fields = [
+        *EventAdmin.readonly_fields,
+        "model__pipeline",
+        "model__pipeline_display",
+        "model__engine_id",
+        "model__model_id",
+        "model__dtype",
+        "model__device",
+    ]
 
     fieldsets = [
-        (None, {
+        *testrun_fieldsets,
+        *event_fieldsets,
+        (_("Model"), {
             "fields": (
-                "testrun",
-                "timestamp",
-                "event_type",
+                "model__pipeline_display",
+                ("model__engine_id", "model__model_id"),
+                ("model__dtype", "model__device"),
             ),
         }),
-        (_("Model and Page"), {
+        (_("Context"), {
             "fields": (
-                ("model", "page_url"),
+                "page_url",
+                "context",
             ),
         }),
         (_("Model Input"), {
             "fields": (
                 "query",
                 ("max_tokens", "source_language", "target_language"),
-                "context",
             ),
         }),
         (_("Model Output"), {
             "fields": (
                 "result",
+            ),
+        }),
+        (_("Measurement"), {
+            "fields": (
                 "runtime",
             ),
-        })
+        }),
     ]
 
+    fieldsets_add = [
+        *testrun_fieldsets_add,
+        *event_fieldsets_add,
+        (_("Model and Context"), {
+            "fields": (
+                ("model", "page_url"),
+                "context",
+            ),
+        }),
+        (_("Model Input"), {
+            "fields": (
+                "query",
+                ("max_tokens", "source_language", "target_language"),
+            ),
+        }),
+        (_("Model Output"), {
+            "fields": (
+                "result",
+            ),
+        }),
+        (_("Measurement"), {
+            "fields": (
+                "runtime",
+            ),
+        }),
+    ]
+
+    @display(description=_("Model ID"))
+    def model__model_id(self, obj):
+        return obj.model.model_id
+
+    @display(description=_("Pipeline"))
+    def model__pipeline(self, obj):
+        return obj.model.pipeline
+
+    @display(description=_("Pipeline"))
+    def model__pipeline_display(self, obj):
+        return obj.model.get_pipeline_display()
+
+    @display(description=_("Engine ID"))
+    def model__engine_id(self, obj):
+        return obj.model.engine_id
+
+    @display(description=_("Model ID"))
+    def model__model_id(self, obj):
+        return obj.model.model_id
+
+    @display(description=_("Quantization"))
+    def model__dtype(self, obj):
+        return obj.model.dtype
+
+    @display(description=_("Device"))
+    def model__device(self, obj):
+        return obj.model.device
+    
 class StartChatEventAdmin(EventAdmin):
-    model = models.StartChatEvent
+    model              = models.StartChatEvent
+    list_display       = ["timestamp", "testrun", "page_url", *testrun_display]
+    list_display_links = ["timestamp", "testrun", "page_url", *testrun_display]
+    ordering           = ["timestamp", "id"]
+    list_filter        = ["timestamp", "page_url", *testrun_filter]
+
+    fieldsets = [
+        *testrun_fieldsets,
+        *event_fieldsets,
+        (_("Start Chat"), {
+            "fields": (
+                "page_url",
+            )
+        }),
+    ]
+
+    fieldsets_add = [
+        *testrun_fieldsets_add,
+        *event_fieldsets_add,
+        (_("Start Chat"), {
+            "fields": (
+                "page_url",
+            )
+        }),
+    ]
 
 class QualityAssessmentInline(StackedInline):
     model = models.QualityAssessment
     extra = 0
 
     fieldsets = [
-        (_("Assessment Meta-data"), {
+        (_("Meta-data"), {
             "fields": (
                 "timestamp",
                 ("judge_type", "judge_name"),
@@ -587,19 +667,37 @@ class QualityAssessmentInline(StackedInline):
 
 class ChatMessageEventAdmin(EventAdmin):
     model = models.ChatMessageEvent
-    inlines = [EventExceptionInline, QualityAssessmentInline]
+    list_display       = ["timestamp", "testrun", "chat", "model", "user_message", *testrun_display]
+    list_display_links = ["timestamp", "testrun", "chat", "model", "user_message", *testrun_display]
+    ordering           = ["timestamp", "id"]
+    list_filter        = ["timestamp", "model__model_id", *testrun_filter]
+    inlines            = [QualityAssessmentInline, *EventAdmin.inlines]
+
+    readonly_fields = [
+        *EventAdmin.readonly_fields,
+        "chat__page_url",
+        "chat__timestamp_display",
+        "model__pipeline",
+        "model__pipeline_display",
+        "model__engine_id",
+        "model__model_id",
+        "model__dtype",
+        "model__device",
+    ]
 
     fieldsets = [
-        (None, {
+        *testrun_fieldsets,
+        *event_fieldsets,
+        (_("Chat"), {
             "fields": (
-                "testrun",
-                "timestamp",
-                "event_type",
+                ("chat__page_url", "chat__timestamp_display"),
             ),
         }),
-        (_("Model and Chat Log"), {
+        (_("Model"), {
             "fields": (
-                ("model", "chat"),
+                "model__pipeline_display",
+                ("model__engine_id", "model__model_id"),
+                ("model__dtype", "model__device"),
             ),
         }),
         (_("Model Input"), {
@@ -611,53 +709,115 @@ class ChatMessageEventAdmin(EventAdmin):
         (_("Model Output"), {
             "fields": (
                 "assistant_message",
+            ),
+        }),
+        (_("Measurement"), {
+            "fields": (
                 ("first_token", "runtime"),
                 ("tokens", "tokens_per_second"),
             ),
         }),
     ]
 
-class QualityAssessmentAdmin(admin.CustomModelAdmin):
-    model              = models.QualityAssessment
-    list_display       = ["timestamp", "message", "judge_type", "judge_name"]
-    list_display_links = ["timestamp", "message", "judge_type", "judge_name"]
-    ordering           = ["timestamp", "id"]
-    list_filter        = ["judge_type", "timestamp"]
-
-    fieldsets = [
-        (_("Assessed Message"), {
+    fieldsets_add = [
+        *testrun_fieldsets_add,
+        *event_fieldsets_add,
+        (_("Chat and Model"), {
             "fields": (
-                "message",
+                ("chat", "model"),
             ),
         }),
-        (_("Assessment Meta-data"), {
+        (_("Model Input"), {
             "fields": (
-                "timestamp",
-                ("judge_type", "judge_name"),
+                ("user_message", "context"),
+                ("max_tokens", "sampling"),
             ),
         }),
-        (_("Assessment"), {
+        (_("Model Output"), {
             "fields": (
-                ("correct_syntax_grade", "correct_syntax_note"),
-                ("correct_lingua_grade", "correct_lingua_note"),
-                ("correct_content_grade", "correct_content_note"),
-                ("thematic_relevance_grade", "thematic_relevance_note"),
-                ("message_length_grade", "message_length_note"),
+                "assistant_message",
+            ),
+        }),
+        (_("Measurement"), {
+            "fields": (
+                ("first_token", "runtime"),
+                ("tokens", "tokens_per_second"),
             ),
         }),
     ]
 
-admin.admin_site.register(models.TestRun,              TestRunAdmin)
-admin.admin_site.register(models.Event,                ReadOnlyEventAdmin)
-admin.admin_site.register(models.EventException,       EventExceptionAdmin)
-admin.admin_site.register(models.StartTestRunEvent,    StartTestRunEventAdmin)
-admin.admin_site.register(models.PageNavigationEvent,  PageNavigationEventAdmin)
-admin.admin_site.register(models.GetInformationEvent,  GetInformationEventAdmin)
-admin.admin_site.register(models.GetInformationLine,   GetInformationLineAdmin)
-admin.admin_site.register(models.LoadModelEvent,       LoadModelEventAdmin)
-admin.admin_site.register(models.SemanticSearchEvent,  SemanticSearchEventAdmin)
-admin.admin_site.register(models.SemanticSearchResult, SemanticSearchResultAdmin)
-admin.admin_site.register(models.RunPipelineEvent,     RunPipelineEventAdmin)
-admin.admin_site.register(models.StartChatEvent,       StartChatEventAdmin)
-admin.admin_site.register(models.ChatMessageEvent,     ChatMessageEventAdmin)
-admin.admin_site.register(models.QualityAssessment,    QualityAssessmentAdmin)
+    @display(description=_("Page URL"))
+    def chat__page_url(self, obj):
+        return obj.chat.page_url
+
+    @display(description=_("Timestamp"))
+    def chat__timestamp_display(self, obj):
+        return date_format(obj.chat.timestamp, "DATETIME_FORMAT")
+
+    @display(description=_("Model ID"))
+    def model__model_id(self, obj):
+        return obj.model.model_id
+
+    @display(description=_("Pipeline"))
+    def model__pipeline(self, obj):
+        return obj.model.pipeline
+
+    @display(description=_("Pipeline"))
+    def model__pipeline_display(self, obj):
+        return obj.model.get_pipeline_display()
+
+    @display(description=_("Engine ID"))
+    def model__engine_id(self, obj):
+        return obj.model.engine_id
+
+    @display(description=_("Model ID"))
+    def model__model_id(self, obj):
+        return obj.model.model_id
+
+    @display(description=_("Quantization"))
+    def model__dtype(self, obj):
+        return obj.model.dtype
+
+    @display(description=_("Device"))
+    def model__device(self, obj):
+        return obj.model.device
+
+class QualityAssessmentAdmin(admin.CustomModelAdmin):
+    model              = models.QualityAssessment
+    list_display_links = ["timestamp", "message__model__model_id"]
+    list_filter        = ["timestamp", "message__model__model_id", "judge_type", "judge_name"]
+    ordering           = ["timestamp", "id"]
+    date_hierarchy     = "timestamp"
+
+    list_display = [
+        "timestamp",
+        "message__model__model_id",
+        "correct_syntax_grade",
+        "correct_lingua_grade",
+        "correct_content_grade",
+        "thematic_relevance_grade",
+        "message_length_grade",
+    ]
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+admin.admin_site.register(models.TestRun,             TestRunAdmin)
+admin.admin_site.register(models.Event,               ReadOnlyEventAdmin)
+admin.admin_site.register(models.EventException,      EventExceptionAdmin)
+admin.admin_site.register(models.StartTestRunEvent,   StartTestRunEventAdmin)
+admin.admin_site.register(models.PageNavigationEvent, PageNavigationEventAdmin)
+admin.admin_site.register(models.GetInformationEvent, GetInformationEventAdmin)
+admin.admin_site.register(models.GetInformationLine,  GetInformationLineAdmin)
+admin.admin_site.register(models.LoadModelEvent,      LoadModelEventAdmin)
+admin.admin_site.register(models.SemanticSearchEvent, SemanticSearchEventAdmin)
+admin.admin_site.register(models.RunPipelineEvent,    RunPipelineEventAdmin)
+admin.admin_site.register(models.StartChatEvent,      StartChatEventAdmin)
+admin.admin_site.register(models.ChatMessageEvent,    ChatMessageEventAdmin)
+admin.admin_site.register(models.QualityAssessment,   QualityAssessmentAdmin)

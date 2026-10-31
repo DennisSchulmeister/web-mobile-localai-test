@@ -166,15 +166,12 @@ class GetInformationEvent(EventMixin, Event):
 
 class GetInformationLine(models.Model):
     """Event: Get engine information (lines)"""
-    # Parent relation
-    parent  = models.ForeignKey(GetInformationEvent, on_delete=models.CASCADE, related_name="lines")
-    seqnr   = models.IntegerField(_("Sequence Number"))
-
-    # The actual information line
-    field   = models.CharField(_("Field"), max_length=50)
-    icon    = models.CharField(_("Icon"), max_length=20)
-    label   = models.CharField(_("Label"), max_length=100)
-    value   = models.CharField(_("Value"), max_length=100)
+    parent = models.ForeignKey(GetInformationEvent, on_delete=models.CASCADE, related_name="lines")
+    seqnr  = models.IntegerField(_("Sequence Number"))
+    field  = models.CharField(_("Field"), max_length=50)
+    icon   = models.CharField(_("Icon"), max_length=20)
+    label  = models.CharField(_("Label"), max_length=100)
+    value  = models.CharField(_("Value"), max_length=100)
 
     class Meta:
         verbose_name        = _("Information Line")
@@ -195,14 +192,11 @@ class LoadModelEvent(EventMixin, Event):
         TEXT_GENERATION      = "text-generation",      _("Text Generation")
         TEXT2TEXT_GENERATION = "text2text-generation", _("Text-to-Text Generation")
 
-    # Model parameters
     pipeline  = models.CharField(_("Pipeline"), max_length=50, choices=PipelineType)
     engine_id = models.CharField(_("Engine ID"), max_length=25)
     model_id  = models.CharField(_("Model ID"), max_length=100)
     dtype     = models.CharField(_("Quantization"), max_length=10, blank=True)
     device    = models.CharField(_("Device"), max_length=20, blank=True)
-
-    # Measurements
     loadtime  = models.DurationField(_("Loading Duration"), blank=True)
 
     class Meta:
@@ -227,10 +221,7 @@ class LoadModelEvent(EventMixin, Event):
 
 class SemanticSearchEvent(EventMixin, Event):
     """Event: Semantic Search"""
-    # Model
     model                = models.ForeignKey(LoadModelEvent, on_delete=models.SET_NULL, blank=True, null=True)
-
-    # Search request
     query                = models.CharField(_("Query"), max_length=255, blank=True)
     include_keywords     = models.BooleanField(_("Include Keywords"))
     include_sentences    = models.BooleanField(_("Include Sentences"))
@@ -247,18 +238,19 @@ class SemanticSearchEvent(EventMixin, Event):
     def save(self, *args, **kwargs):
         return super().save(self.EventType.SEMANTIC_SEARCH, *args, **kwargs)
 
-similarity_validators = [MinValueValidator(0), MaxValueValidator(100)]
-
 class SemanticSearchResult(models.Model):
     """Event: Semantic Search (Result Line)"""
-    # Parent relation
+    class TextType(models.TextChoices):
+        KEYWORD  = "KEYWORD",  _("Keyword")
+        SENTENCE = "SENTENCE", _("Sentence")
+
     parent     = models.ForeignKey(SemanticSearchEvent, on_delete=models.CASCADE, related_name="results")
     seqnr      = models.IntegerField(_("Sequence Number"))
-
-    # Matched page
-    page_url   = models.CharField("_Page URL", max_length=50)
+    page_url   = models.CharField("Page URL", max_length=50)
     page_title = models.CharField(_("Page Title"), max_length=255)
-    similarity = models.SmallIntegerField(_("Similarity in %"), validators=similarity_validators)
+    text       = models.CharField(_("Matched Text"), max_length=255)
+    text_type  = models.CharField(_("Text Type"), max_length=15, choices=TextType)
+    similarity = models.SmallIntegerField(_("Similarity in %"), validators=[MinValueValidator(0), MaxValueValidator(100)], blank=True, null=True)
 
     class Meta:
         verbose_name        = _("Result Line")
@@ -267,49 +259,18 @@ class SemanticSearchResult(models.Model):
         get_latest_by       = ["parent__timestamp", "seqnr"]
 
     def __str__(self):
-        return f"{self.page_title}: {self.similarity}%"
-    
-class SemanticSearchMatch(models.Model):
-    """Event: Semantic Search (Matched Text)"""
-    class TextType(models.TextChoices):
-        KEYWORD  = "KEYWORD",  _("Keyword")
-        SENTENCE = "SENTENCE", _("Sentence")
-
-    # Parent relation
-    parent     = models.ForeignKey(SemanticSearchResult, on_delete=models.CASCADE, related_name="matches")
-    seqnr      = models.IntegerField(_("Sequence Number"))
-
-    # Matched keyword or sentence
-    text       = models.CharField(_("Matched Text"), max_length=255)
-    text_type  = models.CharField(_("Text Type"), max_length=15, choices=TextType)
-    similarity = models.SmallIntegerField(_("Similarity in %"), validators=similarity_validators)
-
-    class Meta:
-        verbose_name        = _("Matched Text")
-        verbose_name_plural = _("Matched Texts")
-        ordering            = ["parent", "seqnr"]
-        get_latest_by       = ["parent__parent__timestamp", "seqnr"]
-
-    def __str__(self):
-        return f"{self.text}: {self.similarity}%"
+        return f"{self.page_title}: {self.text} ({self.similarity}%)"
 
 class RunPipelineEvent(EventMixin, Event):
     """Event: Run pipeline (not chat) event"""
-    # Model and page on which it was run
-    model           = models.ForeignKey(LoadModelEvent, on_delete=models.SET_NULL, blank=True, null=True)
     page_url        = models.CharField(_("Page URL"), max_length=50)
-
-    # Model input
+    model           = models.ForeignKey(LoadModelEvent, on_delete=models.SET_NULL, blank=True, null=True)
     query           = models.CharField(_("Query"), max_length=255, blank=True)
     context         = models.TextField(_("Context"), blank=True)
-    max_tokens      = models.IntegerField(_("Max Tokens"), blank=True)
+    max_tokens      = models.IntegerField(_("Max Tokens"), blank=True, null=True)
     source_language = models.CharField(_("Source Language"), max_length=10, blank=True)
     target_language = models.CharField(_("Target Language"), max_length=10, blank=True)
-
-    # Model output
     result          = models.TextField(_("Result"), blank=True)
-
-    # Measurements
     runtime         = models.DurationField(_("Run Time"), blank=True)
 
     class Meta:
@@ -324,35 +285,31 @@ class RunPipelineEvent(EventMixin, Event):
 
 class StartChatEvent(EventMixin, Event):
     """Event: Start Chat"""
+    page_url = models.CharField(_("Page URL"), max_length=50)
+
     class Meta:
         verbose_name        = _("Start Chat Event")
         verbose_name_plural = _("Start Chat Events")
 
     def __str__(self):
-        return date_format(self.timestamp, "DATETIME_FORMAT")
+        timestamp = date_format(self.timestamp, "DATETIME_FORMAT")
+        return f"{self.page_url}: {timestamp}"
     
     def save(self, *args, **kwargs):
         return super().save(self.EventType.START_CHAT, *args, **kwargs)
 
 class ChatMessageEvent(EventMixin, Event):
     """Event: Chat Message"""
-    # Model and chat log
-    model             = models.ForeignKey(LoadModelEvent, on_delete=models.SET_NULL, blank=True, null=True)
     chat              = models.ForeignKey(StartChatEvent, on_delete=models.CASCADE)
-
-    # Model input
+    model             = models.ForeignKey(LoadModelEvent, on_delete=models.SET_NULL, blank=True, null=True)
     user_message      = models.TextField(_("User Message"), blank=True, null=True)
     context           = models.TextField(_("Context"), blank=True, null=True)
-    max_tokens        = models.IntegerField(_("Max Tokens"), blank=True)
-    sampling          = models.BooleanField(_("Sampling"), blank=True)
-
-    # Model output
+    max_tokens        = models.IntegerField(_("Max Tokens"), blank=True, null=True)
+    sampling          = models.BooleanField(_("Sampling"))
     assistant_message = models.TextField(_("Assistant Message"), blank=True, null=True)
-
-    # Measurements
     first_token       = models.DurationField(_("First Token"), blank=True)
     runtime           = models.DurationField(_("Run Time"), blank=True)
-    tokens            = models.IntegerField(_("Number of Tokens"), blank=True)
+    tokens            = models.IntegerField(_("Number of Tokens"), blank=True, null=True)
     tokens_per_second = models.FloatField(_("Tokens / Second"), blank=True)
 
     class Meta:
@@ -388,25 +345,20 @@ class QualityAssessment(models.Model):
         TOO_LONG     = 2, _("Too long, more than what was asked")
         PERFECT_SIZE = 3, _("Perfect size to answer the question")
 
-    # Assessed message
     message                  = models.ForeignKey(ChatMessageEvent, on_delete=models.CASCADE)
-
-    # Assessment meta-data
     timestamp                = models.DateTimeField(_("Timestamp"), default=timezone.now)
     judge_type               = models.CharField(_("Judge Type"), max_length=15, choices=JudgeType)
     judge_name               = models.CharField(_("Judge Name"), max_length=50, blank=True)
-
-    # The actual assessment
-    correct_syntax_grade     = models.SmallIntegerField(_("Correct Syntax"), blank=True, choices=Correctness)
-    correct_syntax_note      = models.TextField(_("Explanation"), max_length=100, blank=True)
-    correct_lingua_grade     = models.SmallIntegerField(_("Correct Lingua"), blank=True, choices=Correctness)
-    correct_lingua_note      = models.TextField(_("Explanation"), max_length=100, blank=True)
-    correct_content_grade    = models.SmallIntegerField(_("Correct Content"), blank=True, choices=Correctness)
-    correct_content_note     = models.TextField(_("Explanation"), max_length=100, blank=True)
-    thematic_relevance_grade = models.SmallIntegerField(_("Thematic Relevance"), blank=True, choices=ThematicRelevance)
-    thematic_relevance_note  = models.TextField(_("Explanation"), max_length=100, blank=True)
-    message_length_grade     = models.SmallIntegerField(_("Message Length"), blank=True, choices=MessageLength)
-    message_length_note      = models.TextField(_("Explanation"), max_length=100, blank=True)
+    correct_syntax_grade     = models.SmallIntegerField(_("Correct Syntax"), blank=True, null=True, choices=Correctness)
+    correct_syntax_note      = models.CharField(_("Explanation"), max_length=100, blank=True)
+    correct_lingua_grade     = models.SmallIntegerField(_("Correct Lingua"), blank=True, null=True, choices=Correctness)
+    correct_lingua_note      = models.CharField(_("Explanation"), max_length=100, blank=True)
+    correct_content_grade    = models.SmallIntegerField(_("Correct Content"), blank=True, null=True, choices=Correctness)
+    correct_content_note     = models.CharField(_("Explanation"), max_length=100, blank=True)
+    thematic_relevance_grade = models.SmallIntegerField(_("Thematic Relevance"), blank=True, null=True, choices=ThematicRelevance)
+    thematic_relevance_note  = models.CharField(_("Explanation"), max_length=100, blank=True)
+    message_length_grade     = models.SmallIntegerField(_("Message Length"), blank=True, null=True, choices=MessageLength)
+    message_length_note      = models.CharField(_("Explanation"), max_length=100, blank=True)
 
     class Meta:
         verbose_name        = _("Quality Assessment")
