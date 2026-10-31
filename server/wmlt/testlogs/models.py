@@ -84,7 +84,13 @@ class Event(models.Model):
         get_latest_by       = "timestamp"
 
     def __str__(self):
-        return self.get_event_type_display()
+        testrun   = f"{self.testrun}" if self.testrun else ""
+        timestamp = date_format(self.timestamp, "DATETIME_FORMAT")
+
+        if testrun:
+            return f"{_("Test Run")} {testrun} / {timestamp} ({self.get_event_type_display()})"
+        else:
+            return f"{timestamp} ({self.get_event_type_display()})"
 
 class EventMixin:
     """Mixin-class for events to hard-code the event type during saving in those cases

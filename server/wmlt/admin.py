@@ -7,6 +7,7 @@
 from django.apps              import apps
 from django.conf              import settings
 from django.contrib.admin     import AdminSite
+from django.contrib.admin     import ModelAdmin
 from django.utils.translation import gettext_lazy as _
 
 from admin_interface.admin    import ThemeAdmin
@@ -83,6 +84,15 @@ class CustomAdminSite(AdminSite):
                 del model["_index_"]
 
         return app_list
+
+class CustomModelAdmin(ModelAdmin):
+    """Additions to Django's base ''ModelAdmin'' class."""
+
+    def get_fieldsets(self, request, obj=None):
+        """Allow to choose a fieldsets called ''fieldsets_add'' on the add form."""
+        if obj is None and hasattr(self, "fieldsets_add"):
+            return self.fieldsets_add
+        return super().get_fieldsets(request, obj)
 
 admin_site = CustomAdminSite()
 admin_site.register(Theme, ThemeAdmin)

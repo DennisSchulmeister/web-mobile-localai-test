@@ -24,8 +24,8 @@
         .help {
             margin-bottom: 1em;
         }
-    
-        .form-row {
+
+        .form-row:not(tr) {
             display: flex;
             flex-direction: row;
             justify-content: flex-start;
@@ -35,7 +35,7 @@
             max-width: 80em;
         }
     
-        .form-row > * {
+        .form-row:not(tr) > * {
             flex: 1;
         }
     
@@ -49,6 +49,11 @@
             box-sizing: border-box;
             width: calc(100% - 0.5em);
             height: 1.875rem !important;
+        }
+
+        textarea {
+            box-sizing: border-box;
+            width: calc(100% - 0.5em) !important;
         }
     
         /* Fix clock dialog width */
