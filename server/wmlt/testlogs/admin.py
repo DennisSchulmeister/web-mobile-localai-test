@@ -53,6 +53,7 @@ testrun_readonly = [
     "testrun__app_type",
     "testrun__app_type_display",
     "testrun__device_type",
+    "testrun__device_type_display",
     "testrun__device_model",
     "testrun__os_family",
     "testrun__os_family_display",
@@ -63,8 +64,8 @@ testrun_readonly = [
     "testrun__remarks",
 ]
 
-testrun_fieldset = (
-    _("Test Run"), {
+testrun_fieldsets = [
+    (_("Test Run"), {
         "fields": (
             ("testrun", "testrun__start_date_display"),
             ("testrun__access_code", "testrun__app_type_display"),
@@ -73,16 +74,16 @@ testrun_fieldset = (
             ("testrun__browser_family_display", "testrun__browser_version"),
             "testrun__remarks",
         ),
-    }
-)
+    }),
+]
 
-testrun_fieldset_add = (
-    _("Test Run"), {
+testrun_fieldsets_add = [
+    (_("Test Run"), {
         "fields": (
             "testrun",
         )
-    }
-)
+    }),
+]
 
 class EventExceptionInline(TabularInline):
     model = models.EventException
@@ -110,7 +111,7 @@ class EventAdmin(admin.CustomModelAdmin):
     inlines             = [EventExceptionInline]
 
     fieldsets = [
-        testrun_fieldset,
+        *testrun_fieldsets,
         (_("Event"), {
             "fields": (
                 ("timestamp", "event_type"),
@@ -190,6 +191,17 @@ class ReadOnlyEventAdmin(EventAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+event_fieldsets = [
+    (_("Event"), {
+        "fields": (
+            "event_type",
+            "timestamp",
+        ),
+    }),
+]
+
+event_fieldsets_add = event_fieldsets
 
 class EventExceptionAdmin(admin.CustomModelAdmin):
     model              = models.EventException
@@ -329,57 +341,70 @@ class StartTestRunEventAdmin(EventAdmin):
     list_filter        = ["timestamp", *testrun_filter]
 
     fieldsets = [
-        testrun_fieldset,
-        (_("Event"), {
+        *testrun_fieldsets,
+        *event_fieldsets,
+    ]
+
+    fieldsets_add = [
+        *testrun_fieldsets_add,
+        *event_fieldsets_add,
+    ]
+
+class PageNavigationEventAdmin(EventAdmin):
+    model              = models.PageNavigationEvent
+    list_display       = ["timestamp", "testrun", "page_url", *testrun_display]
+    list_display_links = ["timestamp", "testrun", "page_url", *testrun_display]
+    ordering           = ["timestamp", "testrun", "id"]
+    list_filter        = ["timestamp", "testrun", "page_url", *testrun_filter]
+
+    fieldsets = [
+        *testrun_fieldsets,
+        *event_fieldsets,
+        (_("Navigation"), {
             "fields": (
-                "event_type",
-                "timestamp",
+                "page_url",
             ),
         }),
     ]
 
     fieldsets_add = [
-        testrun_fieldset_add,
-        (_("Event"), {
+        *testrun_fieldsets_add,
+        *event_fieldsets_add,
+        (_("Navigation"), {
             "fields": (
-                "event_type",
-                "timestamp",
-            ),
-        }),
-    ]
-
-class PageNavigationEventAdmin(EventAdmin):
-    model              = models.PageNavigationEvent
-    list_display       = ["testrun", "timestamp", "page_url"]
-    list_display_links = ["testrun", "timestamp", "page_url"]
-    ordering           = ["testrun", "timestamp", "id"]
-    list_filter        = ["testrun", "timestamp", "page_url"]
-
-    fieldsets = [
-        (None, {
-            "fields": (
-                "event_type",
-                ("testrun", "timestamp"),
                 "page_url",
             ),
         }),
     ]
 
 class GetInformationLineInline(TabularInline):
-    model = models.GetInformationLine
-    fields = ("seqnr", "field", "icon", "label", "value")
-    extra = 0
+    model  = models.GetInformationLine
+    fields = ("seqnr", "icon", "field", "label", "value")
+    extra  = 0
 
 class GetInformationEventAdmin(EventAdmin):
-    model   = models.GetInformationEvent
-    inlines = [EventExceptionInline, GetInformationLineInline]
+    model              = models.GetInformationEvent
+    list_display       = ["timestamp", "testrun", "engine_id", "engine_name", *testrun_display]
+    list_display_links = ["timestamp", "testrun", "engine_id", "engine_name", *testrun_display]
+    ordering           = ["timestamp", "testrun", "id"]
+    list_filter        = ["timestamp", "testrun", "engine_id", "engine_name", *testrun_filter]
+    inlines            = [GetInformationLineInline, EventExceptionInline]
 
     fieldsets = [
-        (None, {
+        *testrun_fieldsets,
+        *event_fieldsets,
+        (_("Get Information"), {
             "fields": (
-                "testrun",
-                "timestamp",
-                "event_type",
+                ("engine_id", "engine_name"),
+            ),
+        }),
+    ]
+
+    fieldsets_add = [
+        *testrun_fieldsets_add,
+        *event_fieldsets_add,
+        (_("Get Information"), {
+            "fields": (
                 ("engine_id", "engine_name"),
             ),
         }),
@@ -387,36 +412,47 @@ class GetInformationEventAdmin(EventAdmin):
 
 class GetInformationLineAdmin(admin.CustomModelAdmin):
     model              = models.GetInformationLine
-    list_display       = ["parent", "seqnr", "field", "label", "value"]
-    list_display_links = ["parent", "seqnr", "field", "label", "value"]
+    list_display       = ["parent", "seqnr", "icon", "field", "label", "value"]
+    list_display_links = ["parent", "seqnr", "icon", "field", "label", "value"]
     ordering           = ["parent", "seqnr"]
 
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+class LoadModelEventAdmin(EventAdmin):
+    model              = models.LoadModelEvent
+    list_display       = ["timestamp", "testrun", "engine_id", "model_id", "dtype", "device", *testrun_display]
+    list_display_links = ["timestamp", "testrun", "engine_id", "model_id", "dtype", "device", *testrun_display]
+    ordering           = ["timestamp", "testrun", "id"]
+    list_filter        = ["timestamp", "testrun", "engine_id", "model_id", *testrun_filter]
+
     fieldsets = [
-        (_("Parent Relation"), {
+        *testrun_fieldsets,
+        *event_fieldsets,
+        (_("Load Model"), {
             "fields": (
-                ("parent", "seqnr"),
+                "pipeline",
+                ("engine_id", "model_id"),
+                ("dtype", "device"),
             ),
         }),
-        (_("Information"), {
+        (_("Measurements"), {
             "fields": (
-                ("field", "icon"),
-                ("label", "value"),
+                "loadtime",
             ),
         }),
     ]
 
-class LoadModelEventAdmin(EventAdmin):
-    model = models.LoadModelEvent
-
-    fieldsets = [
-        (None, {
-            "fields": (
-                "testrun",
-                "timestamp",
-                "event_type",
-            ),
-        }),
-        (_("Model Parameters"), {
+    fieldsets_add = [
+        *testrun_fieldsets_add,
+        *event_fieldsets_add,
+        (_("Load Model"), {
             "fields": (
                 "pipeline",
                 ("engine_id", "model_id"),
@@ -472,6 +508,12 @@ class SemanticSearchResultAdmin(admin.CustomModelAdmin):
     list_display_links = ["parent", "seqnr", "page_title", "similarity"]
     ordering           = ["parent", "seqnr"]
     inlines            = [SemanticSearchMatchInline]
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
     fieldsets = [
         (_("Parent Relation"), {

@@ -24,7 +24,7 @@ class TestRun(models.Model):
 
     class OperatingSystemFamily(models.TextChoices):
         ANDROID  = "ANDROID",  _("Android")
-        IOS      = "IOT",      _("iOS")
+        IOS      = "IOS",      _("iOS")
         LINUX    = "LINUX",    _("Linux")
         MACOS    = "MACOS",    _("mac OS")
         SAILFISH = "SAILFISH", _("Sailfish")
@@ -183,7 +183,7 @@ class GetInformationLine(models.Model):
         get_latest_by       = ["parent__timestamp", "seqnr"]
 
     def __str__(self):
-        return t"{self.label}: {self.value}"
+        return f"{self.label}: {self.value}"
 
 class LoadModelEvent(EventMixin, Event):
     """Event: Load Model"""
@@ -210,17 +210,17 @@ class LoadModelEvent(EventMixin, Event):
         verbose_name_plural = _("Load Model Events")
 
     def __str__(self):
-        result     = t"{self.pipeline}: {self.model}"
+        result     = f"{self.pipeline}: {self.model_id}"
         additional = ""
 
         if self.dtype:
-            additional += t" {self.dtype}"
+            additional += f" {self.dtype}"
 
         if self.device:
-            additional += t" {self.device}"
+            additional += f" {self.device}"
 
         additional = additional.strip();
-        return t"{result} ({additional})" if additional else result
+        return f"{result} ({additional})" if additional else result
 
     def save(self, *args, **kwargs):
         return super().save(self.EventType.LOAD_MODEL, *args, **kwargs)
@@ -267,7 +267,7 @@ class SemanticSearchResult(models.Model):
         get_latest_by       = ["parent__timestamp", "seqnr"]
 
     def __str__(self):
-        return t"{self.page_title}: {self.similarity}%"
+        return f"{self.page_title}: {self.similarity}%"
     
 class SemanticSearchMatch(models.Model):
     """Event: Semantic Search (Matched Text)"""
@@ -291,7 +291,7 @@ class SemanticSearchMatch(models.Model):
         get_latest_by       = ["parent__parent__timestamp", "seqnr"]
 
     def __str__(self):
-        return t"{self.text}: {self.similarity}%"
+        return f"{self.text}: {self.similarity}%"
 
 class RunPipelineEvent(EventMixin, Event):
     """Event: Run pipeline (not chat) event"""
@@ -317,7 +317,7 @@ class RunPipelineEvent(EventMixin, Event):
         verbose_name_plural = _("Run Pipeline Events")
 
     def __str__(self):
-        return t"{self.page_url}: {self.model.pipeline if self.model else ''}"
+        return f"{self.page_url}: {self.model.pipeline if self.model else ''}"
 
     def save(self, *args, **kwargs):
         return super().save(self.EventType.RUN_PIPELINE, *args, **kwargs)
@@ -415,4 +415,4 @@ class QualityAssessment(models.Model):
         get_latest_by       = "timestamp"
 
     def __str__(self):
-        return t"{self.timestamp}: {self.judge_name}"
+        return f"{self.timestamp}: {self.judge_name}"
