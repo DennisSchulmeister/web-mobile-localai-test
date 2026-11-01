@@ -367,7 +367,8 @@ class QualityAssessment(models.Model):
         get_latest_by       = "timestamp"
 
     def __str__(self):
-        return f"{self.timestamp}: {self.judge_name}"
+        timestamp = date_format(self.timestamp, "DATETIME_FORMAT")
+        return f"{timestamp}: {self.judge_name}"
 
 EVENT_MODELS_BY_TYPE = {
     Event.EventType.START_TESTRUN:   StartTestRunEvent,

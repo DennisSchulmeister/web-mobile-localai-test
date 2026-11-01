@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     "django.contrib.admin",
 
     "wmlt.auth",
+    "wmlt.ai",
     "wmlt.testlogs",
 
     "rest_framework",
