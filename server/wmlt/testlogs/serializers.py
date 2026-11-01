@@ -120,7 +120,7 @@ class SemanticSearchResultSerializer(ModelSerializer):
 
         # Cannot use "__all__" here because that would mark the parent attribute as required.
         # But the parent shall be invisible to the client and be added during saving, instead.
-        fields = ["seqnr", "page_url", "page_title", "text", "text_type", "similarity", "matches"]
+        fields = ["seqnr", "page_url", "page_title", "text", "text_type", "similarity"]
         read_only_fields = ["id"]
 
 class SemanticSearchEventSerializer(AbstractEventSerializer):

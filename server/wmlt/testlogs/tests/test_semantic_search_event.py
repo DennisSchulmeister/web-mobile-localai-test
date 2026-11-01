@@ -9,12 +9,11 @@ from .base                import NestedObjectsAPITestCase
 from django.urls          import reverse
 
 from wmlt.testlogs.models import SemanticSearchEvent
-from wmlt.testlogs.models import SemanticSearchMatch
 
 class SemanticSearchEventNestedObjectsTests(NestedObjectsAPITestCase):
     route_name = "semantic_search_event"
 
-    def test_create_saves_and_returns_nested_results_and_matches(self):
+    def test_create_saves_and_returns_nested_results(self):
         response = self.create_event(
             self.route_name,
             {
@@ -28,21 +27,9 @@ class SemanticSearchEventNestedObjectsTests(NestedObjectsAPITestCase):
                         "seqnr":      1,
                         "page_url":   "https://example.test/one",
                         "page_title": "First",
+                        "text":       "matched keyword",
+                        "text_type":  "KEYWORD",
                         "similarity":  90,
-                        "matches": [
-                            {
-                                "seqnr":      1,
-                                "text":       "matched keyword",
-                                "text_type":  "KEYWORD",
-                                "similarity": 95,
-                            },
-                            {
-                                "seqnr":     2,
-                                "text":      "matched sentence",
-                                "text_type": "SENTENCE",
-                                "similarity": 85,
-                            },
-                        ],
                     }
                 ],
             },
@@ -52,34 +39,22 @@ class SemanticSearchEventNestedObjectsTests(NestedObjectsAPITestCase):
         result = event.results.get()
 
         self.assertEqual(
-            list(result.matches.values_list("seqnr", "text", "text_type", "similarity")),
-            [
-                (1, "matched keyword", "KEYWORD", 95),
-                (2, "matched sentence", "SENTENCE", 85),
-            ],
+            (result.seqnr, result.text, result.text_type, result.similarity),
+            (1, "matched keyword", "KEYWORD", 90),
         )
-
-        self.assertEqual(response.data["results"][0]["seqnr"], 1)
-
         self.assertEqual(
-            response.data["results"][0]["matches"],
-            [
-                {
-                    "seqnr":      1,
-                    "text":       "matched keyword",
-                    "text_type":  "KEYWORD",
-                    "similarity": 95,
-                },
-                {
-                    "seqnr":      2,
-                    "text":       "matched sentence",
-                    "text_type":  "SENTENCE",
-                    "similarity": 85,
-                },
-            ],
+            response.data["results"][0],
+            {
+                "seqnr":      1,
+                "page_url":   "https://example.test/one",
+                "page_title": "First",
+                "text":       "matched keyword",
+                "text_type":  "KEYWORD",
+                "similarity": 90,
+            },
         )
 
-    def test_patch_replaces_nested_hierarchy_and_omitting_results_preserves_it(self):
+    def test_patch_replaces_nested_results_and_omitting_results_preserves_them(self):
         created = self.create_event(
             self.route_name,
             {
@@ -93,15 +68,9 @@ class SemanticSearchEventNestedObjectsTests(NestedObjectsAPITestCase):
                         "seqnr":      1,
                         "page_url":   "https://example.test/old",
                         "page_title": "Old",
+                        "text":       "old match",
+                        "text_type":  "KEYWORD",
                         "similarity": 70,
-                        "matches": [
-                            {
-                                "seqnr":      1,
-                                "text":       "old match",
-                                "text_type":  "KEYWORD",
-                                "similarity": 70,
-                            }
-                        ],
                     }
                 ],
             },
@@ -110,21 +79,14 @@ class SemanticSearchEventNestedObjectsTests(NestedObjectsAPITestCase):
         original_event = SemanticSearchEvent.objects.get(pk=event_id)
         old_result     = original_event.results.get()
         old_result_id  = old_result.pk
-        old_match_id   = old_result.matches.get().pk
 
         replacement = {
             "seqnr":      2,
             "page_url":   "https://example.test/new",
             "page_title": "New",
+            "text":       "new match",
+            "text_type":  "SENTENCE",
             "similarity": 88,
-            "matches": [
-                {
-                    "seqnr":      1,
-                    "text":       "new match",
-                    "text_type":  "SENTENCE",
-                    "similarity": 88,
-                }
-            ],
         }
         response = self.client.patch(
             reverse(f"{self.route_name}-detail", args=[event_id]),
@@ -137,13 +99,11 @@ class SemanticSearchEventNestedObjectsTests(NestedObjectsAPITestCase):
         event = SemanticSearchEvent.objects.get(pk=event_id)
         self.assertFalse(event.results.filter(pk=old_result_id).exists())
 
-        self.assertFalse(SemanticSearchMatch.objects.filter(pk=old_match_id).exists())
-
         new_result = event.results.get()
 
         self.assertEqual(
-            list(new_result.matches.values_list("text", "text_type", "similarity")),
-            [("new match", "SENTENCE", 88)],
+            (new_result.text, new_result.text_type, new_result.similarity),
+            ("new match", "SENTENCE", 88),
         )
 
         response = self.client.patch(
@@ -151,12 +111,10 @@ class SemanticSearchEventNestedObjectsTests(NestedObjectsAPITestCase):
             {"query": "updated query"},
             format="json",
         )
-
         self.assertEqual(response.status_code, 200, response.data)
         self.assertEqual(event.results.count(), 1)
-        self.assertEqual(new_result.matches.count(), 1)
 
-    def test_patch_with_empty_results_clears_results_and_matches(self):
+    def test_patch_with_empty_results_clears_results(self):
         created = self.create_event(
             self.route_name,
             {
@@ -170,15 +128,9 @@ class SemanticSearchEventNestedObjectsTests(NestedObjectsAPITestCase):
                         "seqnr":      1,
                         "page_url":   "https://example.test/one",
                         "page_title": "First",
+                        "text":       "match",
+                        "text_type":  "KEYWORD",
                         "similarity": 90,
-                        "matches": [
-                            {
-                                "seqnr":      1,
-                                "text":       "match",
-                                "text_type":  "KEYWORD",
-                                "similarity": 90,
-                            }
-                        ],
                     }
                 ],
             },
