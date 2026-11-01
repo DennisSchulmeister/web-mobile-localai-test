@@ -1,7 +1,6 @@
 Django App
 ==========
 
-* EventAdmin -> Inlines für die Event-Arten ?? Oder Absprung in die Details
 * Action für Quality Assessment mit LLM
 * Docker Compose für Deployment
 

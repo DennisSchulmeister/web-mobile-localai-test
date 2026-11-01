@@ -10,11 +10,46 @@ from .. import admin
 from django.contrib.admin     import display
 from django.contrib.admin     import StackedInline
 from django.contrib.admin     import TabularInline
+from django.urls              import reverse
+from django.utils.html        import format_html
 from django.utils.formats     import date_format
 from django.utils.translation import gettext_lazy as _
 
+def _event_admin_url(admin_site, obj):
+    """Return the concrete event's change URL."""
+    model = models.EVENT_MODELS_BY_TYPE.get(obj.event_type)
+
+    if model:
+        return reverse(
+            f"{admin_site.name}:{model._meta.app_label}_{model._meta.model_name}_change",
+            args=[obj.pk],
+        )
+    return ""
+
+class TestRunEventInline(TabularInline):
+    model           = models.Event
+    fields          = ["timestamp", "event_type_link"]
+    readonly_fields = ["timestamp", "event_type_link"]
+    ordering        = ["timestamp", "id"]
+    extra           = 0
+
+    @display(description=_("Event"))
+    def event_type_link(self, obj):
+        url = _event_admin_url(self.admin_site, obj)
+        return format_html('<a href="{}">➡️ &nbsp; {}</a>', url, obj.get_event_type_display()) if url else ""
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 class TestRunAdmin(admin.CustomModelAdmin):
     model              = models.TestRun
+    inlines             = [TestRunEventInline]
     list_display       = ["start_date", "access_code", "app_type", "device_type", "device_model", "os_family", "os_version", "browser_family", "browser_version", "remarks"]
     list_display_links = ["start_date", "access_code", "app_type", "device_type", "device_model", "os_family", "os_version", "browser_family", "browser_version", "remarks"]
     ordering           = ["start_date", "id"]
@@ -101,10 +136,10 @@ class ReadOnlyEventExceptionInline(EventExceptionInline):
 
 class EventAdmin(admin.CustomModelAdmin):
     model               = models.Event
-    list_display        = ["timestamp", "testrun", "event_type", *testrun_display]
-    list_display_links  = ["timestamp", "testrun", "event_type", *testrun_display]
+    list_display        = ["testrun", "timestamp", "event_type", *testrun_display]
+    list_display_links  = ["testrun", "timestamp", "event_type", *testrun_display]
     list_select_related = True
-    ordering            = ["timestamp", "id"]
+    ordering            = ["testrun", "timestamp", "id"]
     list_filter         = ["event_type", "timestamp", *testrun_filter]
     readonly_fields     = ["event_type", *testrun_readonly]
     date_hierarchy      = "timestamp"
@@ -181,7 +216,15 @@ class EventAdmin(admin.CustomModelAdmin):
         return obj.testrun.remarks
 
 class ReadOnlyEventAdmin(EventAdmin):
-    inlines = [ReadOnlyEventExceptionInline]
+    inlines            = [ReadOnlyEventExceptionInline]
+    list_display       = [EventAdmin.list_display[0], EventAdmin.list_display[1], "event_type_link", *EventAdmin.list_display[3:]]
+    list_display_links = ["event_type_link"]
+    readonly_fields    = ["event_type_link"]
+
+    @display(description="Event")
+    def event_type_link(self, obj):
+        url = _event_admin_url(self.admin_site, obj)
+        return format_html('<a href="{}">➡️ &nbsp; {}</a>', url, obj.get_event_type_display()) if url else ""
 
     def has_add_permission(self, request):
         return False
@@ -334,9 +377,9 @@ class EventExceptionAdmin(admin.CustomModelAdmin):
 
 class StartTestRunEventAdmin(EventAdmin):
     model              = models.StartTestRunEvent
-    list_display       = ["timestamp", "testrun", *testrun_display]
-    list_display_links = ["timestamp", "testrun", *testrun_display]
-    ordering           = ["timestamp", "id"]
+    list_display       = ["testrun", "timestamp", *testrun_display]
+    list_display_links = ["testrun", "timestamp", *testrun_display]
+    ordering           = ["testrun", "timestamp", "id"]
     list_filter        = ["timestamp", *testrun_filter]
 
     fieldsets = [
@@ -351,10 +394,10 @@ class StartTestRunEventAdmin(EventAdmin):
 
 class PageNavigationEventAdmin(EventAdmin):
     model              = models.PageNavigationEvent
-    list_display       = ["timestamp", "testrun", "page_url", *testrun_display]
-    list_display_links = ["timestamp", "testrun", "page_url", *testrun_display]
-    ordering           = ["timestamp", "testrun", "id"]
-    list_filter        = ["timestamp", "testrun", "page_url", *testrun_filter]
+    list_display       = ["testrun", "timestamp", "page_url", *testrun_display]
+    list_display_links = ["testrun", "timestamp", "page_url", *testrun_display]
+    ordering           = ["testrun", "timestamp", "id"]
+    list_filter        = ["testrun", "timestamp", "page_url", *testrun_filter]
 
     fieldsets = [
         *testrun_fieldsets,
@@ -383,10 +426,10 @@ class GetInformationLineInline(TabularInline):
 
 class GetInformationEventAdmin(EventAdmin):
     model              = models.GetInformationEvent
-    list_display       = ["timestamp", "testrun", "engine_id", "engine_name", *testrun_display]
-    list_display_links = ["timestamp", "testrun", "engine_id", "engine_name", *testrun_display]
-    ordering           = ["timestamp", "testrun", "id"]
-    list_filter        = ["timestamp", "testrun", "engine_id", "engine_name", *testrun_filter]
+    list_display       = ["testrun", "timestamp", "engine_id", "engine_name", *testrun_display]
+    list_display_links = ["testrun", "timestamp", "engine_id", "engine_name", *testrun_display]
+    ordering           = ["testrun", "timestamp", "id"]
+    list_filter        = ["testrun", "timestamp", "engine_id", "engine_name", *testrun_filter]
     inlines            = [GetInformationLineInline, *EventAdmin.inlines]
 
     fieldsets = [
@@ -426,10 +469,10 @@ class GetInformationLineAdmin(admin.CustomModelAdmin):
 
 class LoadModelEventAdmin(EventAdmin):
     model              = models.LoadModelEvent
-    list_display       = ["timestamp", "testrun", "engine_id", "model_id", "dtype", "device", *testrun_display]
-    list_display_links = ["timestamp", "testrun", "engine_id", "model_id", "dtype", "device", *testrun_display]
-    ordering           = ["timestamp", "testrun", "id"]
-    list_filter        = ["timestamp", "testrun", "engine_id", "model_id", *testrun_filter]
+    list_display       = ["testrun", "timestamp", "engine_id", "model_id", "dtype", "device", *testrun_display]
+    list_display_links = ["testrun", "timestamp", "engine_id", "model_id", "dtype", "device", *testrun_display]
+    ordering           = ["testrun", "timestamp", "id"]
+    list_filter        = ["testrun", "timestamp", "engine_id", "model_id", *testrun_filter]
 
     fieldsets = [
         *testrun_fieldsets,
@@ -472,10 +515,10 @@ class SemanticSearchResultInline(TabularInline):
 
 class SemanticSearchEventAdmin(EventAdmin):
     model   = models.SemanticSearchEvent
-    list_display       = ["timestamp", "testrun", "model", "query", *testrun_display]
-    list_display_links = ["timestamp", "testrun", "model", "query", *testrun_display]
-    ordering           = ["timestamp", "testrun", "id"]
-    list_filter        = ["timestamp", "testrun", "model", *testrun_filter]
+    list_display       = ["testrun", "timestamp", "model", "query", *testrun_display]
+    list_display_links = ["testrun", "timestamp", "model", "query", *testrun_display]
+    ordering           = ["testrun", "timestamp", "id"]
+    list_filter        = ["testrun", "timestamp", "model", *testrun_filter]
     inlines            = [SemanticSearchResultInline, *EventAdmin.inlines]
 
     fieldsets = [
@@ -512,10 +555,10 @@ class SemanticSearchEventAdmin(EventAdmin):
 
 class RunPipelineEventAdmin(EventAdmin):
     model              = models.RunPipelineEvent
-    list_display       = ["timestamp", "testrun", "model__pipeline", "model__model_id", "query", *testrun_display]
-    list_display_links = ["timestamp", "testrun", "model__pipeline", "model__model_id", "query", *testrun_display]
-    ordering           = ["timestamp", "testrun", "id"]
-    list_filter        = ["timestamp", "testrun", "model__pipeline", "model__model_id", *testrun_filter]
+    list_display       = ["testrun", "timestamp", "model__pipeline", "model__model_id", "query", *testrun_display]
+    list_display_links = ["testrun", "timestamp", "model__pipeline", "model__model_id", "query", *testrun_display]
+    ordering           = ["testrun", "timestamp", "id"]
+    list_filter        = ["testrun", "timestamp", "model__pipeline", "model__model_id", *testrun_filter]
     
     readonly_fields = [
         *EventAdmin.readonly_fields,
@@ -618,9 +661,9 @@ class RunPipelineEventAdmin(EventAdmin):
     
 class StartChatEventAdmin(EventAdmin):
     model              = models.StartChatEvent
-    list_display       = ["timestamp", "testrun", "page_url", *testrun_display]
-    list_display_links = ["timestamp", "testrun", "page_url", *testrun_display]
-    ordering           = ["timestamp", "id"]
+    list_display       = ["testrun", "timestamp", "page_url", *testrun_display]
+    list_display_links = ["testrun", "timestamp", "page_url", *testrun_display]
+    ordering           = ["testrun", "timestamp", "id"]
     list_filter        = ["timestamp", "page_url", *testrun_filter]
 
     fieldsets = [
@@ -667,9 +710,9 @@ class QualityAssessmentInline(StackedInline):
 
 class ChatMessageEventAdmin(EventAdmin):
     model = models.ChatMessageEvent
-    list_display       = ["timestamp", "testrun", "chat", "model", "user_message", *testrun_display]
-    list_display_links = ["timestamp", "testrun", "chat", "model", "user_message", *testrun_display]
-    ordering           = ["timestamp", "id"]
+    list_display       = ["testrun", "timestamp", "chat", "model", "user_message", *testrun_display]
+    list_display_links = ["testrun", "timestamp", "chat", "model", "user_message", *testrun_display]
+    ordering           = ["testrun", "timestamp", "id"]
     list_filter        = ["timestamp", "model__model_id", *testrun_filter]
     inlines            = [QualityAssessmentInline, *EventAdmin.inlines]
 

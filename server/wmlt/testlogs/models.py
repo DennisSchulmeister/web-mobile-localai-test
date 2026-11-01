@@ -368,3 +368,14 @@ class QualityAssessment(models.Model):
 
     def __str__(self):
         return f"{self.timestamp}: {self.judge_name}"
+
+EVENT_MODELS_BY_TYPE = {
+    Event.EventType.START_TESTRUN:   StartTestRunEvent,
+    Event.EventType.PAGE_NAVIGATION: PageNavigationEvent,
+    Event.EventType.GET_INFORMATION: GetInformationEvent,
+    Event.EventType.LOAD_MODEL:      LoadModelEvent,
+    Event.EventType.SEMANTIC_SEARCH: SemanticSearchEvent,
+    Event.EventType.RUN_PIPELINE:    RunPipelineEvent,
+    Event.EventType.START_CHAT:      StartChatEvent,
+    Event.EventType.CHAT_MESSAGE:    ChatMessageEvent,
+}
