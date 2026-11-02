@@ -15,6 +15,7 @@ def register_api_routes(router: DefaultRouter, prefix: str) -> None:
     router.register(f"{prefix}/events",                 viewsets.EventViewSet,               basename="event")
     router.register(f"{prefix}/event_exceptions",       viewsets.EventExceptionViewSet,      basename="event_exception")
     router.register(f"{prefix}/start_test_run_events",  viewsets.StartTestRunEventViewSet,   basename="start_test_run_event")
+    router.register(f"{prefix}/stop_test_run_events",   viewsets.StopTestRunEventViewSet,    basename="stop_test_run_event")
     router.register(f"{prefix}/page_navigation_events", viewsets.PageNavigationEventViewSet, basename="page_navigation_event")
     router.register(f"{prefix}/get_information_events", viewsets.GetInformationEventViewSet, basename="get_information_event")
     router.register(f"{prefix}/load_model_events",      viewsets.LoadModelEventViewSet,      basename="load_model_event")

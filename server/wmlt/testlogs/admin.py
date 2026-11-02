@@ -136,11 +136,11 @@ class ReadOnlyEventExceptionInline(EventExceptionInline):
 
 class EventAdmin(admin.CustomModelAdmin):
     model               = models.Event
-    list_display        = ["testrun", "timestamp", "event_type", *testrun_display]
-    list_display_links  = ["testrun", "timestamp", "event_type", *testrun_display]
+    list_display        = ["testrun", "timestamp", "event_type", "status", *testrun_display]
+    list_display_links  = ["testrun", "timestamp", "event_type", "status", *testrun_display]
     list_select_related = True
     ordering            = ["testrun", "timestamp", "id"]
-    list_filter         = ["event_type", "timestamp", *testrun_filter]
+    list_filter         = ["event_type", "status", "timestamp", *testrun_filter]
     readonly_fields     = ["event_type", *testrun_readonly]
     date_hierarchy      = "timestamp"
     inlines             = [EventExceptionInline]
@@ -149,7 +149,8 @@ class EventAdmin(admin.CustomModelAdmin):
         *testrun_fieldsets,
         (_("Event"), {
             "fields": (
-                ("timestamp", "event_type"),
+                "timestamp",
+                ("event_type", "status"),
             ),
         }),
     ]
@@ -238,7 +239,8 @@ class ReadOnlyEventAdmin(EventAdmin):
 event_fieldsets = [
     (_("Event"), {
         "fields": (
-            ("timestamp", "event_type"),
+            "timestamp",
+            ("event_type", "status"),
         ),
     }),
 ]
@@ -377,6 +379,23 @@ class EventExceptionAdmin(admin.CustomModelAdmin):
 
 class StartTestRunEventAdmin(EventAdmin):
     model              = models.StartTestRunEvent
+    list_display       = ["testrun", "timestamp", *testrun_display]
+    list_display_links = ["testrun", "timestamp", *testrun_display]
+    ordering           = ["testrun", "timestamp", "id"]
+    list_filter        = ["timestamp", *testrun_filter]
+
+    fieldsets = [
+        *testrun_fieldsets,
+        *event_fieldsets,
+    ]
+
+    fieldsets_add = [
+        *testrun_fieldsets_add,
+        *event_fieldsets_add,
+    ]
+
+class StopTestRunEventAdmin(EventAdmin):
+    model              = models.StopTestRunEvent
     list_display       = ["testrun", "timestamp", *testrun_display]
     list_display_links = ["testrun", "timestamp", *testrun_display]
     ordering           = ["testrun", "timestamp", "id"]
@@ -694,7 +713,7 @@ class QualityAssessmentInline(StackedInline):
         (_("Meta-data"), {
             "fields": (
                 "timestamp",
-                ("judge_type", "judge_name"),
+                ("judge_type", "judge_name", "ai_trace"),
             ),
         }),
         (_("Assessment"), {
@@ -835,6 +854,7 @@ class QualityAssessmentAdmin(admin.CustomModelAdmin):
     list_display = [
         "timestamp",
         "message__model__model_id",
+        "ai_trace",
         "correct_syntax_grade",
         "correct_lingua_grade",
         "correct_content_grade",
@@ -855,6 +875,7 @@ admin.admin_site.register(models.TestRun,             TestRunAdmin)
 admin.admin_site.register(models.Event,               ReadOnlyEventAdmin)
 admin.admin_site.register(models.EventException,      EventExceptionAdmin)
 admin.admin_site.register(models.StartTestRunEvent,   StartTestRunEventAdmin)
+admin.admin_site.register(models.StopTestRunEvent,    StopTestRunEventAdmin)
 admin.admin_site.register(models.PageNavigationEvent, PageNavigationEventAdmin)
 admin.admin_site.register(models.GetInformationEvent, GetInformationEventAdmin)
 admin.admin_site.register(models.GetInformationLine,  GetInformationLineAdmin)

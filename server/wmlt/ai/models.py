@@ -11,10 +11,10 @@ from django.utils.formats     import date_format
 from django.utils.translation import gettext_lazy as _
 from instructor               import Mode
 
-def empty_or_dict(value):
+def is_dict(value):
     if not isinstance(value, dict):
         raise ValidationError(_("The field must be empty or a JSON object."))
-        
+
 class AIModel(models.Model):
     """API keys and connection data for AI models"""
     class Mode(models.TextChoices):
@@ -27,11 +27,11 @@ class AIModel(models.Model):
     model_id    = models.CharField(_("Model ID"), max_length=100, unique=True)
     api_Key     = models.CharField(_("API Key"), max_length=255, blank=True)
     base_url    = models.URLField(_("Base URL"), blank=True, help_text=_("When different from the default base URL."))
-    mode        = models.CharField(_("Call Mode"), blank=True, help_text=_("Normally you shouldn't need to set this value."))
-    batch       = models.BooleanField(_("Batch Mode"), help_text=_("Enabling this saves consts but requests take longer to process."))
+    mode        = models.CharField(_("Call Mode"), blank=True, choices=Mode, help_text=_("Normally you shouldn't need to set this value."))
+    batch       = models.BooleanField(_("Batch Mode"), help_text=_("Enabling this saves costs but requests take longer to process."))
     cache_size  = models.IntegerField(_("Response Cache Size"), blank=True, null=True, help_text=_("Setting this value enables the built-in response cache."))
     max_retries = models.IntegerField(_("Maximum Retries"), blank=True, null=True, default=2)
-    kwargs      = models.JSONField(_("Provider-specific Parameters"), blank=True, default=dict, validators=[empty_or_dict])
+    kwargs      = models.JSONField(_("Provider-specific Parameters"), blank=True, default=dict, validators=[is_dict])
 
     class Meta:
         verbose_name        = _("AI Model")
@@ -57,8 +57,7 @@ class Trace(models.Model):
         get_latest_by       = "timestamp"
 
     def __str__(self):
-        timestamp = date_format(self.timestamp, "DATETIME_FORMAT")
-        return f"{timestamp}: {self.model.model_id}"
+        return date_format(self.timestamp, "DATETIME_FORMAT")
 
 class Message(models.Model):
     """Logged messages"""

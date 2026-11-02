@@ -51,6 +51,10 @@ class StartTestRunEventViewSet(AbstractEventViewSet):
     queryset         = models.StartTestRunEvent.objects.all()
     serializer_class = serializers.StartTestRunEventSerializer
 
+class StopTestRunEventViewSet(AbstractEventViewSet):
+    queryset         = models.StopTestRunEvent.objects.all()
+    serializer_class = serializers.StopTestRunEventSerializer
+
 class PageNavigationEventViewSet(AbstractEventViewSet):
     queryset         = models.PageNavigationEvent.objects.all()
     serializer_class = serializers.PageNavigationEventSerializer

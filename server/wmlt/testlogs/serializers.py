@@ -61,6 +61,11 @@ class StartTestRunEventSerializer(AbstractEventSerializer):
         model  = models.StartTestRunEvent
         fields = "__all__"
 
+class StopTestRunEventSerializer(AbstractEventSerializer):
+    class Meta:
+        model  = models.StopTestRunEvent
+        fields = "__all__"
+
 class PageNavigationEventSerializer(AbstractEventSerializer):
     class Meta:
         model  = models.PageNavigationEvent

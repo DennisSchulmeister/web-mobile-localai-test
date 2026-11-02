@@ -56,7 +56,7 @@ class Migration(migrations.Migration):
                 (
                     "batch",
                     models.BooleanField(
-                        help_text="Enabling this saves consts but requests take longer to process.",
+                        help_text="Enabling this saves costs but requests take longer to process.",
                         verbose_name="Batch Mode",
                     ),
                 ),
@@ -80,7 +80,7 @@ class Migration(migrations.Migration):
                     models.JSONField(
                         blank=True,
                         default=dict,
-                        validators=[wmlt.ai.models.empty_or_dict],
+                        validators=[wmlt.ai.models.is_dict],
                         verbose_name="Provider-specific Parameters",
                     ),
                 ),

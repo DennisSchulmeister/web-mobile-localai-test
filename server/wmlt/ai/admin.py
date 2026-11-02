@@ -7,10 +7,19 @@
 from .  import models
 from .. import admin
 
-from django.contrib.admin     import display
 from django.contrib.admin     import StackedInline
-from django.contrib.admin     import TabularInline
-from django.urls              import reverse
-from django.utils.html        import format_html
-from django.utils.formats     import date_format
 from django.utils.translation import gettext_lazy as _
+
+class AIModelAdmin(admin.CustomModelAdmin):
+    model = models.AIModel
+
+class MessageInline(StackedInline):
+    model = models.Message
+    extra = 0
+
+class TraceAdmin(admin.CustomModelAdmin):
+    model   = models.Trace
+    inlines = [MessageInline]
+
+admin.admin_site.register(models.AIModel, AIModelAdmin)
+admin.admin_site.register(models.Trace,   TraceAdmin)

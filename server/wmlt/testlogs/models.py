@@ -65,6 +65,7 @@ class Event(models.Model):
     """Actions performed during a single test run"""
     class EventType(models.TextChoices):
         START_TESTRUN    = "START_TESTRUN",    _("Start Testrun")
+        STOP_TESTRUN     = "STOP_TESTRUN",     _("Stop Testrun")
         PAGE_NAVIGATION  = "PAGE_NAVIGATION",  _("Page Navigation")
         GET_INFORMATION  = "GET_INFORMATION",  _("Get Information")
         LOAD_MODEL       = "LOAD_MODEL",       _("Load Model")
@@ -73,9 +74,14 @@ class Event(models.Model):
         START_CHAT       = "START_CHAT",       _("Start Chat")
         CHAT_MESSAGE     = "CHAT_MESSAGE",     _("Chat Message")
 
+    class Status(models.TextChoices):
+        SUCCESS = "SUCCESS", _("Success")
+        ERROR   = "ERROR",   _("Error")
+
     testrun    = models.ForeignKey(TestRun, on_delete=models.CASCADE)
     timestamp  = models.DateTimeField(_("Timestamp"), default=timezone.now)
     event_type = models.CharField(_("Event Type"), max_length=30, choices=EventType, editable=False)
+    status     = models.CharField(_("Status"), max_length=10, choices=Status)
 
     class Meta:
         verbose_name        = _("Event")
@@ -134,6 +140,15 @@ class StartTestRunEvent(EventMixin, Event):
 
     def save(self, *args, **kwargs):
         return super().save(self.EventType.START_TESTRUN, *args, **kwargs)
+
+class StopTestRunEvent(EventMixin, Event):
+    """Event: Stop Testrun"""
+    class Meta:
+        verbose_name        = _("Stop Testrun Event")
+        verbose_name_plural = _("Stop Testrun Events")
+
+    def save(self, *args, **kwargs):
+        return super().save(self.EventType.STOP_TESTRUN, *args, **kwargs)
 
 class PageNavigationEvent(EventMixin, Event):
     """Event: Page Navigation"""
@@ -349,6 +364,7 @@ class QualityAssessment(models.Model):
     timestamp                = models.DateTimeField(_("Timestamp"), default=timezone.now)
     judge_type               = models.CharField(_("Judge Type"), max_length=15, choices=JudgeType)
     judge_name               = models.CharField(_("Judge Name"), max_length=50, blank=True)
+    ai_trace                 = models.ForeignKey("wmlt_ai.Trace", on_delete=models.SET_NULL, null=True, blank=True)
     correct_syntax_grade     = models.SmallIntegerField(_("Correct Syntax"), blank=True, null=True, choices=Correctness)
     correct_syntax_note      = models.CharField(_("Explanation"), max_length=100, blank=True)
     correct_lingua_grade     = models.SmallIntegerField(_("Correct Lingua"), blank=True, null=True, choices=Correctness)
@@ -372,6 +388,7 @@ class QualityAssessment(models.Model):
 
 EVENT_MODELS_BY_TYPE = {
     Event.EventType.START_TESTRUN:   StartTestRunEvent,
+    Event.EventType.STOP_TESTRUN:    StopTestRunEvent,
     Event.EventType.PAGE_NAVIGATION: PageNavigationEvent,
     Event.EventType.GET_INFORMATION: GetInformationEvent,
     Event.EventType.LOAD_MODEL:      LoadModelEvent,
