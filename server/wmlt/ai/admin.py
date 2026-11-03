@@ -4,13 +4,14 @@
 # This source code is licensed under the BSD 3-Clause License found in the
 # LICENSE file in the root directory of this source tree.
 
-from .  import models
-from .. import admin
+from .                        import models
+from ..                       import admin
 
 from django                   import forms
 from django.contrib.admin     import action
 from django.contrib.admin     import ActionLocation
 from django.contrib.admin     import StackedInline
+from django.contrib.admin     import TabularInline
 from django.utils.translation import gettext_lazy as _
 
 class AIModelAdminForm(forms.ModelForm):
@@ -32,7 +33,17 @@ class AIModelAdminForm(forms.ModelForm):
         """Restore saved API key when submitting the unchanged empty API key field."""
         api_key = self.cleaned_data["api_key"]
         return api_key or self.instance.api_key
-    
+
+class TraceInline(TabularInline):
+    model            = models.Trace
+    fields           = ["timestamp", "model", "description"]
+    readonly_fields  = ["timestamp", "model", "description"]
+    extra            = 0
+    show_change_link = True
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
 class AIModelAdmin(admin.CustomModelAdmin):
     model              = models.AIModel
     form               = AIModelAdminForm
@@ -40,6 +51,7 @@ class AIModelAdmin(admin.CustomModelAdmin):
     list_display_links = ["model_id", "base_url", "batch"]
     ordering           = ["model_id"]
     actions            = ["test_model"]
+    inlines            = [TraceInline]
 
     fieldsets = [
         (_("Connection"), {
@@ -69,7 +81,6 @@ class AIModelAdmin(admin.CustomModelAdmin):
 
 class MessageInline(StackedInline):
     model = models.Message
-    #fields = ["flownr", "msgnr", "role", "content"]
     extra = 0
 
     fieldsets = [
