@@ -44,6 +44,10 @@
             align-items: first baseline;
             gap: 1em;
         }
+
+        .flex-container legend {
+            padding-top: 0;
+        }
     
         select, input:not([type="submit"]):not([type="checkbox"]) {
             box-sizing: border-box;
@@ -72,6 +76,11 @@
 
         td.delete input {
             margin: 0 !important;
+        }
+
+        /* Put help text below fields to vertically align fields with and without help text */
+        .flex-container .help {
+            order: 10;
         }
     
         /* Fix clock dialog width */

@@ -24,8 +24,8 @@ class AIModel(models.Model):
         PARALLEL_TOOLS = str(Mode.PARALLEL_TOOLS),  _("Parallel Tool Calling")
         RESPONSE_TOOLS = str(Mode.RESPONSES_TOOLS), _("OpenAI Responses API Tools")
 
-    model_id    = models.CharField(_("Model ID"), max_length=100, unique=True)
-    api_Key     = models.CharField(_("API Key"), max_length=255, blank=True)
+    model_id    = models.CharField(_("Model ID"), max_length=100, unique=True, help_text=_("See https://python.useinstructor.com/integrations/#getting-started"))
+    api_key     = models.CharField(_("API Key"), max_length=255, blank=True)
     base_url    = models.URLField(_("Base URL"), blank=True, help_text=_("When different from the default base URL."))
     mode        = models.CharField(_("Call Mode"), blank=True, choices=Mode, help_text=_("Normally you shouldn't need to set this value."))
     batch       = models.BooleanField(_("Batch Mode"), help_text=_("Enabling this saves costs but requests take longer to process."))
@@ -62,7 +62,7 @@ class Trace(models.Model):
 class Message(models.Model):
     """Logged messages"""
     trace   = models.ForeignKey(Trace, on_delete=models.CASCADE)
-    flownr  = models.IntegerField(_("Flow Number"))
+    flownr  = models.IntegerField(_("Flow Number"), help_text=_("One request/response exchange"))
     msgnr   = models.IntegerField(_("Message Number"), help_text=_("Message number within a flow"))
     role    = models.CharField(_("Role"), max_length=25)
     content = models.TextField(_("Content"), blank=True)
@@ -73,4 +73,4 @@ class Message(models.Model):
         ordering            = ["trace", "flownr", "msgnr"]
 
     def __str__(self):
-        return f"{self.parent}: {self.flownr}-{self.msgnr}"
+        return f"{self.trace}: {self.flownr}-{self.msgnr}"
