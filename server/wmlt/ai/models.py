@@ -9,7 +9,7 @@ from django.db                import models
 from django.utils             import timezone
 from django.utils.formats     import date_format
 from django.utils.translation import gettext_lazy as _
-from instructor               import Mode
+from instructor               import Mode as ModeInspector
 
 def is_dict(value):
     if not isinstance(value, dict):
@@ -18,20 +18,36 @@ def is_dict(value):
 class AIModel(models.Model):
     """API keys and connection data for AI models"""
     class Mode(models.TextChoices):
-        TOOLS          = str(Mode.TOOLS),           _("Tool Calling")
-        JSON_SCHEMA    = str(Mode.JSON_SCHEMA),     _("JSON Schema")
-        MD_JSON        = str(Mode.MD_JSON),         _("Extract JSON from Markdown")
-        PARALLEL_TOOLS = str(Mode.PARALLEL_TOOLS),  _("Parallel Tool Calling")
-        RESPONSE_TOOLS = str(Mode.RESPONSES_TOOLS), _("OpenAI Responses API Tools")
+        TOOLS          = str(ModeInspector.TOOLS),           _("Tool Calling")
+        JSON_SCHEMA    = str(ModeInspector.JSON_SCHEMA),     _("JSON Schema")
+        MD_JSON        = str(ModeInspector.MD_JSON),         _("Extract JSON from Markdown")
+        PARALLEL_TOOLS = str(ModeInspector.PARALLEL_TOOLS),  _("Parallel Tool Calling")
+        RESPONSE_TOOLS = str(ModeInspector.RESPONSES_TOOLS), _("OpenAI Responses API Tools")
 
     model_id    = models.CharField(_("Model ID"), max_length=100, unique=True, help_text=_("See https://python.useinstructor.com/integrations/#getting-started"))
     api_key     = models.CharField(_("API Key"), max_length=255, blank=True)
     base_url    = models.URLField(_("Base URL"), blank=True, help_text=_("When different from the default base URL."))
     mode        = models.CharField(_("Call Mode"), blank=True, choices=Mode, help_text=_("Normally you shouldn't need to set this value."))
-    batch       = models.BooleanField(_("Batch Mode"), help_text=_("Enabling this saves costs but requests take longer to process."))
     cache_size  = models.IntegerField(_("Response Cache Size"), blank=True, null=True, help_text=_("Setting this value enables the built-in response cache."))
     max_retries = models.IntegerField(_("Maximum Retries"), blank=True, null=True, default=2)
     kwargs      = models.JSONField(_("Provider-specific Parameters"), blank=True, default=dict, validators=[is_dict])
+
+    @property
+    def mode_inspector(self):
+        """Get ``Mode`` constant from ``Inspector``"""
+        match self.mode:
+            case self.Mode.TOOLS:
+                return ModeInspector.TOOLS
+            case self.Mode.JSON_SCHEMA:
+                return ModeInspector.JSON_SCHEMA
+            case self.Mode.MD_JSON:
+                return ModeInspector.MD_JSON
+            case self.Mode.PARALLEL_TOOLS:
+                return ModeInspector.PARALLEL_TOOLS
+            case self.Mode.RESPONSE_TOOLS:
+                return ModeInspector.RESPONSES_TOOLS
+            case _:
+                return None
 
     class Meta:
         verbose_name        = _("AI Model")

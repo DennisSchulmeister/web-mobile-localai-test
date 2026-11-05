@@ -840,6 +840,17 @@ files = [
 all = ["coverage (>=7.10.0)", "hypothesis (>=6.141.1)", "mypy (>=1.11.2)", "pytest (>=8.3.2)", "ruff (>=0.16.0)", "ty (>=0.0.37)"]
 
 [[package]]
+name = "inspector"
+version = "0.5.1.1"
+description = "a Python server and shell for inspecting Python processes"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "inspector-0.5.1.1.tar.gz", hash = "sha256:61dc698235a37d3ab54f67e3f42af0a5386ebeaf18b3b10b6155ce4f5c49e50c"},
+]
+
+[[package]]
 name = "instructor"
 version = "1.17.0"
 description = "structured outputs for llm"
@@ -2368,4 +2379,4 @@ propcache = ">=0.2.1"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.14,<4.0"
-content-hash = "df71cc8db00805aaa25b3974cccf60233236941de1617033725758a98ce67fa1"
+content-hash = "1ce0732facce0cc01bea4c2ea629f6aae77c55c3fdd1e36206a521998c4baa01"

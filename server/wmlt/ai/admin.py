@@ -4,15 +4,22 @@
 # This source code is licensed under the BSD 3-Clause License found in the
 # LICENSE file in the root directory of this source tree.
 
-from .                        import models
+import logging
+
+from .                        import client, models
 from ..                       import admin
 
 from django                   import forms
+from django.contrib           import messages
 from django.contrib.admin     import action
 from django.contrib.admin     import ActionLocation
 from django.contrib.admin     import StackedInline
 from django.contrib.admin     import TabularInline
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ngettext
+from pydantic                 import BaseModel
+
+logger = logging.getLogger(__name__)
 
 class AIModelAdminForm(forms.ModelForm):
     """Hide API Key in the UI"""
@@ -47,8 +54,8 @@ class TraceInline(TabularInline):
 class AIModelAdmin(admin.CustomModelAdmin):
     model              = models.AIModel
     form               = AIModelAdminForm
-    list_display       = ["model_id", "base_url", "batch"]
-    list_display_links = ["model_id", "base_url", "batch"]
+    list_display       = ["model_id", "base_url"]
+    list_display_links = ["model_id", "base_url"]
     ordering           = ["model_id"]
     actions            = ["test_model"]
     inlines            = [TraceInline]
@@ -62,7 +69,6 @@ class AIModelAdmin(admin.CustomModelAdmin):
         }),
         (_("Settings"), {
             "fields": (
-                "batch",
                 ("mode", "max_retries", "cache_size"),
                 "kwargs",
             ),
@@ -77,7 +83,47 @@ class AIModelAdmin(admin.CustomModelAdmin):
     )
     def test_model(self, request, queryset):
         """Send and trace a test message to check if the model connection works."""
-        pass
+        responses = 0
+        last_text = ""
+
+        class TestResponse(BaseModel):
+            """Response to a test message"""
+            text: str
+
+        try:
+            for model in queryset.all():
+                if not model.model_id:
+                    continue
+
+                ai_client = client.get_ai_client(model.model_id)
+                ai_client.start_trace(description=_("Test AI Model"))
+
+                response = ai_client.create(
+                    messages = [{
+                        "role":    "user",
+                        "content": _("This is a test. Please acknowledge.")
+                    }],
+                    response_model = TestResponse,
+                )
+
+                if response and response.text:
+                    responses += 1
+                    last_text  = response.text
+
+                ai_client.save_trace()
+
+            self.message_user(
+                request,
+                ngettext(
+                    "The AI Model was successfully tested. Its response is: %(last_text)s",
+                    "%(count)d AI Models were successfully tested. The last response is: %(last_text)s",
+                    responses,
+                ) % {"count": responses, "last_text": last_text},
+                messages.SUCCESS,
+            )
+        except Exception as error:
+            logger.exception("Error while testing AI Model")
+            self.message_user(request, _("Error while testing AI Model: %s") % error, messages.ERROR)
 
 class MessageInline(StackedInline):
     model = models.Message
@@ -96,7 +142,7 @@ class TraceAdmin(admin.CustomModelAdmin):
     model              = models.Trace
     list_display       = ["timestamp", "model", "description"]
     list_display_links = ["timestamp", "model", "description"]
-    ordering           = ["timestamp", "model"]
+    ordering           = ["-timestamp", "model"]
     list_filter        = ["timestamp", "model"]
     date_hierarchy     = "timestamp"
     inlines            = [MessageInline]
