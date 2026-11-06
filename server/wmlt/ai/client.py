@@ -55,7 +55,7 @@ class AIClient:
         return self._ai_model.model_id
 
     def start_trace(self, description):
-        """Start a new message trace"""
+        """Start a new message trace. Returns the yet unsaved ``Trace`` instance."""
         self._trace = models.Trace(
             model             = self._ai_model,
             description       = description or None,
@@ -66,6 +66,8 @@ class AIClient:
 
         self._traces.append(self._trace)
         self._flownr = 0
+
+        return self._trace
 
     def save_trace(self):
         """Save message trace and its logged messages"""

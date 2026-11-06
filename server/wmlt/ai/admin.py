@@ -6,18 +6,18 @@
 
 import logging
 
-from .                        import client, models
+from .                        import actions, models
 from ..                       import admin
 
 from django                   import forms
 from django.contrib           import messages
 from django.contrib.admin     import action
 from django.contrib.admin     import ActionLocation
+from django.contrib.admin     import display
 from django.contrib.admin     import StackedInline
 from django.contrib.admin     import TabularInline
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext
-from pydantic                 import BaseModel
 
 logger = logging.getLogger(__name__)
 
@@ -83,47 +83,55 @@ class AIModelAdmin(admin.CustomModelAdmin):
     )
     def test_model(self, request, queryset):
         """Send and trace a test message to check if the model connection works."""
-        responses = 0
-        last_text = ""
-
-        class TestResponse(BaseModel):
-            """Response to a test message"""
-            text: str
-
         try:
-            for model in queryset.all():
-                if not model.model_id:
-                    continue
+            result = actions.test_ai_models(queryset)
+            count  = len(result)
 
-                ai_client = client.get_ai_client(model.model_id)
-                ai_client.start_trace(description=_("Test AI Model"))
-
-                response = ai_client.create(
-                    messages = [{
-                        "role":    "user",
-                        "content": _("This is a test. Please acknowledge.")
-                    }],
-                    response_model = TestResponse,
+            if count:
+                self.message_user(
+                    request,
+                    ngettext(
+                        "The AI Model was successfully tested. Its response is: %(last_text)s",
+                        "%(count)d AI Models were successfully tested. The last response is: %(last_text)s",
+                        count,
+                    ) % {"count": count, "last_text": result[-1]["response"].text},
+                    messages.SUCCESS,
                 )
-
-                if response and response.text:
-                    responses += 1
-                    last_text  = response.text
-
-                ai_client.save_trace()
-
-            self.message_user(
-                request,
-                ngettext(
-                    "The AI Model was successfully tested. Its response is: %(last_text)s",
-                    "%(count)d AI Models were successfully tested. The last response is: %(last_text)s",
-                    responses,
-                ) % {"count": responses, "last_text": last_text},
-                messages.SUCCESS,
-            )
+            else:
+                self.message_user(request, _("Test failed. No response was generated."), messages.WARNING)
         except Exception as error:
             logger.exception("Error while testing AI Model")
             self.message_user(request, _("Error while testing AI Model: %s") % error, messages.ERROR)
+
+class PromptTemplateAdmin(admin.CustomModelAdmin):
+    model               = models.PromptTemplate
+    list_display        = ["use_case", "seqnr", "role", "description", "ai_models__model_id"]
+    list_display_links  = ["use_case", "seqnr", "role", "description"]
+    ordering            = ["use_case", "seqnr", "role"]
+    list_filter         = ["use_case", "role", "ai_models"]
+    filter_horizontal   = ["ai_models"]
+    readonly_fields     = ["ai_models__model_id"]
+    list_select_related = True
+
+    fieldsets = [
+        (_("Prompt"), {
+            "fields": (
+                ("use_case", "seqnr"),
+                ("role", "description"),
+                "content",
+            ),
+        }),
+        (_("Assigned AI Models"), {
+            "fields": (
+                "ai_models",
+            ),
+            "description": _("Make sure to assign each use case and role at most once to each AI Model."),
+        })
+    ]
+
+    @display(description=_("AI Models"))
+    def ai_models__model_id(self, obj):
+        return ", ".join(list(obj.ai_models.values_list("model_id", flat=True)))
 
 class MessageInline(StackedInline):
     model = models.Message
@@ -161,5 +169,6 @@ class TraceAdmin(admin.CustomModelAdmin):
         }),
     ]
 
-admin.admin_site.register(models.AIModel, AIModelAdmin)
-admin.admin_site.register(models.Trace,   TraceAdmin)
+admin.admin_site.register(models.AIModel,        AIModelAdmin)
+admin.admin_site.register(models.PromptTemplate, PromptTemplateAdmin)
+admin.admin_site.register(models.Trace,          TraceAdmin)

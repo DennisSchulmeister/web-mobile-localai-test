@@ -57,6 +57,41 @@ class AIModel(models.Model):
     def __str__(self):
         return self.model_id
 
+class PromptTemplateManager(models.Manager):
+    """Custom manager for prompt templates with added filter methods."""
+    def for_use_case(self, model_id, use_case):
+        """Filter prompt templates by AI Model ID and use case."""
+        return self.filter(ai_models__model_id=model_id, use_case=use_case).order_by("seqnr")
+
+class PromptTemplate(models.Model):
+    """Prompt templates"""
+    class UseCase(models.TextChoices):
+        QUALITY_ASSESSMENT = "QUALITY_ASSESSMENT", _("Quality Assessment")
+
+    objects     = PromptTemplateManager()
+
+    ai_models   = models.ManyToManyField(AIModel, related_name="prompt_templates", blank=True)
+    use_case    = models.CharField(_("Use Case"), max_length=25, choices=UseCase)
+    seqnr       = models.IntegerField(_("Sequence Number"))
+    description = models.CharField(_("Description"), max_length=255, blank=True)
+    role        = models.CharField(_("Role"), max_length=25)
+    content     = models.TextField(_("Content"), blank=True, help_text=_("Placeholders: {QUESTION}, {ANSWER}"))
+
+    class Meta:
+        verbose_name        = _("Prompt Template")
+        verbose_name_plural = _("Prompt Templates")
+        ordering            = ["use_case", "seqnr", "role"]
+
+    def __str__(self):
+        return self.description
+
+    def apply_template(self, placeholders):
+        """Insert placeholders and return the template as a ``{"role": "", "content": ""}`` dictionary."""
+        content = self.content
+        content = content.replace("{QUESTION}", placeholders.get("question", ""))
+        content = content.replace("{ANSWER}", placeholders.get("answer", ""))
+        return {"role": self.role, "content": content}
+
 class Trace(models.Model):
     """Logged message traces"""
     timestamp         = models.DateTimeField(_("Timestamp"), default=timezone.now)
@@ -73,7 +108,8 @@ class Trace(models.Model):
         get_latest_by       = "timestamp"
 
     def __str__(self):
-        return date_format(self.timestamp, "DATETIME_FORMAT")
+        timestamp = date_format(self.timestamp, "DATETIME_FORMAT")
+        return f"{timestamp}: {self.description}"
 
 class Message(models.Model):
     """Logged messages"""
