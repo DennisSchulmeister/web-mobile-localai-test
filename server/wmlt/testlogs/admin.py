@@ -864,10 +864,19 @@ class ChatMessageEventAdmin(EventAdmin):
         """Add missing AI quality assessments for the selected chat messages."""
         try:
             result = actions.run_ai_quality_assessment(queryset)
-            self.message_user(request, _("Created Quality Assessments: %i, Errors: %i" % result), messages.SUCCESS)
+            self.message_user(
+                request,
+                _("Created Quality Assessments: %(created)i, Errors: %(errors)i")
+                % {"created": result[0], "errors": result[1]},
+                messages.SUCCESS,
+            )
         except Exception as error:
             logger.exception("Error while running AI quality assessments")
-            self.message_user(request, _("Error while running AI quality assessments: %s") % error, messages.ERROR)
+            self.message_user(
+                request,
+                _("Error while running AI quality assessments: %(error)s") % {"error": error},
+                messages.ERROR,
+            )
 
 class QualityAssessmentAdmin(admin.CustomModelAdmin):
     model              = models.QualityAssessment

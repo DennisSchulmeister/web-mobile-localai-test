@@ -13,7 +13,7 @@ from ...actions                  import iter_ai_quality_assessment
 from ...models                   import ChatMessageEvent
 
 class Command(BaseCommand):
-    help = "Run AI quality assessments for all chat messages"
+    help = _("Run AI quality assessments for all chat messages")
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -30,7 +30,13 @@ class Command(BaseCommand):
             queryset = ChatMessageEvent.objects.all()
 
         count = queryset.count()
-        self.stdout.write(ngettext("Found %s chat message", "Found %s chat messages", count) % count)
+        self.stdout.write(
+            ngettext(
+                "Found %(count)s chat message",
+                "Found %(count)s chat messages",
+                count,
+            ) % {"count": count}
+        )
 
         count_created = 0
         count_errors  = 0
@@ -51,4 +57,7 @@ class Command(BaseCommand):
                 case _:
                     self.stdout.write()
 
-        self.stdout.write(_("Created Quality Assessments: %i, Errors: %i" % (count_created, count_errors)))
+        self.stdout.write(
+            _("Created Quality Assessments: %(created)i, Errors: %(errors)i")
+            % {"created": count_created, "errors": count_errors}
+        )

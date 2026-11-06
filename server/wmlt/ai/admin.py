@@ -95,7 +95,11 @@ class AIModelAdmin(admin.CustomModelAdmin):
                 self.message_user(request, _("Test failed. No response was generated."), messages.WARNING)
         except Exception as error:
             logger.exception("Error while testing AI Model")
-            self.message_user(request, _("Error while testing AI Model: %s") % error, messages.ERROR)
+            self.message_user(
+                request,
+                _("Error while testing AI Model: %(error)s") % {"error": error},
+                messages.ERROR,
+            )
 
 class PromptTemplateAdmin(admin.CustomModelAdmin):
     model               = models.PromptTemplate

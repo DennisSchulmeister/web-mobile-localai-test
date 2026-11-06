@@ -2,7 +2,7 @@ Django App
 ==========
 
 -[x] Action für Quality Assessment mit LLM
--[ ] Deutsche Übersetzung
+-[x] Deutsche Übersetzung
 -[ ] Docker Compose für Deployment
 
 -[x] Link von QA auf Trace
@@ -23,3 +23,4 @@ README
 ======
 
 -[ ] Auf Englisch übersetzen
+-[ ] Dokumentation splitten, und z.B. Django-Installation, Testplan etc. beschreiben

@@ -132,7 +132,10 @@ def iter_ai_quality_assessment(queryset):
                     "error":        None
                 }
 
-                ai_trace = ai_client.start_trace(description=_("Quality Assessment for Chat Message %s") % chat_message)
+                ai_trace = ai_client.start_trace(
+                    description=_("Quality Assessment for Chat Message %(chat_message)s")
+                    % {"chat_message": chat_message}
+                )
 
                 placeholders = {
                     "user_message":      chat_message.user_message,
