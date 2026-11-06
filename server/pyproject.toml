@@ -5,7 +5,7 @@ description = "Backend-Server zum Aufzeichnen der Testfälle"
 authors = [
     {name = "Dennis Schulmeister-Zimolong", email = "dennis@windows3.de"}
 ]
-license = {text = "BSD-3-Clause"}
+license = "BSD-3-Clause"
 requires-python = ">=3.14,<4.0"
 dependencies = [
     "django (>=6.1.2,<7.0.0)",
@@ -24,3 +24,21 @@ package-mode = false
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.postgres]
+optional = true
+
+[tool.poetry.group.postgres.dependencies]
+psycopg = {version = ">=3.2,<4.0", extras = ["binary"]}
+
+[tool.poetry.group.mysql]
+optional = true
+
+[tool.poetry.group.mysql.dependencies]
+mysqlclient = ">=2.2,<3.0"
+
+[tool.poetry.group.daphne]
+optional = true
+
+[tool.poetry.group.daphne.dependencies]
+daphne  = ">=4.2.3,<5.0.0"

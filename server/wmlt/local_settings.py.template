@@ -3,32 +3,43 @@
 #--------------------------------------------------#
 
 from pathlib import Path
+import os
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Replace with your own secret key !!
+# Generate with: python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
 SECRET_KEY = "django-insecure-x0t%jjv2p3i)fo@9#u6p39c127wtcjt-kq2f4r9g6(0ss#n6bj"
 DEBUG = False
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "*").split(",")
 
 # Needed to secure the CSRF and session cookies.
-# SECURITY: Use a sub-domain that is not shared with other applications!
-#SECURE_SSL_REDIRECT = True  # HTTP to HTTPS redirect, if not already done by reverse proxy
-CSRF_COOKIE_DOMAIN = "your-domain.com"
-SESSION_COOKIE_DOMAIN = "your-domain.com"
+CSRF_COOKIE_DOMAIN = os.environ.get("CSRF_COOKIE_DOMAIN") or None
+SESSION_COOKIE_DOMAIN = os.environ.get("SESSION_COOKIE_DOMAIN") or None
+FORCE_SCRIPT_NAME = os.environ.get("DJANGO_SCRIPT_NAME") or None
 
 # Built-in database engines:
 #   * "django.db.backends.postgresql"
 #   * "django.db.backends.mysql"
-#   * "django.db.backends.sqlite3"
-#   * "django.db.backends.oracle"
+DATABASE_DRIVERS = {
+    "postgres": ("django.db.backends.postgresql", "5432"),
+    "mysql": ("django.db.backends.mysql", "3306"),
+}
+DATABASE_DRIVER = os.environ.get("DATABASE_DRIVER", "postgres").lower()
+
+if DATABASE_DRIVER not in DATABASE_DRIVERS:
+    raise ValueError(f"Unsupported DATABASE_DRIVER: {DATABASE_DRIVER}")
+
+DATABASE_ENGINE, DATABASE_DEFAULT_PORT = DATABASE_DRIVERS[DATABASE_DRIVER]
+
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "mydatabase",
-        "USER": "mydatabaseuser",
-        "PASSWORD": "mypassword",
-        "HOST": "localhost",
-        "PORT": "5432",
+        "ENGINE": DATABASE_ENGINE,
+        "NAME": os.environ.get("DATABASE_NAME", "wmlt"),
+        "USER": os.environ.get("DATABASE_USER", "wmlt"),
+        "PASSWORD": os.environ.get("DATABASE_PASSWORD", "wmlt"),
+        "HOST": os.environ.get("DATABASE_HOST", "host.docker.internal"),
+        "PORT": os.environ.get("DATABASE_PORT") or DATABASE_DEFAULT_PORT,
     }
 }
 
@@ -46,11 +57,11 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
 # Static files
 # Run `manage.py collectstatic` to copy the files first!
-STATIC_DIR = "/srv/www/mysite.de/static"
-STATIC_URL = "static/"
+STATIC_ROOT = os.environ.get("DJANGO_STATIC_ROOT", "/srv/static")
+STATIC_URL = os.environ.get("DJANGO_STATIC_URL", "/srv/static/")
 
 # Uploaded media files
-MEDIA_DIR = "/srv/www/mysite.de/media"
+MEDIA_ROOT = os.environ.get("DJANGO_MEDIA_ROOT", str(BASE_DIR / "media"))
 MEDIA_URL = "media/"
 
 # i18n, l10n settings

@@ -1,0 +1,16 @@
+.git
+.env
+.venv
+**/.venv
+node_modules
+**/node_modules
+android
+.capacitor
+logs
+static/_bundle
+static/_generated
+server/static
+server/db.sqlite3
+__pycache__
+**/__pycache__
+*.py[cod]

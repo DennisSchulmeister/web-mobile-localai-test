@@ -126,6 +126,54 @@ kann dann über http://localhost:8888 im Browser aufgerufen werden.
 Für ein statisches Deployment kann die Anwendung mit `npm run build` gebaut werden.
 Die Inhalte des `static`-Verzeichnisses können dann auf einen Webserver geschoben werden.
 
+Docker Compose
+--------------
+
+Das komplette Projekt kann mit dem enthaltenen Docker Compose Setup in der Datei `compose.yml`
+einfach deployed werden. Das Setup unterstützt hierfür verschiedene Szenarios, je nachdem, ob
+alle oder nur einzelne Teile als Docker Container laufen sollen. Die Container führen dabei den
+lokalen Quellcode in temporären Runtime-Containern aus, ohne den Code selbst als Container zu
+verpacken:
+
+1. Django-Backend in Docker, alles andere lokal
+2. Django-Backend und Datenbank in Docker, alles andere lokal
+3. Django-Backend und Datenbank in Docker, Web-App in Docker bauen aber lokal gehostet
+4. Django-Backend, Datenbank und Web-App komplett in Docker
+
+Vor dem ersten Start müssen die Django-Einstellungen angepasst und die Container konfiguriert
+werden. Dies erfolgt durch Kopieren der folgenden zwei Datei:
+
+```sh
+cp .env.template .env
+cp server/wmlt/local_settings.py.template server/wmlt/local_settings.py
+```
+
+In `.env` muss der gewünschte Datenbanktreiber ausgewählt werden. Ggf. müssen hier auch die
+Verbindungsdaten für den Datenbankserver angepasst werden. Die möglichen Einstellungen sind
+durch entsprechende Kommentare dokumentiert. In `server/wmlt/local_settings.py` muss lediglich
+der `SECRET_KEY` ausgetauscht werden. Die anderen Einstellungen könne unverändert übernommen,
+bei Bedarf aber angepasst werden. Anschließend können die Container wie folgt gestartet werden:
+
+```sh
+# Django mit externer Datenbank
+docker compose --profile external up --build
+
+# Django mit PostgreSQL im Compose-Netzwerk
+docker compose --profile postgres up --build
+
+# Externe Datenbank und Initialisierung/Build des Frontends
+docker compose --profile external --profile node up --build
+
+# PostgreSQL und Initialisierung/Build des Frontends
+docker compose --profile postgres --profile node up --build
+
+# Vollständig containerisiert: PostgreSQL, Django, Frontend und Caddy
+docker compose --profile full up --build
+```
+
+Der erste Start dauert in der Regel etwas länger (mehrere Minuten), da alle Abhängigkeiten
+installiert und die Sprachmodelle heruntergeladen werden müssen.
+
 Android-App bauen
 -----------------
 

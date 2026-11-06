@@ -1,0 +1,116 @@
+#==============================================================================
+# IMPORTANT:
+#
+# Copy .env.template to .env and server/wmlt/local_settings.py.template to
+# server/wmlt/local_settings.py before starting.
+#==============================================================================
+# NOTE:
+#
+# This Docker Compose setup always runs the source code as-is, without copying
+# it permanently into the Docker containers. Build files are stored on the host
+# but excluded from git.
+#==============================================================================
+
+# Shared backend configuration
+x-backend: &backend
+    build:
+        context: .
+        dockerfile: bin/docker/python.Dockerfile
+        args:
+            DATABASE_DRIVER: ${DATABASE_DRIVER:-postgres}
+    working_dir: /workspace/server
+    env_file:
+        - path: .env
+          required: false
+    volumes:
+        - .:/workspace
+        - python-dependencies:/opt/poetry
+        - python-venv:/workspace/server/.venv
+        - ./server/static:/srv/static
+    extra_hosts:
+        - host.docker.internal:host-gateway
+    ports:
+        - "${DJANGO_PORT:-8000}:8000"
+    healthcheck:
+        test:
+            - CMD
+            - python
+            - -c
+            - import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/admin/login/').close()
+        interval: 10s
+        timeout: 5s
+        retries: 6
+        start_period: 10m
+
+# Service definitions
+services:
+    # =================================================================
+    # Backend
+    # =================================================================
+    backend-external:
+        <<: *backend
+        profiles: [external]
+
+    backend-postgres:
+        <<: *backend
+        profiles: [postgres, full]
+        depends_on:
+            db:
+                condition: service_healthy
+
+    # =================================================================
+    # Database (optional)
+    # =================================================================
+    db:
+        image: postgres:18-alpine
+        profiles: [postgres, full]
+        environment:
+            POSTGRES_DB: ${DATABASE_NAME:-wmlt}
+            POSTGRES_USER: ${DATABASE_USER:-wmlt}
+            POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-wmlt}
+        volumes:
+            - postgres-data:/var/lib/postgresql
+        healthcheck:
+            test:
+                [
+                    "CMD-SHELL",
+                    'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"',
+                ]
+            interval: 5s
+            timeout: 5s
+            retries: 12
+        restart: unless-stopped
+
+    # =================================================================
+    # Frontend (optional)
+    # =================================================================
+    frontend-init:
+        image: node:24-slim
+        profiles: [node, full]
+        working_dir: /workspace
+        volumes:
+            - .:/workspace
+            - node-dependencies:/workspace/node_modules
+        command: ["sh", "/workspace/bin/docker/node-entrypoint.sh"]
+
+    caddy:
+        image: caddy:2-alpine
+        profiles: [full]
+        depends_on:
+            backend-full:
+                condition: service_healthy
+            frontend-init:
+                condition: service_completed_successfully
+        ports:
+            - "${HTTP_PORT:-8080}:80"
+        volumes:
+            - ./bin/docker/Caddyfile:/etc/caddy/Caddyfile:ro
+            - ./static:/workspace/static:ro
+            - ./server/static:/srv/staticfiles:ro
+        restart: unless-stopped
+
+volumes:
+    node-dependencies:
+    python-dependencies:
+    python-venv:
+    postgres-data:

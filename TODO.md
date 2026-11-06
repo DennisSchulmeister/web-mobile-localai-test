@@ -3,7 +3,7 @@ Django App
 
 -[x] Action für Quality Assessment mit LLM
 -[x] Deutsche Übersetzung
--[ ] Docker Compose für Deployment
+-[x] Docker Compose für Deployment
 
 -[x] Link von QA auf Trace
 -[x] Event status
