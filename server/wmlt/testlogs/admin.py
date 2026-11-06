@@ -4,9 +4,14 @@
 # This source code is licensed under the BSD 3-Clause License found in the
 # LICENSE file in the root directory of this source tree.
 
-from .  import models
+import logging
+
+from .  import actions, models
 from .. import admin
 
+from django.contrib           import messages
+from django.contrib.admin     import action
+from django.contrib.admin     import ActionLocation
 from django.contrib.admin     import display
 from django.contrib.admin     import StackedInline
 from django.contrib.admin     import TabularInline
@@ -14,6 +19,8 @@ from django.urls              import reverse
 from django.utils.html        import format_html
 from django.utils.formats     import date_format
 from django.utils.translation import gettext_lazy as _
+
+logger = logging.getLogger(__name__)
 
 def _event_admin_url(admin_site, obj):
     """Return the concrete event's change URL."""
@@ -705,27 +712,29 @@ class StartChatEventAdmin(EventAdmin):
         }),
     ]
 
+quality_assessment_fieldsets = [
+    (_("Meta-data"), {
+        "fields": (
+            "timestamp",
+            ("judge_type", "judge_name", "ai_trace"),
+        ),
+    }),
+    (_("Assessment"), {
+        "fields": (
+            ("correct_syntax_grade", "correct_syntax_note"),
+            ("correct_lingua_grade", "correct_lingua_note"),
+            ("correct_content_grade", "correct_content_note"),
+            ("thematic_relevance_grade", "thematic_relevance_note"),
+            ("message_length_grade", "message_length_note"),
+        ),
+    }),
+]
+
 class QualityAssessmentInline(StackedInline):
     model = models.QualityAssessment
     extra = 0
 
-    fieldsets = [
-        (_("Meta-data"), {
-            "fields": (
-                "timestamp",
-                ("judge_type", "judge_name", "ai_trace"),
-            ),
-        }),
-        (_("Assessment"), {
-            "fields": (
-                ("correct_syntax_grade", "correct_syntax_note"),
-                ("correct_lingua_grade", "correct_lingua_note"),
-                ("correct_content_grade", "correct_content_note"),
-                ("thematic_relevance_grade", "thematic_relevance_note"),
-                ("message_length_grade", "message_length_note"),
-            ),
-        }),
-    ]
+    fieldsets = quality_assessment_fieldsets
 
 class ChatMessageEventAdmin(EventAdmin):
     model = models.ChatMessageEvent
@@ -733,6 +742,7 @@ class ChatMessageEventAdmin(EventAdmin):
     list_display_links = ["testrun", "timestamp", "chat", "model", "user_message", *testrun_display]
     ordering           = ["testrun", "timestamp", "id"]
     list_filter        = ["timestamp", "model__model_id", *testrun_filter]
+    actions            = ["run_ai_quality_assessment"]
     inlines            = [QualityAssessmentInline, *EventAdmin.inlines]
 
     readonly_fields = [
@@ -844,6 +854,21 @@ class ChatMessageEventAdmin(EventAdmin):
     def model__device(self, obj):
         return obj.model.device
 
+    @action(
+        permissions        = ["change"],
+        location           = ActionLocation.CHANGE_LIST,
+        description        = _("Run AI Quality Assessment"),
+        description_plural = _("Run AI Quality Assessments"),
+    )
+    def run_ai_quality_assessment(self, request, queryset):
+        """Add missing AI quality assessments for the selected chat messages."""
+        try:
+            result = actions.run_ai_quality_assessment(queryset)
+            self.message_user(request, _("Created Quality Assessments: %i, Errors: %i" % result), messages.SUCCESS)
+        except Exception as error:
+            logger.exception("Error while running AI quality assessments")
+            self.message_user(request, _("Error while running AI quality assessments: %s") % error, messages.ERROR)
+
 class QualityAssessmentAdmin(admin.CustomModelAdmin):
     model              = models.QualityAssessment
     list_display_links = ["timestamp", "message__model__model_id"]
@@ -862,13 +887,9 @@ class QualityAssessmentAdmin(admin.CustomModelAdmin):
         "message_length_grade",
     ]
 
+    fieldsets = quality_assessment_fieldsets
+
     def has_add_permission(self, request):
-        return False
-
-    def has_change_permission(self, request, obj=None):
-        return False
-
-    def has_delete_permission(self, request, obj=None):
         return False
 
 admin.admin_site.register(models.TestRun,             TestRunAdmin)

@@ -6,7 +6,9 @@
 
 import enum, logging
 
-from .                        import client, models
+from .                        import models
+from ..ai.client              import get_all_ai_clients
+from ..ai.models              import PromptTemplate
 from django.utils.translation import gettext_lazy as _
 from pydantic                 import BaseModel
 from pydantic                 import Field
@@ -33,7 +35,7 @@ class MessageLength(enum.IntEnum):
 class CorrectnessJudgement(BaseModel):
     grade: Correctness = Field(
         description = (
-            "Choose on rating: "
+            "Choose one rating: "
             "0 = Completely Wrong; "
             "1 = Minor Flaws; "
             "2 = No Errors Found."
@@ -45,7 +47,7 @@ class CorrectnessJudgement(BaseModel):
 class RelevanceJudgement(BaseModel):
     grade: ThematicRelevance = Field(
         description = (
-            "Choose on rating: "
+            "Choose one rating: "
             "0 = Unrelated Answer; "
             "1 = Loosely Related Answer; "
             "2 = Answer Beyond Scope; "
@@ -58,7 +60,7 @@ class RelevanceJudgement(BaseModel):
 class LengthJudgement(BaseModel):
     grade: MessageLength = Field(
         description = (
-            "Choose on rating: "
+            "Choose one rating: "
             "0 = Empty Response; "
             "1 = Too Short; "
             "2 = Too Long; "
@@ -93,54 +95,67 @@ class QualityAssessment(BaseModel):
         )
     )
 
-def run_ai_quality_assessment(queryset):
+def iter_ai_quality_assessment(queryset):
     """Add missing AI quality assessments for the given chat messages.
     
     Parameters:
         queryset: ``ChatMessage`` query set
 
-    Returns:
-        - Number of created quality assessments
-        - Number of errors
+    Returns an iterator for status objects. A status is returned before and after each
+    processed chat message. The status object has the following form:
+
+    .. code-block::
+
+        {
+            "chat_message": ChatMessage,
+            "model_id":     AIModel.model_id,
+            "status":       "start" | "success" | "error",
+            "error":        Exception | None,
+        }
     """
-    ai_clients    = client.get_all_ai_clients()
-    count_created = 0
-    count_errors  = 0
+    ai_clients = get_all_ai_clients()
 
     for chat_message in queryset.all():
         for ai_client in ai_clients:
             try:
                 if models.QualityAssessment.objects.filter(
-                    message_pk = chat_message.pk,
-                    judge_type = models.QualityAssessment.JudgeType.LLM,
-                    judge_name = ai_client.model_id,
+                    message__pk = chat_message.pk,
+                    judge_type  = models.QualityAssessment.JudgeType.LLM,
+                    judge_name  = ai_client.model_id,
                 ).count():
                     continue
 
+                yield {
+                    "chat_message": chat_message,
+                    "model_id":     ai_client.model_id,
+                    "status":       "start",
+                    "error":        None
+                }
+
                 ai_trace = ai_client.start_trace(description=_("Quality Assessment for Chat Message %s") % chat_message)
 
+                placeholders = {
+                    "user_message":      chat_message.user_message,
+                    "assistant_message": chat_message.assistant_message,
+                }
+
+                templates = PromptTemplate.objects.for_use_case(
+                    model_id = ai_client.model_id,
+                    use_case = PromptTemplate.UseCase.QUALITY_ASSESSMENT
+                )
+                
                 response = ai_client.create(
-                    messages = [
-                        {
-                            "role":    "system",
-                            "content": "",
-                        },
-                        {
-                            "role":    "user",
-                            "content": "",
-                        }
-                        # TODO
-                    ],
+                    messages       = [template.apply_template(placeholders) for template in templates],
                     response_model = QualityAssessment,
                 )
 
                 ai_client.save_trace()      # Only now we have the Trace ID
 
                 models.QualityAssessment(
-                    message_pk               = chat_message.pk,
+                    message                  = chat_message,
                     judge_type               = models.QualityAssessment.JudgeType.LLM,
                     judge_name               = ai_client.model_id,
-                    ai_trace                 = ai_trace.pk,
+                    ai_trace                 = ai_trace,
                     correct_syntax_grade     = response.syntax.grade,
                     correct_syntax_note      = response.syntax.note,
                     correct_lingua_grade     = response.lingua.grade,
@@ -153,9 +168,39 @@ def run_ai_quality_assessment(queryset):
                     message_length_note      = response.length.note,
                 ).save()
 
-                count_created += 1
-            except:
-                logger.exception("Error during AI Quality Assessment")
-                count_errors += 1
+                yield {
+                    "chat_message": chat_message,
+                    "model_id":     ai_client.model_id,
+                    "status":       "success",
+                    "error":        None
+                }
+            except Exception as error:
+                logger.exception(_("Error during AI quality assessment"))
+
+                yield {
+                    "chat_message": chat_message,
+                    "model_id":     ai_client.model_id,
+                    "status":       "error",
+                    "error":        error,
+                }
+
+def run_ai_quality_assessment(queryset):
+    """Add missing AI quality assessments for the given chat messages.
+    
+    Parameters:
+        queryset: ``ChatMessage`` query set
+
+    Returns:
+        - Number of created quality assessments
+        - Number of errors
+    """
+    count_created = 0
+    count_errors  = 0
+
+    for status in iter_ai_quality_assessment(queryset):
+        if status["status"] == "success":
+            count_created += 1
+        elif status["status"] == "error":
+            count_errors += 1
 
     return count_created, count_errors

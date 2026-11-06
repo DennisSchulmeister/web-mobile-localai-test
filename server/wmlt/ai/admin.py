@@ -6,10 +6,9 @@
 
 import logging
 
-from .                        import actions, models
+from .                        import actions, forms, models
 from ..                       import admin
 
-from django                   import forms
 from django.contrib           import messages
 from django.contrib.admin     import action
 from django.contrib.admin     import ActionLocation
@@ -20,26 +19,6 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext
 
 logger = logging.getLogger(__name__)
-
-class AIModelAdminForm(forms.ModelForm):
-    """Hide API Key in the UI"""
-    class Meta:
-        model   = models.AIModel
-        fields  = "__all__"
-        widgets = {"api_key": forms.PasswordInput()}
-
-    def __init__(self, *args, **kwargs):
-        """Work around an UX problem of the password field and provide at least some visual
-        feedback, when a saved model does have an API Key."""
-        super().__init__(*args, **kwargs)
-
-        if self.instance.pk and self.instance.api_key:
-            self.fields["api_key"].help_text = _("Leave blank to keep the existing API Key.")
-
-    def clean_api_key(self):
-        """Restore saved API key when submitting the unchanged empty API key field."""
-        api_key = self.cleaned_data["api_key"]
-        return api_key or self.instance.api_key
 
 class TraceInline(TabularInline):
     model            = models.Trace
@@ -53,12 +32,13 @@ class TraceInline(TabularInline):
 
 class AIModelAdmin(admin.CustomModelAdmin):
     model              = models.AIModel
-    form               = AIModelAdminForm
+    form               = forms.AIModelAdminForm
     list_display       = ["model_id", "base_url"]
     list_display_links = ["model_id", "base_url"]
     ordering           = ["model_id"]
     actions            = ["test_model"]
     inlines            = [TraceInline]
+    readonly_fields    = ["prompt_templates_display"]
 
     fieldsets = [
         (_("Connection"), {
@@ -73,7 +53,21 @@ class AIModelAdmin(admin.CustomModelAdmin):
                 "kwargs",
             ),
         }),
+        (_("Assigned Prompt Templates"), {
+            "fields": ("prompt_templates_display",),
+        }),
     ]
+
+    @display(description=_("Prompt Templates"))
+    def prompt_templates_display(self, obj):
+        if obj is None or not obj.pk:
+            return _("No prompt templates assigned.")
+
+        prompt_templates = obj.prompt_templates.order_by("use_case", "seqnr", "role")
+        return ", ".join(
+            f"{template.get_use_case_display()} / {template.seqnr} / {template.role} / {template.description}"
+            for template in prompt_templates
+        ) or _("No prompt templates assigned.")
 
     @action(
         permissions        = ["change"],
@@ -105,6 +99,7 @@ class AIModelAdmin(admin.CustomModelAdmin):
 
 class PromptTemplateAdmin(admin.CustomModelAdmin):
     model               = models.PromptTemplate
+    form                = forms.PromptTemplateModelForm
     list_display        = ["use_case", "seqnr", "role", "description", "ai_models__model_id"]
     list_display_links  = ["use_case", "seqnr", "role", "description"]
     ordering            = ["use_case", "seqnr", "role"]

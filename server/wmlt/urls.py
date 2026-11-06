@@ -19,5 +19,6 @@ register_testlogs_api_routes(api_router, "testlogs")
 urlpatterns = [
     path("api/",      include(api_router.urls)),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
+    path("i18n/",     include("django.conf.urls.i18n")),
     path("admin/",    admin_site.urls),
 ]

@@ -1,7 +1,7 @@
 Django App
 ==========
 
--[ ] Action für Quality Assessment mit LLM
+-[x] Action für Quality Assessment mit LLM
 -[ ] Deutsche Übersetzung
 -[ ] Docker Compose für Deployment
 

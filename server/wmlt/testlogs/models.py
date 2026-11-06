@@ -332,7 +332,7 @@ class ChatMessageEvent(EventMixin, Event):
         verbose_name_plural = _("Chat Message Events")
 
     def __str__(self):
-        return self.user_message
+        return f"{self.chat} / {self.model} / {self.user_message}"
 
     def save(self, *args, **kwargs):
         return super().save(self.EventType.CHAT_MESSAGE, *args, **kwargs)

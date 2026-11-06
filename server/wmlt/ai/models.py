@@ -75,7 +75,7 @@ class PromptTemplate(models.Model):
     seqnr       = models.IntegerField(_("Sequence Number"))
     description = models.CharField(_("Description"), max_length=255, blank=True)
     role        = models.CharField(_("Role"), max_length=25)
-    content     = models.TextField(_("Content"), blank=True, help_text=_("Placeholders: {QUESTION}, {ANSWER}"))
+    content     = models.TextField(_("Content"), blank=True, help_text=_("Placeholders: {user_message}, {assistant_message}"))
 
     class Meta:
         verbose_name        = _("Prompt Template")
@@ -88,8 +88,8 @@ class PromptTemplate(models.Model):
     def apply_template(self, placeholders):
         """Insert placeholders and return the template as a ``{"role": "", "content": ""}`` dictionary."""
         content = self.content
-        content = content.replace("{QUESTION}", placeholders.get("question", ""))
-        content = content.replace("{ANSWER}", placeholders.get("answer", ""))
+        content = content.replace("{user_message}", placeholders.get("user_message", ""))
+        content = content.replace("{assistant_message}", placeholders.get("assistant_message", ""))
         return {"role": self.role, "content": content}
 
 class Trace(models.Model):
