@@ -47,7 +47,11 @@ class RelatedObjectPermissionTests(TestCase):
         )
 
     def create_related_objects(self, testrun):
-        event = Event.objects.create(testrun=testrun, event_type=Event.EventType.PAGE_NAVIGATION)
+        event = Event.objects.create(
+            testrun=testrun,
+            event_type=Event.EventType.PAGE_NAVIGATION,
+            status=Event.Status.SUCCESS,
+        )
         event_exception = EventException.objects.create(event=event, seqnr=1, name="Test exception")
         chat = StartChatEvent.objects.create(testrun=testrun)
 

@@ -11,6 +11,7 @@ from django.urls          import reverse
 from rest_framework.test  import APIClient
 
 from wmlt.auth.models     import AccessCode
+from wmlt.testlogs.models import Event
 from wmlt.testlogs.models import TestRun
 
 class NestedObjectsAPITestCase(TestCase):
@@ -45,7 +46,11 @@ class NestedObjectsAPITestCase(TestCase):
         """Utility method to create new events via the webservice"""
         response = self.client.post(
             reverse(f"{route_name}-list"),
-            {"testrun": self.testrun.pk, **payload},
+            {
+                "testrun": self.testrun.pk,
+                "status": Event.Status.SUCCESS,
+                **payload,
+            },
             format="json",
         )
         self.assertEqual(response.status_code, 201, response.data)
