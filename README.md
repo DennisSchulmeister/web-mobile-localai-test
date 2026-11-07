@@ -33,47 +33,47 @@ Folgende Anwendungsfälle sollen hier getestet werden:
 <table>
     <tr>
         <td>
-            <a href="./doc/screenshot1.png">
-                <img src="./doc/screenshot1.png" width="200" alt="Screenshot: Textseite auswählen">
+            <a href="./doc/img/screenshot1.png">
+                <img src="./doc/img/screenshot1.png" width="200" alt="Screenshot: Textseite auswählen">
             </a>
         </td>
         <td>
-            <a href="./doc/screenshot2.png">
-                <img src="./doc/screenshot2.png" width="200" alt="Screenshot: Textseite anzeigen">
+            <a href="./doc/img/screenshot2.png">
+                <img src="./doc/img/screenshot2.png" width="200" alt="Screenshot: Textseite anzeigen">
             </a>
         </td>
         <td>
-            <a href="./doc/screenshot3.png">
-                <img src="./doc/screenshot3.png" width="200" alt="Screenshot: Semantische Suche">
-            </a>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <a href="./doc/screenshot4.png">
-                <img src="./doc/screenshot4.png" width="200" alt="Screenshot: Einstieg in Chat">
-            </a>
-        </td>
-        <td>
-            <a href="./doc/screenshot5.png">
-                <img src="./doc/screenshot5.png" width="200" alt="Screenshot: Sprachmodell laden">
-            </a>
-        </td>
-        <td>
-            <a href="./doc/screenshot6.png">
-                <img src="./doc/screenshot6.png" width="200" alt="Screenshot: Laufender Chat">
+            <a href="./doc/img/screenshot3.png">
+                <img src="./doc/img/screenshot3.png" width="200" alt="Screenshot: Semantische Suche">
             </a>
         </td>
     </tr>
     <tr>
         <td>
-            <a href="./doc/screenshot7.png">
-                <img src="./doc/screenshot7.png" width="200" alt="Screenshot: Systeminformationen">
+            <a href="./doc/img/screenshot4.png">
+                <img src="./doc/img/screenshot4.png" width="200" alt="Screenshot: Einstieg in Chat">
+            </a>
+        </td>
+        <td>
+            <a href="./doc/img/screenshot5.png">
+                <img src="./doc/img/screenshot5.png" width="200" alt="Screenshot: Sprachmodell laden">
+            </a>
+        </td>
+        <td>
+            <a href="./doc/img/screenshot6.png">
+                <img src="./doc/img/screenshot6.png" width="200" alt="Screenshot: Laufender Chat">
+            </a>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <a href="./doc/img/screenshot7.png">
+                <img src="./doc/img/screenshot7.png" width="200" alt="Screenshot: Systeminformationen">
             </a>
         </td>
         <td colspan="2">
-            <a href="./doc/android-studio.png">
-                <img src="./doc/android-studio.png" width="400" alt="Screenshot: Ausführung im Android Emulator">
+            <a href="./doc/img/android-studio.png">
+                <img src="./doc/img/android-studio.png" width="400" alt="Screenshot: Ausführung im Android Emulator">
             </a>
         </td>
     </tr>
@@ -677,7 +677,7 @@ die Leistung auf ca. 6,3 Token/Sekunden. Der Browser friert dabei aber komplett 
 allen auf WASM ausgeführten Modellen).
 
 Die Zahlen wurden anhand der Debug-Logs beim Laden der Modelle und mit Copilot ermittelt. Die Logs liegen unter
-`logs/**/debug-loading.log`. Getestet mit Firefox 157 unter Fedora Linux.
+`doc/logs/**/debug-loading.log`. Getestet mit Firefox 157 unter Fedora Linux.
 
 | Graph-Knoten              | SmolLM2 | Qwen3 | BananaMind |
 |---------------------------|--------:|------:|-----------:|
