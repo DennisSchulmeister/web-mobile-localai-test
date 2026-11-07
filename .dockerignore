@@ -7,8 +7,8 @@ node_modules
 android
 .capacitor
 logs
-static/_bundle
-static/_generated
+app/static/_bundle
+app/static/_generated
 server/static
 server/db.sqlite3
 __pycache__

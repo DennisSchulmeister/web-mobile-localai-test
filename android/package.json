@@ -1,0 +1,19 @@
+{
+    "name": "@dschulmeis/web-mobile-localai-test-android",
+    "version": "1.0.0",
+    "description": "Android packaging for Web/Mobile-Test für lokale KI",
+    "author": "Dennis Schulmeister-Zimolong",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "android:add": "npx cap init 'Local AI Test' 'de.wpvs.localai_test' --web-dir ../.capacitor/www && npx cap add android",
+        "android:sync": "npm --prefix ../app run build && node bin/prepare.js && npx cap sync android",
+        "android:open": "npx cap open android"
+    },
+    "devDependencies": {
+        "@capacitor/android": "^8.6.0",
+        "@capacitor/cli": "^8.6.0",
+        "@capacitor/core": "^8.6.0",
+        "typescript": "^7.0.2"
+    }
+}

@@ -1,0 +1,44 @@
+{
+    "name": "@dschulmeis/web-mobile-localai-test",
+    "version": "1.0.0",
+    "description": "Web/Mobile-Test für lokale KI",
+    "author": "Dennis Schulmeister-Zimolong",
+    "private": "true",
+    "type": "module",
+    "scripts": {
+        "clean": "npm run clean:bundle && npm run clean:data && npm run clean:models",
+        "clean:bundle": "node bin/clean.js static/_bundle",
+        "clean:data": "node bin/clean.js static/_generated/preprocessed static/_generated/embeddings",
+        "clean:models": "node bin/clean.js static/_generated/models",
+        "build": "npm run clean:bundle && node bin/esbuild/bundle.js",
+        "start": "node bin/esbuild/serve.js",
+        "watch": "node bin/esbuild/serve.js",
+        "init": "npm run init:download && npm run init:preprocess && npm run init:embeddings",
+        "init:download": "node bin/init/download.js static/config.json",
+        "init:preprocess": "node bin/init/preprocess.js static/config.json",
+        "init:embeddings": "node bin/init/embeddings.js static/config.json"
+    },
+    "devDependencies": {
+        "@huggingface/transformers": "^4.3.0",
+        "@picocss/pico": "^2.1.1",
+        "bootstrap-icons": "^1.13.1",
+        "chalk": "^6.0.0",
+        "esbuild": "^0.28.2",
+        "markdown-it": "^15.0.2",
+        "mdast-util-from-markdown": "^2.0.3",
+        "mdast-util-to-markdown": "^2.1.3",
+        "mdast-util-to-string": "^4.0.0",
+        "natural": "^8.1.1",
+        "nodejs-file-downloader": "^4.13.0",
+        "shelljs": "^0.10.0",
+        "svelte": "^5.57.1",
+        "svelte-check": "^4.7.6",
+        "svelte-preprocess": "^6.0.5",
+        "svelte-spa-router": "^5.1.1",
+        "unist-util-remove": "^4.0.0"
+    },
+    "dependencies": {
+        "@capacitor/core": "^8.6.0",
+        "esbuild-svelte": "^0.9.5"
+    }
+}

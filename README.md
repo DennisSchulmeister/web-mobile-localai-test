@@ -82,6 +82,10 @@ Folgende Anwendungsfälle sollen hier getestet werden:
 Vorbereitungen
 --------------
 
+Die Webanwendung liegt in `app/`; ihre Abhängigkeiten werden dort mit
+`npm --prefix app ci` installiert. Die Capacitor-CLI und die Android-Plattform-Abhängigkeiten
+liegen unter `android/` und werden mit `npm --prefix android ci` installiert.
+
 Bevor die Anwendung gestartet werden kann, müssen folgende Schritte ausgeführt werden:
 
 1. **Modelle herunterladen:** Um ein realistisches Deployment-Szenario nachzustellen,
@@ -103,28 +107,28 @@ Bevor die Anwendung gestartet werden kann, müssen folgende Schritte ausgeführt
    unten. Da sich letztere nur ändern, wenn sich die Testdaten ändern, müssen sie
    vor Ausführung der App einmalig vorberechnet werden.
 
-Alle drei Schritte können mit `npm run init` am Stück ausgeführt werden.
+Alle drei Schritte können mit `npm --prefix app run init` am Stück ausgeführt werden.
 Alternativ können die Schritte einzeln ausgeführt werden:
 
-1. `npm run init:download`: Modelle herunterladen
-2. `npm run init:preprocess`: Testdaten aufbereiten
-3. `npm run init:embeddings`: Worteinbettungen berechnen
+1. `npm --prefix app run init:download`: Modelle herunterladen
+2. `npm --prefix app run init:preprocess`: Testdaten aufbereiten
+3. `npm --prefix app run init:embeddings`: Worteinbettungen berechnen
 
 Wann immer sich die Testdaten ändern, müssen die Schritte 2 und 3 ausgeführt werden.
 Wenn sich die verwendeten Feature-Extraction-Modelle ändern (und nur dann), müssen
 die Schritte 1 und 3 ausgeführt werden.
 
 Da die Daten für die clientseitige Webanwendung nutzbar sein müssen, liegen die Ergebnisse
-dieser Schritte im `static`-Verzeichnis, sind aber von der Git-Versionierung ausgeschlossen.
+dieser Schritte im `app/static`-Verzeichnis, sind aber von der Git-Versionierung ausgeschlossen.
 
 Start der Anwendung
 -------------------
 
-Der Devserver kann mit `npm start` oder `npm run watch` gestartet werden. Die Anwendung
-kann dann über http://localhost:8888 im Browser aufgerufen werden.
+Der Devserver kann mit `npm --prefix app start` oder `npm --prefix app run watch` gestartet
+werden. Die Anwendung kann dann über http://localhost:8888 im Browser aufgerufen werden.
 
-Für ein statisches Deployment kann die Anwendung mit `npm run build` gebaut werden.
-Die Inhalte des `static`-Verzeichnisses können dann auf einen Webserver geschoben werden.
+Für ein statisches Deployment kann die Anwendung mit `npm --prefix app run build` gebaut werden.
+Die Inhalte des `app/static`-Verzeichnisses können dann auf einen Webserver geschoben werden.
 
 Docker Compose
 --------------
@@ -180,30 +184,32 @@ Android-App bauen
 Die Anwendung kann optional auch mit [Capacitor](https://capacitorjs.com/) als installierbares
 APK-File für Android verpackt werden. Hierfür muss die Anwendung, wie oben beschrieben,
 initialisiert und mindestens einmal während der lokalen Entwicklung gebaut worden sein.
+Das native Android-Projekt und die zugehörigen Hilfsskripte liegen unter `android/`; das
+Gradle-Projekt kann direkt über `android/app/` in Android Studio geöffnet werden.
 
 Danach können die Quelldateien für Android mit folgendem Befehl aktualisiert werden. Dies
-muss immer gemacht werden, wenn sich die Webquellen oder die Inhalte im `static/`-Verzeichnis
+muss immer gemacht werden, wenn sich die Webquellen oder die Inhalte im `app/static/`-Verzeichnis
 verändern.
 
 ```sh
-npm run android:sync
+npm --prefix android run android:sync
 ```
 
-Zum Bauen öffnet man am besten das Verzeichnis `android/` in Android Studio und wählt dort
+Zum Bauen öffnet man am besten das Verzeichnis `android/app/` in Android Studio und wählt dort
 _Build → Generate App Bundles or APKs_ zum Bauen der Anwendung.
 
 Damit das APK nicht die Größenlimits des ZIP32-Formats überschreitet, bereitet `android:sync`
 nach dem Web-Build ein separates Verzeichnis `.capacitor/www/` vor. Dieses ist in der Datei
-`capacitor.config.ts` als `webDir` konfiguriert und enthält alle Web-Assets, aber nur vorab
-heruntergeladene Modelle, die in der Datei `static/models/index.json` mit
-`"android": {"include": true}` gekennzeichnet wurden.
+`android/capacitor.config.ts` als `webDir` konfiguriert und enthält alle Web-Assets, aber nur vorab
+heruntergeladene Modelle, die in der Datei `app/static/models/index.json` mit
+`"engines": {"onnx-android": {"include": true}}` gekennzeichnet wurden.
 
-Die ausgewählten Modelle müssen vor dem Sync mit `npm run init:download` heruntergeladen worden
+Die ausgewählten Modelle müssen vor dem Sync mit `npm --prefix app run init:download` heruntergeladen worden
 sein. Das Staging-Verzeichnis wird bei jedem Sync neu erstellt, damit keine veralteten Modelle
 übernommen werden.
 
 Fehlende Modelle werden in der Android-App vom HuggingFace Hub geladen. Um dies zu unterbinden,
-können in der Datei `static/config.json` die betroffenen Features deaktiviert werden.
+können in der Datei `app/static/config.json` die betroffenen Features deaktiviert werden.
 
 Technische Umsetzung
 --------------------
@@ -219,7 +225,7 @@ Versuch abzulenken. Für die Weboberfläche kommen zum Einsatz:
 Für die KI kommen folgende Bibliotheken und Modelle zum Einsatz:
 
 * **Runtime:** [transformers.js](https://huggingface.co/docs/transformers.js/index) (basiert auf [ONNX](https://onnxruntime.ai/))
-* **KI-Modelle:** Siehe [./static/models/index.json](static/models/index.json)
+* **KI-Modelle:** Siehe [app/static/models/index.json](app/static/models/index.json)
 
 Die Anwendung nutzt die high-level Pipeline API von transformers.js, da diese für jede
 Modellart die typischen Verarbeitungsschritte kapselt. Bei Bedarf könnte aber durch
@@ -334,7 +340,7 @@ Lessons Learned
   des Modells einen Fehler.
 
 * Nicht immer sieht man am Dateinamen der Modelle, welche Datenformate (`dtype`) unterstützt
-  werden. Das Skript `bin/init/download.js` ruft daher die Funktion `ModelRegistry.get_available_dtypes()`
+  werden. Das Skript `app/bin/init/download.js` ruft daher die Funktion `ModelRegistry.get_available_dtypes()`
   auf, um die verfügbaren Datentypen abzurufen und zeigt diese auf der Konsole an.
 
 * Manchmal unterstützen die Modelle die deutsche Sprache, auch wenn dies in den Metadaten

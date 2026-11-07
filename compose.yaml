@@ -15,7 +15,7 @@
 x-backend: &backend
     build:
         context: .
-        dockerfile: bin/docker/python.Dockerfile
+        dockerfile: docker/python.Dockerfile
         args:
             DATABASE_DRIVER: ${DATABASE_DRIVER:-postgres}
     working_dir: /workspace/server
@@ -87,11 +87,11 @@ services:
     frontend-init:
         image: node:24-slim
         profiles: [node, full]
-        working_dir: /workspace
+        working_dir: /workspace/app
         volumes:
             - .:/workspace
-            - node-dependencies:/workspace/node_modules
-        command: ["sh", "/workspace/bin/docker/node-entrypoint.sh"]
+            - node-dependencies:/workspace/app/node_modules
+        command: ["sh", "/workspace/docker/node-entrypoint.sh"]
 
     caddy:
         image: caddy:2-alpine
@@ -104,8 +104,8 @@ services:
         ports:
             - "${HTTP_PORT:-8080}:80"
         volumes:
-            - ./bin/docker/Caddyfile:/etc/caddy/Caddyfile:ro
-            - ./static:/workspace/static:ro
+            - ./docker/Caddyfile:/etc/caddy/Caddyfile:ro
+            - ./app/static:/workspace/app/static:ro
             - ./server/static:/srv/staticfiles:ro
         restart: unless-stopped
 

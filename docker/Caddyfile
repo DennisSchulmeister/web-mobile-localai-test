@@ -1,0 +1,21 @@
+:80 {
+	@root path /
+	redir @root /app 302
+	redir /app /app/ 308
+	redir /srv /srv/ 308
+
+	handle_path /app/* {
+		root * /workspace/app/static
+		try_files {path} {path}/ /index.html
+		file_server
+	}
+
+	handle_path /srv/static/* {
+		root * /srv/staticfiles
+		file_server
+	}
+
+	handle_path /srv/* {
+		reverse_proxy backend-full:8000
+	}
+}

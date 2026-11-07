@@ -2,8 +2,8 @@
 node_modules/
 
 # Generierte statische Dateien
-static/_bundle/
-static/_generated/
+app/static/_bundle/
+app/static/_generated/
 
 # Capacitor
 .capacitor/
