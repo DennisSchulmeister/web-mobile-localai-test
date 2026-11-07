@@ -1,7 +1,7 @@
 # Building and Running the Django Backend
 
 The Django project is in `server/`. It provides backend functionality for recording test
-cases and uses Django REST Framework.
+cases through a REST API.
 
 * [Prerequisites](#prerequisites)
 * [Install dependencies](#install-dependencies)
