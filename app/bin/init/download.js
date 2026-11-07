@@ -19,7 +19,7 @@ console.log("");
 
 // Read the configuration.
 if (process.argv.length < 3) {
-    utils.logError("Too few arugments!");
+    utils.logError("Too few arguments!");
     utils.logError(`Usage: ${process.argv[0]} ${process.argv[1]} <config.json>`);
     process.exit(1);
 }
