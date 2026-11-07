@@ -22,5 +22,5 @@ Web App
 README
 ======
 
--[ ] Auf Englisch übersetzen
+-[x] Auf Englisch übersetzen
 -[ ] Dokumentation splitten, und z.B. Django-Installation, Testplan etc. beschreiben
