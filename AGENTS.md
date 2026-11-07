@@ -1,1 +1,1 @@
-Use `poetry run` to run Python commands inside the `server` directory.
+Before using `poetry` or any other Python command, `cd` into `server/`.
