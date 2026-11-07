@@ -5,7 +5,7 @@ import static org.junit.Assert.assertArrayEquals;
 import org.junit.Test;
 
 /**
- * Tests von Pooling und Normalisierung der {@link EmbeddingPipeline}.
+ * Tests pooling and normalization in {@link EmbeddingPipeline}.
  */
 public class EmbeddingPipelineTest {
     @Test

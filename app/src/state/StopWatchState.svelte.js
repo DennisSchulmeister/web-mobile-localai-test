@@ -1,5 +1,5 @@
 /**
- * Web/Mobile-Test für lokale KI
+ * Web/Mobile Test for Local AI
  * © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
  *
  * This source code is licensed under the BSD 3-Clause License found in the
@@ -9,55 +9,54 @@
 import {formatSeconds} from "../utils/formatter.js";
 
 /**
- * Eine einfache Stoppuhr, mit der die Ausführung eines oder mehrerer
- * Schritte gemessen werden kann. Die dazugehörige `StoppWatch`-Komponente
- * zeigt die Messungen an.
+ * A simple stopwatch for measuring the execution time of one or more steps.
+ * The associated `StopWatch` component displays the measurements.
  */
 export default class StopWatchState {
     /**
-     * Array mit Objekten. Die Objekte besitzen folgende Attribute:
+     * Array of objects. Each object has the following attributes:
      * 
-     *  - `name`:      Name der Messung
-     *  - `icon`:      Icon der Messung
-     *  - `started`:   Startzeit der Messung (ms seit 1970)
-     *  - `stopped`:   Stopzeit der Messing (ms seit 1970)
-     *  - `runtime`:   Gemessene Zeit in Millisekunden
-     *  - `formatted`: Formatierter Zeitstring
+     *  - `name`:      Measurement name
+     *  - `icon`:      Measurement icon
+     *  - `started`:   Measurement start time (ms since 1970)
+     *  - `stopped`:   Measurement stop time (ms since 1970)
+     *  - `runtime`:   Measured time in milliseconds
+     *  - `formatted`: Formatted time string
      */
     measurements = $state([]);
 
     /**
-     * Status, ob die Messung läuft.
+     * Whether the measurement is running.
      */
     running = $state(false);
 
     /**
-     * Intervall für UI-Updates in Millisekunden
+     * Interval for UI updates in milliseconds
      */
     interval = 100;
 
     /**
-     * ID für den UI-Update-Timer.
+     * ID of the UI update timer.
      */
     #intervalId = null;
 
     /**
-     * Konstruktor.
-     * @param {number} interval Intervall für UI-Updates in Millisekunden (Default: 100)
+     * Constructor.
+     * @param {number} interval Interval for UI updates in milliseconds (default: 100)
      */
     constructor(interval) {
         if (interval) this.interval = interval;
     }
 
     /**
-     * Neue Messung starten. Kann mehrfach hintereinander aufgerufen werden,
-     * um mehrere Teilschritte zu messen. Die letzte Messung wird dann gestoppt
-     * und eine neue Messung gestartet. Läuft gerade keine Messung, werden die
-     * alten Messungen verworfen.
+     * Start a new measurement. Can be called multiple times in succession to
+     * measure several steps. The previous measurement is stopped and a new one
+     * is started. If no measurement is currently running, previous measurements
+     * are discarded.
      * 
-     * @param {string} name Name der Messung
-     * @param {string} icon Icon der Messung
-     * @param {number?} interval Update-Intervall für das UI (default 100ms)
+     * @param {string} name Measurement name
+     * @param {string} icon Measurement icon
+     * @param {number?} interval UI update interval (default 100ms)
      * @returns {this} Fluent API
      */
     start(name, icon) {
@@ -86,7 +85,7 @@ export default class StopWatchState {
     }
 
     /**
-     * Messungen stoppen.
+     * Stop measurements.
      * @returns {this} Fluent API
      */
     stop() {
@@ -105,7 +104,7 @@ export default class StopWatchState {
     }
 
     /**
-     * Messungen löschen.
+     * Delete measurements.
      * @returns {this} Fluent API
      */
     reset() {
@@ -114,8 +113,8 @@ export default class StopWatchState {
     }
 
     /**
-     * Aktuell laufende Messung aktualisieren. Aktualisiert die Datenfelder des letzten
-     * Eintrags in `this.measurements[]`.
+     * Update the currently running measurement. Updates the data fields of the
+     * last entry in `this.measurements[]`.
      */
     #updateCurrentMeasurement() {
         if (this.measurements.length > 0) {

@@ -1,5 +1,5 @@
 /**
- * Web/Mobile-Test für lokale KI
+ * Web/Mobile Test for Local AI
  * © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
  *
  * This source code is licensed under the BSD 3-Clause License found in the
@@ -9,45 +9,45 @@
 import backends from "../backends/index.js";
 
 /**
- * Konfigurierte KI-Modelle.
+ * Configured AI models.
  */
 class ModelState {
     /**
-     * Inhalt der Konfigurationsdatei `static/config.js`.
+     * Contents of the configuration file `static/config.js`.
      */
     config = $state({});
 
     /**
-     * Konfiguration aller verfügbaren Modelle.
+     * Configuration of all available models.
      */
     models = $state({});
 
     /**
-     * Verfügbare Backends-Instanzen.
+     * Available backend instances.
      */
     backends = $state([]);
 
     /**
-     * Verfügbare Ausführumgebungen: Liste mit `{device: "", label: ""}`
+     * Available execution environments: list of `{device: "", label: ""}` objects
      */
     devices = $state([]);
 
     /**
-     * Metadaten des aktuell geladenen Modells
+     * Metadata of the currently loaded model
      */
     loadedModel = $state({
-        task:    "",            // Erster Parameter für `transformers.pipeline()`
-        modelId: "",            // Modell-ID
-        dtype:   "",            // Datentyp
-        device:  "",            // Ausführumgebung
+        task:    "",            // First parameter for `transformers.pipeline()`
+        modelId: "",            // Model ID
+        dtype:   "",            // Data type
+        device:  "",            // Execution environment
         status:  "not-loaded",  // "not-loaded", "loading", "ready", "error"
-        message: "",            // Fehlermeldung bei status "error",
-        config:  {},            // JSON-Konfiguration aus der Datei `models.json`
-        backend: null,          // Inferenz-Backend mit den Methoden zur Nutzung des Modells
+        message: "",            // Error message when status is "error"
+        config:  {},            // JSON configuration from the `models.json` file
+        backend: null,          // Inference backend with methods for using the model
     });
 
     /**
-     * Datei `models/index.json` mit den konfigurierten KI-Modellen einlesen.
+     * Read the `models/index.json` file containing the configured AI models.
      */
     async reloadModelConfiguration() {
         this.config = await(await fetch("config.json")).json();
@@ -66,15 +66,15 @@ class ModelState {
     }
 
     /**
-     * Vgl. `/app/bin/utils.js → embeddingPaths()`
+     * See `/app/bin/utils.js → embeddingPaths()`
      * 
-     * Verzeichnispfade für die Texteinbettungen aller Seiten eines spezifischen
-     * KI-Modells ermitteln. Liefert ein Objekt mit den Attributen `dir`, `keywords`
-     * und `sentences`. `dir` ist das  Verzeichnis, die anderen Dateien darin.
+     * Get directory paths for the text embeddings of all pages for a specific
+     * AI model. Returns an object with the `dir`, `keywords`, and `sentences`
+     * attributes. `dir` is the directory; the others are files within it.
      * 
-     * @param {string} modelId ID des KI-Modells
-     * @param {string} dtype Datentyp des KI-Modells (z.B. fp32, int8)
-     * @returns {object} Verzeichnispfade
+     * @param {string} modelId AI model ID
+     * @param {string} dtype AI model data type (e.g. fp32, int8)
+     * @returns {object} Directory paths
      */
     embeddingsPaths(modelId, dtype) {
         let dir = `${this.config.data.embeddingsDir}/${modelId}/${dtype}`;
@@ -87,21 +87,21 @@ class ModelState {
     }
 
     /**
-     * KI-Modell laden. Da die Modelle sehr groß sind, wird immer nur das zuletzt
-     * geladene Modell im Speicher behalten. Das Modell wird im Attribut `model`
-     * abgelegt. `loadedModel` wird entsprechend mit den Metadaten aktualisiert.
+     * Load an AI model. Since models are very large, only the most recently
+     * loaded model is kept in memory. The model is stored in the `model`
+     * attribute, and `loadedModel` is updated with the corresponding metadata.
      * 
-     * Wir nutzen hier die high-level Pipeline API von transformers.js, da diese
-     * für jede Modellart die typischen Verarbeitungsschritte kapselt. Sollte dies
-     * für bestimmte Modelle nicht ausreichen, könnte man hier je nach Modellart in
-     * eine neue Methode verzweigen, die die low-level Model/Tokenizer/…-Klassen
-     * selbst nutzt.
+     * Use the high-level pipeline API from transformers.js here because it
+     * encapsulates the typical processing steps for each model type. If this
+     * is insufficient for certain models, branch here by model type into a
+     * new method that uses the low-level Model/Tokenizer/… classes that
+     * transformers.js uses internally.
      * 
-     * @param {string} task Art des Modells
-     * @param {string} modelId Modell-ID
-     * @param {string} backendId Backend-ID
-     * @param {string} dtype Datentyp
-     * @param {string} device Ausführumgebung
+     * @param {string} task Model type
+     * @param {string} modelId Model ID
+     * @param {string} backendId Backend ID
+     * @param {string} dtype Data type
+     * @param {string} device Execution environment
      */
     async loadModel({task, modelId, backendId, dtype, device} = {}) {
         try {

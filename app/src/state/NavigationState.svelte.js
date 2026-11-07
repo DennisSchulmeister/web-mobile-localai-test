@@ -1,5 +1,5 @@
 /**
- * Web/Mobile-Test für lokale KI
+ * Web/Mobile Test for Local AI
  * © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
  *
  * This source code is licensed under the BSD 3-Clause License found in the
@@ -7,28 +7,28 @@
  */
 
 /**
- * Inhalte der Navigationsleiste und des Page Footers. Wird in der Datei
- * `router.js` beim Wechsel der Seite mit neuen Werten aktualisiert.
+ * Contents of the navigation bar and page footer. Updated with new values in
+ * `router.js` when the page changes.
  */
 const navigationState = $state({
     /**
-     * Zurück-Pfeil in der Navigationsleiste anzeigen
+     * Show the back arrow in the navigation bar.
      */
     backLink: false,
 
     /**
-     * Überschrift der Seite.
+     * Page heading.
      */
     pageTitle: "",
 
     /**
-     * Auswählbare Unterseiten im Page Footer. Jeder Eintrag ist ein Objekt mit
-     * den Attributen `id`, `icon`, `label`, `url`, `active`.
+     * Selectable subpages in the page footer. Each entry is an object with
+     * the attributes `id`, `icon`, `label`, `url`, and `active`.
      */
     subPages: [],
 
     /**
-     * ID der aktiven Unterseite (oder leer, wenn es keine Unterseiten gibt).
+     * ID of the active subpage (or empty if there are no subpages).
      */
     currentSubPage: "",
 });

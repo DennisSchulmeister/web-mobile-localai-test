@@ -1,5 +1,5 @@
 /**
- * Web/Mobile-Test für lokale KI
+ * Web/Mobile Test for Local AI
  * © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
  *
  * This source code is licensed under the BSD 3-Clause License found in the
@@ -29,10 +29,10 @@ const relativeModelDir = path.relative(webDir, modelDir);
 
 if (!relativeModelDir || relativeModelDir.startsWith(`..${path.sep}`)
         || relativeModelDir === ".." || path.isAbsolute(relativeModelDir)) {
-    throw new Error("models.downloadDir muss ein Verzeichnis innerhalb von static sein.");
+    throw new Error("models.downloadDir must be a directory within 'static'.");
 }
 
-// Nur tatsächlich relevante Modelle kopieren, statt sie nach dem Kopieren wieder zu löschen
+// Copy only the relevant models instead of deleting the others after copying.
 await rm(outputDir, {recursive: true, force: true});
 
 await cp(webDir, outputDir, {
@@ -44,6 +44,6 @@ const outputModelDir = path.join(outputDir, relativeModelDir);
 await mkdir(outputModelDir, {recursive: true});
 
 for (const modelId of bundledModels) {
-    console.log(`Kopiere Android-Modell: ${modelId}`);
+    console.log(`Copy Language Model: ${modelId}`);
     await cp(path.join(modelDir, modelId), path.join(outputModelDir, modelId), {recursive: true});
 }

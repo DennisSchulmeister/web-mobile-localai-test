@@ -1,5 +1,5 @@
 <!--
-Web/Mobile-Test für lokale KI
+Web/Mobile Test for Local AI
 © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
 
 This source code is licensed under the BSD 3-Clause License found in the
@@ -8,13 +8,13 @@ LICENSE file in the root directory of this source tree.
 
 <!--
 @component
-Eine einfache Auswahlliste im Android-Style. Items sind Objekte mit folgenden Attributen:
+Simple Android-style selection list. Items are objects with the following attributes:
 
- - `type`:  Art des Listeneintrags: "section" oder "link"
- - `text`:  Haupttext des Listeneintrags
- - `extra`: Randtext des Listeneintrags (optional)
- - `href`:  Linkziel (nur für Typ Link)
- - `lines`: Untergeordnete Zeilen, jeweils mit `text` und `extra`
+ - `type`:  List item type: "section" or "link"
+ - `text`:  Main text of the list item
+ - `extra`: Secondary text of the list item (optional)
+ - `href`:  Link target (only for type "link")
+ - `lines`: Nested rows, each with `text` and `extra`
 -->
 
 <script>

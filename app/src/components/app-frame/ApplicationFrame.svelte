@@ -1,5 +1,5 @@
 <!--
-Web/Mobile-Test für lokale KI
+Web/Mobile Test for Local AI
 © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
 
 This source code is licensed under the BSD 3-Clause License found in the
@@ -8,8 +8,8 @@ LICENSE file in the root directory of this source tree.
 
 <!--
 @component
-Wurzelkomponente der App, die das HTML-Grundgerüst definiert und das
-SPA-Routing ermöglicht.
+Root component of the app, defining the HTML structure and enabling
+SPA routing.
 -->
 
 <script>

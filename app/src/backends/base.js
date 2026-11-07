@@ -1,5 +1,5 @@
 /**
- * Web/Mobile-Test für lokale KI
+ * Web/Mobile Test for Local AI
  * © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
  *
  * This source code is licensed under the BSD 3-Clause License found in the
@@ -7,77 +7,76 @@
  */
 
 /**
- * Basisklasse für alle Inferenz-Backends.
+ * Base class for all inference backends.
  * 
- * Die Parameter `device` und `dtype` beim Laden eines Modells sowie die spezifischen
- * Pipeline-Parameter sondern eigentlich nicht fester Teil der API sein, da hier die
- * API von transformers.js durchscheint. Stattdessen sollte jedes Backend eine dynamische
- * Liste mit Lade- und Pipeline-Parametern definieren können, wobei jeder Parameter eine
- * ID, Anzeigename, Datentyp und mögliche Ausprägungen besitzt. Das ist mir jetzt aber zu
- * aufwändig, so lange keine anderen Backends außer transformers.js und ONNX Runtime
- * genutzt werden.
+ * The `device` and `dtype` parameters used to load a model, as well as the specific
+ * pipeline parameters, should not really be part of the API because they expose the
+ * transformers.js API. Instead, each backend should be able to define a dynamic list
+ * of loading and pipeline parameters, with each parameter having an ID, display name,
+ * data type, and possible values. However, that is too much work as long as no backends
+ * other than transformers.js and ONNX Runtime are used.
  */
 export default class BaseBackend {
     /**
-     * Inhalt der Konfigurationsdatei `app/static/config.json`.
+     * Contents of the configuration file `app/static/config.json`.
      */
     config = {};
 
     /**
-     * Konfiguration aller verfügbaren Modelle.
+     * Configuration of all available models.
      */
     models = {};
 
     /**
-     * Technische ID des Backends ermitteln.
-     * @returns {string} ID des Backends
+     * Get the backend's technical ID.
+     * @returns {string} Backend ID
      */
     get id() {
         return "";
     }
 
     /**
-     * Anzeigename des Backends ermitteln.
-     * @returns {string} Name des Backends
+     * Get the backend's display name.
+     * @returns {string} Backend name
      */
     get name() {
         return "Kein Name";
     }
 
     /**
-     * Flag, ob das Backend auf dem aktuellen Gerät verfügbar ist.
-     * @returns {boolean} Backend wird unterstützt
+     * Whether the backend is available on the current device.
+     * @returns {boolean} Whether the backend is supported
      */
     get isSupported() {
         return false;
     }
 
     /**
-     * Unterstützte Ausführumgebungen als Name/Wert-Paare. Der Wert wird der Methode
-     * `loadModel()` im Parameter `device` übergeben, wenn ein Modell geladen wird.
+     * Supported execution environments as name/value pairs. The value is passed
+     * to the `device` parameter of `loadModel()` when a model is loaded.
      * 
-     * Aufrufer müssen das Ergebnis mit `await` auswerten.
-     * @returns {Array|Promise<Array>} Liste mit `{device: "", label: ""}`-Objekten
+     * Callers must await the result.
+     * @returns {Array|Promise<Array>} List of `{device: "", label: ""}` objects
      */
     get devices() {
         return [];
     }
 
     /**
-     * Diagnoseinformationen des Backends als Name/Wert-Liste zurückgeben, zum Beispiel
-     * ob die Ausführung auf der GPU oder TPU unterstützt wird.
+     * Return backend diagnostic information as a list of name/value pairs, for example
+     * whether execution on the GPU or TPU is supported.
      * 
-     * @returns {Array} Liste mit `{field: "", icon: "", label: "", text: ""}`-Objekten
+     * @returns {Array} List of `{field: "", icon: "", label: "", text: ""}` objects
      */
     async getInformation() {
         return [];
     }
 
     /**
-     * Konfiguration setzen.
+     * Set the configuration.
      * 
-     * @param {Object} config Globale Konfiguration aus `app/static/config.json`
-     * @param {Objet} models Modellkonfiguration aus `app/static/models/index.json`
+     * @param {Object} config Global configuration from `app/static/config.json`
+     * @param {Object} models Model configuration from `app/static/models/index.json`
      */
     setConfig({config, models} = {}) {
         this.config = config || {};
@@ -85,103 +84,103 @@ export default class BaseBackend {
     }
 
     /**
-     * Abfragen, ob eine bestimmte Modellart vom Backend unterstützt wird.
-     * @param {string} task Art des Modells
-     * Aufrufer müssen das Ergebnis mit `await` auswerten.
-     * @returns {boolean|Promise<boolean>} Modellart wird unterstützt
+     * Check whether the backend supports a particular model type.
+     * @param {string} task Model type
+     * Callers must await the result.
+     * @returns {boolean|Promise<boolean>} Whether the model type is supported
      */
     supportsTask(task) {
         return false;
     }
 
     /**
-     * Prüfen, ob das Backend das gewünschte KI-Modell mit der gegebenen Konfiguration
-     * laden und ausführen kann.
+     * Check whether the backend can load and run the requested AI model with the
+     * given configuration.
      * 
-     * @param {string} task Art des Modells
+     * @param {string} task Model type
      * @param {string} modelId Model ID
-     * @param {object} config Modellkonfiguration
-     * @returns {boolean} Laden und Ausführen möglich
+     * @param {object} config Model configuration
+     * @returns {boolean} Whether loading and execution are possible
      */
     supportsModel({task, modelId, config} = {}) {
         return false;
     }
 
     /**
-     * KI-Modell laden. Da die Modelle sehr groß sind, wird immer nur das zuletzt
-     * geladene Modell im Speicher behalten.
+     * Load an AI model. Since the models are very large, only the most recently
+     * loaded model is kept in memory.
      * 
-     * @param {string} task Art des Modells
+     * @param {string} task Model type
      * @param {string} modelId Model ID
-     * @param {string} dtype Datentyp
-     * @param {string} device Ausführumgebung
-     * @param {object} config Modellkonfiguration
+     * @param {string} dtype Data type
+     * @param {string} device Execution environment
+     * @param {object} config Model configuration
      */
     async loadModel({task, modelId, dtype, device, config} = {}) {
         throw new Error("Nicht implementiert!");
     }
 
     /**
-     * KI-Inferenz: Normalisierte Worteinbettungen für Cosinus-Vergleich
+     * AI inference: normalized word embeddings for cosine similarity
      * 
-     * @param {string} input Eingabetext
-     * @returns {Array} Nummerische Einbettungen
+     * @param {string} input Input text
+     * @returns {Array} Numeric embeddings
      */
     async runEmbeddingPipeline(input) {
         throw new Error("Nicht implementiert!");
     }
 
     /**
-     * KI-Inferenz: Frage zu Text beantworten
+     * AI inference: answer a question about text
      * 
-     * @param {string} question Frage
-     * @param {string} context Text-Kontext
-     * @returns {string} Antwort
+     * @param {string} question Question
+     * @param {string} context Text context
+     * @returns {string} Answer
      */
     async runQuestionAnsweringPipeline({question, context} = {}) {
         throw new Error("Nicht implementiert");
     }
 
     /**
-     * KI-Inferenz: Text zusammenfassen
+     * AI inference: summarize text
      * 
-     * @param {string} input Eingabetext
-     * @param {number} maxNewTokens Maximale Anzahl Tokens
-     * @returns {string} Zusammenfassung
+     * @param {string} input Input text
+     * @param {number} maxNewTokens Maximum number of tokens
+     * @returns {string} Summary
      */
     async runSummaryPipeline({input, maxNewTokens} = {}) {
         throw new Error("Nicht implementiert");
     }
 
     /**
-     * KI-Inferenz: Text übersetzen
+     * AI inference: translate text
      * 
-     * @param {string} input Eingabetext
-     * @param {sourceLanguage} input Quellsprache
-     * @param {targetLanguage} input Zielsprache
-     * @returns {string} Übersetzung
+     * @param {string} input Input text
+     * @param {sourceLanguage} input Source language
+     * @param {targetLanguage} input Target language
+     * @returns {string} Translation
      */
     async runTranslationPipeline({input, sourceLanguage, targetLanguage} = {}) {
         throw new Error("Nicht implementiert");
     }
 
     /**
-     * KI-Inferenz: Textgenerierung / Chat
+     * AI inference: text generation / chat
      * 
-     * Die beiden Callback-Funktionen können für UI-Updates in Echtzeit genutzt werden.
-     * Sie werden jeweils mit einem Array der zuletzt generierten Tokens bzw. einem
-     * String mit dem zuletzt generierten Text-Schnippsel aufgerufen.
+     * The two callback functions can be used for real-time UI updates. They are
+     * called with an array of the most recently generated tokens or a string
+     * containing the most recently generated text fragment.
      * 
-     * @param {string} question Frage
-     * @param {string} context Text-Kontext
-     * @param {Function} tokenCallback Streaming Callback: Generierte Tokens
-     * @param {Function} textCallback Streaming Callback: Generierter Text
-     * @param {number} maxNewTokens Maximale Anzahl zu generierender Tokens
-     * @param {number} maxLength Maximale Länge der Antwort
-     * @param {boolean} doSample Sampling ja/nein
-     * @param {number} temperature Temperatur
-     * @param {number} repetitionPenalty Bestrafung für wörtliche Wiederholungen
-     * @returns {string} Generierter Text
+     * @param {string} question Question
+     * @param {string} context Text context
+     * @param {Function} tokenCallback Streaming callback: generated tokens
+     * @param {Function} textCallback Streaming callback: generated text
+     * @param {number} maxNewTokens Maximum number of tokens to generate
+     * @param {number} maxLength Maximum response length
+     * @param {boolean} doSample Whether to use sampling
+     * @param {number} temperature Temperature
+     * @param {number} repetitionPenalty Penalty for verbatim repetitions
+     * @returns {string} Generated text
      */
     async runTextGenerationPipeline({question, context, tokenCallback, textCallback,
                                      maxNewTokens, maxLength, doSample, temperature, repetitionPenalty
@@ -190,7 +189,7 @@ export default class BaseBackend {
     }
 
     /**
-     * Laufende Textgenerierung abbrechen.
+     * Stop the current text generation.
      */
     stopTextGeneration() {
         throw new Error("Nicht implementiert");

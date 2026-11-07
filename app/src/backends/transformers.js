@@ -1,5 +1,5 @@
 /**
- * Web/Mobile-Test für lokale KI
+ * Web/Mobile Test for Local AI
  * © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
  *
  * This source code is licensed under the BSD 3-Clause License found in the
@@ -14,39 +14,38 @@ import BaseBackend                     from "./base.js";
 import {formatNumber}                  from "../utils/formatter.js";
 
 /**
- * Inferenz-Backend basierend auf Transformers.js (ONNX) im Browser. Dies ist
- * das Standard-Backend, das die Inferenz direkt im Browser ausführt.
+ * Inference backend based on Transformers.js (ONNX) in the browser. This is
+ * the default backend, which runs inference directly in the browser.
  */
 export default class TransformersBackend extends BaseBackend {
     /**
-     * Optionale Debug-Logs zum Untersuchen von Performance-Problemen.
+     * Optional debug logs for investigating performance issues.
      * 
-     * Sowohl beim Laden aus auch bei der Ausführung werden durch die
-     * ONNX-Runtime umfangreiche Logs geschrieben, die Hinweise darauf
-     * geben können, warum ein bestimmtes Modell nur sehr langsam läuft.
+     * ONNX Runtime writes extensive logs while loading and running a model.
+     * These may help explain why a particular model is running very slowly.
      * 
-     * Hierfür sichert man die Browser Logs in eine Textdatei und nutzt
-     * z.B. Copilot zur Auswertung.
+     * To investigate, save the browser logs to a text file and use, for example,
+     * Copilot to analyze them.
      */
     #sessionOptions = {};
 
     /**
-     * Aktuell geladenes KI-Modell.
+     * Currently loaded AI model.
      */
     #model = null;
 
     /**
-     * Konfiguration des aktuell geladenen Modells.
+     * Configuration of the currently loaded model.
      */
     #modelConfig = null;
 
     /**
-     * Hilfsobjekt zum Stoppen der aktuellen Textgenerierung.
+     * Helper object for stopping the current text generation.
      */
     #stoppingCriteria = new InterruptableStoppingCriteria();
 
     /**
-     * Textgenerierung läuft
+     * Text generation is running.
      */
     #running = false;
 
@@ -319,14 +318,14 @@ export default class TransformersBackend extends BaseBackend {
             });
 
             if (this.#modelConfig.instructionTuned) {
-                // Chat-Modelle: Diese enden oft auf `-instruct`, da sie "instruction tuned" sind.
-                // Das heißt, sie vervollständigen nicht einfach nur einen Eingabetext, sondern der
-                // Eingabetext muss ein spezielles Format besitzen, um eine Chat-Struktur abzubilden.
-                // Das Modell liefert dann ein Chat-Template mit, so dass eine Liste von Chat-Nachrichten
-                // in die richtige Nur-Text-Form umgewandelt werden kann.
+                // Chat models often end in `-instruct` because they are instruction-tuned.
+                // This means they do not simply complete an input text; the input must
+                // have a specific format to represent a chat structure. The model
+                // provides a chat template to convert a list of chat messages into
+                // the correct plain-text format.
                 //
-                // In der Regel handelt es sich hier um CausalLM (Decoder-Only) Modelle, wie die GPT-Familie.
-                // Seq2Seq-Modelle wie die T5-Familie sind in der Regel nicht Instruction Tuned.
+                // These are usually CausalLM (decoder-only) models, such as the GPT family.
+                // Seq2Seq models such as the T5 family are generally not instruction-tuned.
                 input = [
                     {role: "system", content: this.#modelConfig.systemPrompt || "Du bist ein hilfreicher Assistent."},
                     {role: "user",   content: question}

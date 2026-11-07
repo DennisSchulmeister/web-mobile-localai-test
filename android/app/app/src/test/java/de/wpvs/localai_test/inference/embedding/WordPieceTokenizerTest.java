@@ -16,8 +16,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * Vergleicht den WordPiece-Tokenizer mit Token-IDs, die mit Transformers.js für das
- * Modell {@code sentence-transformers/all-MiniLM-L6-v2} erzeugt wurden.
+ * Compares the WordPiece tokenizer with token IDs generated for the model
+ * {@code sentence-transformers/all-MiniLM-L6-v2} using Transformers.js.
  */
 public class WordPieceTokenizerTest {
     private static final String MODEL_PATH = "_generated/models/sentence-transformers/all-MiniLM-L6-v2/";

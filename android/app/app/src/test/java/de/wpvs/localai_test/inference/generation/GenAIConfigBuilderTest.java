@@ -8,7 +8,7 @@ import org.json.JSONObject;
 import org.junit.Test;
 
 /**
- * Tests der Erzeugung von {@code genai_config.json} durch {@link GenAIConfigBuilder}.
+ * Tests the generation of {@code genai_config.json} by {@link GenAIConfigBuilder}.
  */
 public class GenAIConfigBuilderTest {
     @Test

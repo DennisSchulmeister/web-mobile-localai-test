@@ -1,5 +1,5 @@
 /**
- * Web/Mobile-Test für lokale KI
+ * Web/Mobile Test for Local AI
  * © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
  *
  * This source code is licensed under the BSD 3-Clause License found in the
@@ -12,30 +12,28 @@ import {toString}     from "mdast-util-to-string";
 import {remove}       from "unist-util-remove";
 
 /**
- * Markdown-Text parsen und mit Hilfe von `mdast` einen Syntaxbaum
- * daraus erstellen. Dies dient als Grundlage für die nachfolgenden
- * Funktionen zur Arbeit mit den Markdown-Inhalten.
+ * Parse Markdown text and create a syntax tree with `mdast`. This serves as the
+ * basis for the following functions that work with Markdown content.
  * 
- * Siehe: https://github.com/syntax-tree/mdast
+ * See: https://github.com/syntax-tree/mdast
  * 
- * @param {string} mdText Text im Markdown-Format
- * @returns {object} Syntaxbaum des Dokuments
+ * @param {string} mdText Text in Markdown format
+ * @returns {object} Document syntax tree
  */
 export function parseMarkdown(mdText) {
     return fromMarkdown(mdText);
 }
 
 /**
- * Vereinfachen des Markdown-Inhalts, damit dieser besser von den KI-Modellen
- * verarbeitet werden kann:
+ * Simplify Markdown content so that AI models can process it more effectively:
  * 
- * - Hierfür werden alle Formatierungen für Fett und Kursiv entfernt.
- * - Links werden durch ihren Text ersetzt.
- * - Überschriften werden durch Absätze ersetzt.
- * - Bilder, Tabellen, Codeblöcke und HTML-Blöcke werden entfernt.
+ * - Remove all bold and italic formatting.
+ * - Replace links with their text.
+ * - Replace headings with paragraphs.
+ * - Remove images, tables, code blocks, and HTML blocks.
  * 
- * @param {object} mdAst Syntaxbaum des Dokuments
- * @returns {object} Dieselbe Syntaxbaum-Instanz
+ * @param {object} mdAst Document syntax tree
+ * @returns {object} The same syntax tree instance
  */
 export function simplifyMarkdown(mdAst) {
     remove(mdAst, ["code", "definition", "html", "image", "imageReference", "thematicBreack"]);
@@ -67,21 +65,20 @@ export function simplifyMarkdown(mdAst) {
 }
 
 /**
- * Markdown-Syntaxbaum in einen String zurück wandeln.
+ * Convert a Markdown syntax tree back into a string.
  * 
- * @param {object} mdAst Syntaxbaum des Dokuments
- * @returns {string} Text im Markdown-Format
+ * @param {object} mdAst Document syntax tree
+ * @returns {string} Text in Markdown format
  */
 export function stringifyMarkdown(mdAst) {
     return toMarkdown(mdAst);
 }
 
 /**
- * In einem Array mit Strings alle Zeilenumbrücke durch
- * Leerzeichen ersetzen.
+ * Replace all line breaks in an array of strings with spaces.
  * 
- * @param {Array} strings Array mit Strings
- * @returns Modifiziertes Array mit Strings
+ * @param {Array} strings Array of strings
+ * @returns Modified array of strings
  */
 export function replaceLineBreaks(strings) {
     for (let i in strings) {
@@ -94,12 +91,12 @@ export function replaceLineBreaks(strings) {
 }
 
 /**
- * Relative URLs im Dokument anpassen, damit sie auch innerhalb der Webanwendung
- * funktionieren, wo die Markdown-Dokumente in einem Unterverzeichnis der SPA liegen.
+ * Adjust relative URLs in the document so they also work within the web application,
+ * where Markdown documents are located in a subdirectory of the SPA.
  * 
- * @param {object} mdAst Syntaxbaum des Objekts
- * @param {string} urlPrefix Prefix für relative URLs
- * @returns {object} Dieselbe Syntaxbaum-Instanz
+ * @param {object} mdAst Object syntax tree
+ * @param {string} urlPrefix Prefix for relative URLs
+ * @returns {object} The same syntax tree instance
  */
 export function fixRelativeUrls(mdAst, urlPrefix) {
     if (mdAst.url && !mdAst.url.includes("://") && !mdAst.url.startsWith("/")) {

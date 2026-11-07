@@ -9,7 +9,7 @@ import org.json.JSONObject;
 import org.junit.Test;
 
 /**
- * Tests der Auflösung der Generierungsparameter durch {@link GenerationOptions}.
+ * Tests the resolution of generation parameters by {@link GenerationOptions}.
  */
 public class GenerationOptionsTest {
     private static final double DELTA = 1e-9;

@@ -22,7 +22,7 @@ allprojects {
         google()
         mavenCentral()
 
-        // ONNX Runtime GenAI für Android wird nur als AAR in den GitHub-Releases veröffentlicht
+        // ONNX Runtime GenAI for Android is published only as an AAR in GitHub releases.
         ivy {
             name = "onnxruntime-genai-releases"
             url = "https://github.com/microsoft/onnxruntime-genai/releases/download/"

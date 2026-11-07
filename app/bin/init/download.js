@@ -1,5 +1,5 @@
 /**
- * Web/Mobile-Test für lokale KI
+ * Web/Mobile Test for Local AI
  * © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
  *
  * This source code is licensed under the BSD 3-Clause License found in the
@@ -13,14 +13,14 @@ import {ModelRegistry} from "@huggingface/transformers";
 import {Downloader}    from "nodejs-file-downloader";
 import * as utils      from "../utils.js";
 
-console.log("Modelle Herunterladen");
-console.log("=====================");
+console.log("Download Language Models");
+console.log("========================");
 console.log("");
 
-// Konfiguration einlesen
+// Read the configuration.
 if (process.argv.length < 3) {
-    utils.logError("Zu wenig Kommandozeilenparameter!");
-    utils.logError(`Aufruf: ${process.argv[0]} ${process.argv[1]} <config.json>`);
+    utils.logError("Too few arugments!");
+    utils.logError(`Usage: ${process.argv[0]} ${process.argv[1]} <config.json>`);
     process.exit(1);
 }
 
@@ -29,7 +29,7 @@ let config = utils.readConfig({
     withModels: true,
 });
 
-// Jedes Modell einmal herunterladen
+// Download each model once.
 let modelsById  = new Map();
 
 for (let modelType in config.models.config) {
@@ -41,7 +41,7 @@ for (let modelType in config.models.config) {
         }
 
         if (Array.isArray(prevModelDefinition?.dtypes)) {
-            // Edge Case: Selbes Modell mit unterschiedlichen dtypes mehrfach konfiguriert
+            // Edge case: The same model is configured multiple times with different dtypes.
             let dtypes = new Set([...modelDefinition.dtypes, ...prevModelDefinition.dtypes]);
             modelDefinition.dtypes = [...dtypes.values()];
         }
@@ -53,12 +53,12 @@ for (let modelType in config.models.config) {
 for (let [modelId, modelDefinition] of modelsById.entries()) {
     console.log(`» ${modelId}`);
 
-    // Prüfen, ob die gewünschten dtypes für das Modell verfügbar sind
+    // Check whether the requested dtypes are available for the model.
     let dtypes = await ModelRegistry.get_available_dtypes(modelId);
-    console.log(`Verfügbare dtypes: ${dtypes.toLocaleString()}`);
-    console.log(`Konfigurierte dtypes: ${modelDefinition.dtypes || ""}`);
+    console.log(`Available dtypes: ${dtypes.toLocaleString()}`);
+    console.log(`Configured dtypes: ${modelDefinition.dtypes || ""}`);
 
-    // Für den Download benötigte Dateien ermitteln
+    // Determine which files are needed for the download.
     let downloadFiles = new Set();
 
     if (!Array.isArray(modelDefinition.dtypes) || !modelDefinition.dtypes.length) {
@@ -79,7 +79,7 @@ for (let [modelId, modelDefinition] of modelsById.entries()) {
 
     console.log();
 
-    // Fehlende Dateien herunterladen
+    // Download missing files.
     for (let downloadFile of downloadFiles) {
         let modelPath = utils.modelPath(config, modelId);
         let localPath = path.join(modelPath, ...downloadFile.split("/"));
@@ -87,8 +87,8 @@ for (let [modelId, modelDefinition] of modelsById.entries()) {
         let fileName  = path.basename(localPath);
 
         if (!shell.test("-e", localPath)) {
-            // Diese URL sollte immer die Datei selbst liefern, egal ob sie direkt im Hub
-            // liegt oder aufgrund der Größe auf einem externen Speicher
+            // This URL should always return the file itself, whether it is hosted directly
+            // on the Hub or on external storage due to its size.
             let remoteUrl = `https://huggingface.co/${modelId}/resolve/main/${downloadFile}?download=true`;
             console.log(`Download ${remoteUrl}`);
 

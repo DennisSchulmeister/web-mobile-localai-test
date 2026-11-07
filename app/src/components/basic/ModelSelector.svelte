@@ -1,5 +1,5 @@
 <!--
-Web/Mobile-Test für lokale KI
+Web/Mobile Test for Local AI
 © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
 
 This source code is licensed under the BSD 3-Clause License found in the
@@ -8,7 +8,7 @@ LICENSE file in the root directory of this source tree.
 
 <!--
 @component
-Auswahl eines KI-Modells
+AI model selection
 -->
 
 <script>
@@ -17,8 +17,8 @@ Auswahl eines KI-Modells
     import modelState from "../../state/ModelState.svelte.js";
 
     let {
-        task = "",               // Erster Parameter für `transformers.pipeline()` als String oder String Array
-        disabled = false,        // Keine Auswahl zulassen, z.B. weil das geladene Modell gerade genutzt wird
+        task = "",               // First parameter for `transformers.pipeline()` as a string or string array
+        disabled = false,        // Disallow selection, e.g. because the loaded model is currently in use
     } = $props();
 
     let available_tasks    = $derived(Array.isArray(task) ? task : [task]);
@@ -70,7 +70,7 @@ Auswahl eines KI-Modells
 <details>
     <summary>Sprachmodell auswählen</summary>
 
-    <!-- Infos zum geladenen Modell -->
+    <!-- Information about the loaded model -->
     <article>
         <header>
             Aktuell verwendet
@@ -97,7 +97,7 @@ Auswahl eines KI-Modells
         {/if}
     </article>
 
-    <!-- Modell laden -->
+    <!-- Load a model -->
     <article>
         <header>
             Modell laden

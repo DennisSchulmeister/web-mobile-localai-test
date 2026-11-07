@@ -7,7 +7,7 @@ import org.json.JSONObject;
 import org.junit.Test;
 
 /**
- * Tests der Dateinamen-Logik von {@link ModelFiles}.
+ * Tests the file name logic in {@link ModelFiles}.
  */
 public class ModelFilesTest {
     @Test

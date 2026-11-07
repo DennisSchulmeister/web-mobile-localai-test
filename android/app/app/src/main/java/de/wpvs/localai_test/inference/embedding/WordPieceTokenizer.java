@@ -12,19 +12,19 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * WordPiece-Tokenizer für BERT-artige Embedding-Modelle. Da ORT GenAI keine
- * WordPiece-Tokenizer unterstützt, wird hier die Implementierung von Transformers.js
- * ({@code @huggingface/tokenizers}) nachgebildet, damit native und im Browser
- * berechnete Embeddings übereinstimmen.
+ * WordPiece tokenizer for BERT-style embedding models. Since ORT GenAI does not
+ * support WordPiece tokenizers, this reproduces the Transformers.js implementation
+ * ({@code @huggingface/tokenizers}) so embeddings computed natively and in the browser
+ * match.
  *
- * <p>Unterstützt werden {@code BertNormalizer}, {@code BertPreTokenizer}, das
- * {@code WordPiece}-Modell sowie die Post-Prozessoren {@code TemplateProcessing},
- * {@code BertProcessing} und {@code RobertaProcessing}, jeweils auch ohne
- * Normalizer, Pre-Tokenizer oder Post-Prozessor.</p>
+ * <p>Supported components are {@code BertNormalizer}, {@code BertPreTokenizer}, the
+ * {@code WordPiece} model, and the {@code TemplateProcessing}, {@code BertProcessing},
+ * and {@code RobertaProcessing} post-processors, each also without a normalizer,
+ * pre-tokenizer, or post-processor.</p>
  */
 final class WordPieceTokenizer implements EmbeddingPipeline.TextTokenizer {
     /**
-     * Sonder-Token aus {@code added_tokens}.
+     * Special token from {@code added_tokens}.
      */
     private static final class AddedToken {
         final String content;
@@ -39,7 +39,7 @@ final class WordPieceTokenizer implements EmbeddingPipeline.TextTokenizer {
     }
 
     /**
-     * Knoten im Präfixbaum zum Abtrennen der Sonder-Tokens.
+     * Node in the prefix tree used to split out special tokens.
      */
     private static final class TrieNode {
         final Map<Character, TrieNode> children = new HashMap<>();
@@ -47,7 +47,7 @@ final class WordPieceTokenizer implements EmbeddingPipeline.TextTokenizer {
     }
 
     /**
-     * Element der Post-Processing-Vorlage: Entweder feste Token-IDs oder die Eingabesequenz.
+     * Element of the post-processing template: either fixed token IDs or the input sequence.
      */
     private static final class TemplatePiece {
         final long[] ids;
@@ -78,10 +78,10 @@ final class WordPieceTokenizer implements EmbeddingPipeline.TextTokenizer {
     private final boolean hasPreTokenizer;
 
     /**
-     * Prüfen, ob ein Tokenizer von dieser Klasse unterstützt wird.
+     * Check whether a tokenizer is supported by this class.
      *
-     * @param tokenizerJson Inhalt der {@code tokenizer.json}
-     * @return {@code true}, wenn alle Bestandteile unterstützt werden
+     * @param tokenizerJson Contents of {@code tokenizer.json}
+     * @return {@code true} if all components are supported
      */
     static boolean supports(JSONObject tokenizerJson) {
         JSONObject model = tokenizerJson.optJSONObject("model");
@@ -107,17 +107,17 @@ final class WordPieceTokenizer implements EmbeddingPipeline.TextTokenizer {
     }
 
     /**
-     * @param tokenizerJson   Inhalt der {@code tokenizer.json}
-     * @param tokenizerConfig Inhalt der {@code tokenizer_config.json} (für {@code model_max_length})
-     * @throws JSONException bei unvollständiger Konfiguration
-     * @throws IllegalArgumentException bei nicht unterstützten Bestandteilen
+     * @param tokenizerJson   Contents of {@code tokenizer.json}
+     * @param tokenizerConfig Contents of {@code tokenizer_config.json} (for {@code model_max_length})
+     * @throws JSONException if the configuration is incomplete
+     * @throws IllegalArgumentException for unsupported components
      */
     WordPieceTokenizer(JSONObject tokenizerJson, JSONObject tokenizerConfig) throws JSONException {
         if (!supports(tokenizerJson)) {
             throw new IllegalArgumentException("Tokenizer wird nicht unterstützt (nur BERT/WordPiece).");
         }
 
-        // WordPiece-Modell
+        // WordPiece model.
         JSONObject model = tokenizerJson.getJSONObject("model");
         JSONObject modelVocab = model.getJSONObject("vocab");
 
@@ -130,7 +130,7 @@ final class WordPieceTokenizer implements EmbeddingPipeline.TextTokenizer {
         subwordPrefix        = model.optString("continuing_subword_prefix", "##");
         maxInputCharsPerWord = model.optInt("max_input_chars_per_word", 100);
 
-        // Normalizer
+        // Normalizer.
         JSONObject normalizer = tokenizerJson.optJSONObject("normalizer");
         hasNormalizer      = normalizer != null;
         cleanText          = hasNormalizer && normalizer.optBoolean("clean_text", false);
@@ -141,7 +141,7 @@ final class WordPieceTokenizer implements EmbeddingPipeline.TextTokenizer {
 
         hasPreTokenizer = tokenizerJson.optJSONObject("pre_tokenizer") != null;
 
-        // Sonder-Tokens, getrennt nach normalisierter und nicht normalisierter Form
+        // Special tokens, separated into normalized and unnormalized forms.
         JSONArray added = tokenizerJson.optJSONArray("added_tokens");
 
         for (int i = 0; added != null && i < added.length(); i++) {
@@ -161,19 +161,19 @@ final class WordPieceTokenizer implements EmbeddingPipeline.TextTokenizer {
             }
         }
 
-        // Post-Processing (Sonder-Tokens am Anfang und Ende)
+        // Post-processing (special tokens at the beginning and end).
         parseTemplate(tokenizerJson.optJSONObject("post_processor"));
 
-        // Truncation wie in Transformers.js nur anhand von model_max_length
+        // Truncate based on model_max_length only, as in Transformers.js.
         double maxLength = tokenizerConfig.optDouble("model_max_length", Double.NaN);
         modelMaxLength   = Double.isNaN(maxLength) || maxLength >= Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) maxLength;
     }
 
     /**
-     * Text in Token-IDs inklusive Sonder-Tokens umwandeln.
+     * Convert text to token IDs, including special tokens.
      *
-     * @param text Eingabetext
-     * @return Token-IDs und Token-Type-IDs, gekürzt auf {@code model_max_length}
+     * @param text Input text
+     * @return Token IDs and token type IDs, truncated to {@code model_max_length}
      */
     @Override
     public EmbeddingPipeline.Encoding encode(String text) {
@@ -215,10 +215,10 @@ final class WordPieceTokenizer implements EmbeddingPipeline.TextTokenizer {
     }
 
     /**
-     * Text in Tokens ohne Sonder-Tokens am Anfang und Ende zerlegen
+     * Split text into tokens without special tokens at the beginning or end
      * ({@code encode_text} in Transformers.js).
      *
-     * @param text Eingabetext
+     * @param text Input text
      * @return Tokens
      */
     List<String> tokenize(String text) {
@@ -257,7 +257,7 @@ final class WordPieceTokenizer implements EmbeddingPipeline.TextTokenizer {
     }
 
     /**
-     * {@code BertNormalizer.normalize} aus Transformers.js.
+     * {@code BertNormalizer.normalize} from Transformers.js.
      */
     String normalize(String text) {
         if (cleanText) text = cleanText(text);
@@ -274,7 +274,7 @@ final class WordPieceTokenizer implements EmbeddingPipeline.TextTokenizer {
     }
 
     /**
-     * Steuerzeichen entfernen und Leerraum durch Leerzeichen ersetzen.
+     * Remove control characters and replace whitespace with spaces.
      */
     private static String cleanText(String text) {
         StringBuilder output = new StringBuilder(text.length());
@@ -296,8 +296,8 @@ final class WordPieceTokenizer implements EmbeddingPipeline.TextTokenizer {
     }
 
     /**
-     * CJK-Zeichen mit Leerzeichen umgeben. Wie in Transformers.js werden UTF-16-Codeeinheiten
-     * geprüft, so dass nur Zeichen der Basisebene (BMP) erkannt werden.
+     * Surround CJK characters with spaces. As in Transformers.js, UTF-16 code units
+     * are checked, so only basic multilingual plane (BMP) characters are recognized.
      */
     private static String tokenizeChineseChars(String text) {
         StringBuilder output = new StringBuilder(text.length());
@@ -316,7 +316,7 @@ final class WordPieceTokenizer implements EmbeddingPipeline.TextTokenizer {
     }
 
     /**
-     * Akzente durch NFD-Zerlegung und Entfernen der nicht-spacing Marks ({@code \p{Mn}}) entfernen.
+     * Remove accents by applying NFD decomposition and removing non-spacing marks ({@code \p{Mn}}).
      */
     private static String stripAccents(String text) {
         String decomposed = Normalizer.normalize(text, Normalizer.Form.NFD);
@@ -335,8 +335,8 @@ final class WordPieceTokenizer implements EmbeddingPipeline.TextTokenizer {
     }
 
     /**
-     * {@code BertPreTokenizer}: Wörter aus Nicht-Leerraum/Nicht-Satzzeichen sowie einzelne
-     * Satzzeichen, entspricht dem regulären Ausdruck {@code [^\s P]+|[P]}.
+     * {@code BertPreTokenizer}: words consisting of non-whitespace, non-punctuation characters,
+     * along with individual punctuation marks, matching the regular expression {@code [^\s P]+|[P]}.
      */
     private static List<String> preTokenize(String text) {
         List<String> words = new ArrayList<>();
@@ -367,7 +367,7 @@ final class WordPieceTokenizer implements EmbeddingPipeline.TextTokenizer {
     }
 
     /**
-     * Gierige Zerlegung der Wörter in die längsten bekannten Wortteile.
+     * Greedily split words into the longest known subwords.
      */
     private List<String> wordPiece(List<String> words) {
         List<String> output = new ArrayList<>();
@@ -427,7 +427,7 @@ final class WordPieceTokenizer implements EmbeddingPipeline.TextTokenizer {
     }
 
     /**
-     * Vorlage für Sonder-Tokens am Anfang und Ende aus dem Post-Prozessor lesen.
+     * Read the template for special tokens at the beginning and end from the post-processor.
      */
     private void parseTemplate(JSONObject postProcessor) throws JSONException {
         if (postProcessor == null) return;
@@ -470,7 +470,7 @@ final class WordPieceTokenizer implements EmbeddingPipeline.TextTokenizer {
     }
 
     /**
-     * Leerraum neben Sonder-Tokens mit {@code lstrip}/{@code rstrip} entfernen.
+     * Remove whitespace next to special tokens with {@code lstrip}/{@code rstrip}.
      */
     private void stripAroundAddedTokens(List<String> sections) {
         for (int i = 0; i < sections.size(); i++) {
@@ -498,7 +498,7 @@ final class WordPieceTokenizer implements EmbeddingPipeline.TextTokenizer {
     }
 
     /**
-     * Text an den längsten Treffern im Präfixbaum aufteilen ({@code DictionarySplitter}).
+     * Split text at the longest matches in the prefix tree ({@code DictionarySplitter}).
      */
     private static List<String> split(TrieNode root, String text) {
         List<String> result = new ArrayList<>();
@@ -537,7 +537,7 @@ final class WordPieceTokenizer implements EmbeddingPipeline.TextTokenizer {
     }
 
     /**
-     * Steuerzeichen nach Unicode-Kategorie Cc, Cf, Co oder Cs, ausgenommen Tab und Zeilenumbrüche.
+     * Control characters in Unicode categories Cc, Cf, Co, or Cs, excluding tabs and line breaks.
      */
     private static boolean isControl(int cp) {
         if (cp == '\t' || cp == '\n' || cp == '\r') return false;
@@ -554,7 +554,7 @@ final class WordPieceTokenizer implements EmbeddingPipeline.TextTokenizer {
     }
 
     /**
-     * Satzzeichen nach Unicode-Kategorie P sowie alle ASCII-Sonderzeichen.
+     * Punctuation in Unicode category P, along with all ASCII special characters.
      */
     private static boolean isPunctuation(int cp) {
         if ((cp >= 0x21 && cp <= 0x2F) || (cp >= 0x3A && cp <= 0x40) || (cp >= 0x5B && cp <= 0x60) || (cp >= 0x7B && cp <= 0x7E)) {
@@ -576,8 +576,8 @@ final class WordPieceTokenizer implements EmbeddingPipeline.TextTokenizer {
     }
 
     /**
-     * Leerraum im Sinne von {@code \s} in JavaScript, das sich von
-     * {@link Character#isWhitespace(int)} unterscheidet.
+     * Whitespace as defined by {@code \s} in JavaScript, which differs from
+     * {@link Character#isWhitespace(int)}.
      */
     static boolean isJsWhitespace(int cp) {
         switch (cp) {

@@ -20,8 +20,8 @@ android {
         }
     }
     androidResources {
-        // Mitgelieferte Modelle unkomprimiert ablegen, damit sie schneller kopiert und
-        // nach einem App-Update anhand ihrer Größe wiedererkannt werden können
+        // Store bundled models uncompressed so they can be copied faster and
+        // identified by size after an app update.
         noCompress += ["onnx", "onnx_data"]
     }
     buildFeatures {

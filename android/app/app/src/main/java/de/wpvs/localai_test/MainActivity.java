@@ -6,12 +6,12 @@ import com.getcapacitor.BridgeActivity;
 import de.wpvs.localai_test.plugin.NativeInferencePlugin;
 
 /**
- * Start-Aktivität
+ * Main activity.
  */
 public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        // Eigene Capacitor-Plugins registrieren
+        // Register own Capacitor plugins
         registerPlugin(NativeInferencePlugin.class);
 
         super.onCreate(savedInstanceState);

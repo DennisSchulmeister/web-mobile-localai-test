@@ -1,15 +1,15 @@
 /**
- * Web/Mobile-Test für lokale KI
+ * Web/Mobile Test for Local AI
  * © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
  *
  * This source code is licensed under the BSD 3-Clause License found in the
  * LICENSE file in the root directory of this source tree.
  */
 
-// Debug-Logs für ONNX/Transformers.js
+// Enable debug logs for ONNX/Transformers.js.
 window.ENABLE_DEBUG_LOGS = false;
 
-// In der Android-Version fehlende Modelle aus dem HuggingFace Hub laden
+// Download models missing from the Hugging Face Hub in the Android version.
 window.ALLOW_REMOTE_MODELS = Capacitor.isNativePlatform();
 
 import {mount}           from "svelte";

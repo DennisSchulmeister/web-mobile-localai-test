@@ -1,5 +1,5 @@
 /**
- * Web/Mobile-Test für lokale KI
+ * Web/Mobile Test for Local AI
  * © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
  *
  * This source code is licensed under the BSD 3-Clause License found in the
@@ -13,27 +13,26 @@ const nativeInference = registerPlugin("NativeInference");
 let nextRequestId = 0;
 
 /**
- * Zusätzliches Inferenz-Backend für die Android App. Kommuniziert über ein
- * Capacitor Plugin mit nativem Java-Code, um die Inferenz mit einer nativen
- * Library außerhalb der Web View auszuführen. Dies müsste theoretisch mehrere
- * Vorteile haben:
+ * Additional inference backend for the Android app. It communicates with native
+ * Java code through a Capacitor plugin to run inference with a native library
+ * outside the WebView. This should theoretically have several benefits:
  * 
- * 1. Weniger Speicherprobleme, da wir das Speichermodell des Browsers umgehen.
- * 2. Schnellere Ausführung, vor allem wenn TPU-Devices genutzt werden können.
+ * 1. Fewer memory issues because it avoids the browser's memory model.
+ * 2. Faster execution, especially when TPU devices can be used.
  */
 export default class AndroidBackend extends BaseBackend {
     /**
-     * ID der laufenden Textgenerierung zur Zuordnung von Streaming-Events.
+     * ID of the running text generation, used to associate streaming events.
      */
     #generationRequestId = null;
 
     /**
-     * Flag, ob die Textgenerierung bereits an das native Plugin übergeben wurde.
+     * Whether text generation has already been passed to the native plugin.
      */
     #generationStarted = false;
 
     /**
-     * Abbruchanforderung während der Registrierung des Streaming-Listeners.
+     * Cancellation request made while registering the streaming listener.
      */
     #cancelRequested = false;
 

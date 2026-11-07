@@ -1,5 +1,5 @@
 /**
- * Web/Mobile-Test für lokale KI
+ * Web/Mobile Test for Local AI
  * © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
  *
  * This source code is licensed under the BSD 3-Clause License found in the
@@ -11,13 +11,13 @@ import {formatNumber}  from "../utils/formatter.js";
 import {formatSeconds} from "../utils/formatter.js";
 
 /**
- * Hilfsklasse zur Berechnung typischer Statistiken wie Tokens/Sekunde während
- * der Textgenerierung. Die Statistiken können mit der `StopWatch`-Komponenten
- * im UI angezeigt werden.
+ * Helper class for calculating common statistics such as tokens per second
+ * during text generation. The statistics can be displayed in the UI with the
+ * `StopWatch` component.
  */
 export default class TextGenerationStatsState {
     /**
-     * Alle Statistiken als Liste für die `StopWatch`-Komponente.
+     * All statistics as a list for the `StopWatch` component.
      */
     values = $state([
         {
@@ -41,23 +41,23 @@ export default class TextGenerationStatsState {
     ]);
 
     /**
-     * Anzahl generierter Tokens
+     * Number of generated tokens
      */
     numberTokens = this.values[0];
 
     /**
-     * Zeit in Sekunden bis zum ersten Token
+     * Time in seconds until the first token
      */
     timeToFirstToken = this.values[1];
 
     /**
-     * Generierte Tokens je Sekunde (ohne Verarbeitung des Prompts und
-     * daher erst ab dem ersten Token gemessen).
+     * Generated tokens per second (excluding prompt processing and therefore
+     * measured only after the first token).
      */
     tokensPerSec = this.values[2];
 
     /**
-     * Zeitstempel und Zähler zum Berechnen der Statistiken
+     * Timestamps and counters for calculating statistics
      */
     startedAt    = 0;
     firstTokenAt = 0;
@@ -65,7 +65,7 @@ export default class TextGenerationStatsState {
     tokenCount   = 0;
 
     /**
-     * Neue Messung starten.
+     * Start a new measurement.
      * @returns {this} Fluent API
      */
     start() {
@@ -83,12 +83,12 @@ export default class TextGenerationStatsState {
     }
 
     /**
-     * Messung aktualisieren, sobald neue Tokens vorliegen. Um Performance einzusparen
-     * kann mit `recalc` gesteuert werden, ob nur die internen Zähle aktualisiert oder
-     * alle Kennzahlen vollständig neu gerechnet werden.
+     * Update the measurement when new tokens are available. To save processing time,
+     * `recalc` controls whether only the internal counters are updated or all metrics
+     * are recalculated.
      * 
-     * @param {Array} numTokens Anzahl der zwischenzeitlich generierten Tokens
-     * @param {boolean} recalc Kennzahlen vollständig neu rechnen
+     * @param {Array} numTokens Number of tokens generated in the meantime
+     * @param {boolean} recalc Recalculate all metrics
      * @returns {this} Fluent API
      */
     update(numTokens, recalc) {
@@ -106,7 +106,7 @@ export default class TextGenerationStatsState {
     }
 
     /**
-     * Messung beenden.
+     * Stop the measurement.
      * @returns {this} Fluent API
      */
     stop() {
@@ -115,7 +115,7 @@ export default class TextGenerationStatsState {
     }
 
     /**
-     * Im UI sichtbare Kennzahlen neurechnen.
+     * Recalculate metrics displayed in the UI.
      */
     #recalc() {
         this.numberTokens.value     = this.tokenCount;

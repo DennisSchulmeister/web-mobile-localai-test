@@ -1,5 +1,5 @@
 /**
- * Web/Mobile-Test für lokale KI
+ * Web/Mobile Test for Local AI
  * © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
  *
  * This source code is licensed under the BSD 3-Clause License found in the
@@ -15,14 +15,14 @@ import shell               from "shelljs";
 import * as utils          from "../utils.js";
 import * as md             from "../../shared/markdown.js";
 
-console.log("Daten vorverarbeiten");
-console.log("====================");
+console.log("Preprocess Data");
+console.log("================");
 console.log("");
 
-// Konfiguration einlesen
+// Read the configuration.
 if (process.argv.length < 3) {
-    utils.logError("Zu wenig Kommandozeilenparameter!");
-    utils.logError(`Aufruf: ${process.argv[0]} ${process.argv[1]} <config.json>`);
+    utils.logError("Too few arguments!");
+    utils.logError(`Usage: ${process.argv[0]} ${process.argv[1]} <config.json>`);
     process.exit(1);
 }
 
@@ -53,14 +53,12 @@ for (let category of config.data.config) {
 }
 
 /**
- * Schlüsselwörter für die semantische Suche aus dem übergebenen
- * Markdown-Syntaxbaum extrahieren. Der Einfachheit halber werden
- * hier einfach alle Überschriften und direkt formatierten Texte
- * (Fett, Kursiv) verwendet.
+ * Extract keywords for semantic search from the provided Markdown syntax tree.
+ * For simplicity, all headings and directly formatted text (bold, italic) are used.
  * 
- * @param {object} mdAst Teil-Syntaxbaum des Dokuments
- * @param {Array} keywords Schon vorhandene Schlüsselwörter
- * @returns {Array} Erweiterte Schlüsselwörter
+ * @param {object} mdAst Partial document syntax tree
+ * @param {Array} keywords Existing keywords
+ * @returns {Array} Extended keywords
  */
 function extractKeywords(mdAst, keywords) {
     if (["strong", "emphasis", "heading"].includes(mdAst.type)) {
@@ -75,12 +73,12 @@ function extractKeywords(mdAst, keywords) {
 }
 
 /**
- * Formatierung entferne und den Text in Sätze für das Question
- * Answering und die Volltextsuche splitten.
+ * Remove formatting and split the text into sentences for question answering
+ * and full-text search.
  * 
- * @param {object} mdAst Teil-Syntaxbaum des Dokuments
- * @param {Array} sentences Schon vorhandene Sätze
- * @returns {Array} Erweiterte Sätze
+ * @param {object} mdAst Partial document syntax tree
+ * @param {Array} sentences Existing sentences
+ * @returns {Array} Extended sentences
  */
 function extractSentences(mdAst, sentences) {
     if (mdAst.type === "paragraph") {

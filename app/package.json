@@ -1,7 +1,7 @@
 {
     "name": "@dschulmeis/web-mobile-localai-test",
     "version": "1.0.0",
-    "description": "Web/Mobile-Test für lokale KI",
+    "description": "Web/Mobile Test for Local AI",
     "author": "Dennis Schulmeister-Zimolong",
     "private": "true",
     "type": "module",

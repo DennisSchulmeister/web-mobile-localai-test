@@ -1,5 +1,5 @@
 /**
- * Web/Mobile-Test für lokale KI
+ * Web/Mobile Test for Local AI
  * © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
  *
  * This source code is licensed under the BSD 3-Clause License found in the
@@ -16,8 +16,7 @@ import {randomId}        from "../../../utils/id.js";
 import {decodeEmbedding} from "../../../../shared/embedding.js";
 
 /**
- * Gesicherter Zustand für die semantische Suche, damit dieser bei der Navigation
- * nicht verloren geht.
+ * Persistent state for semantic search so it is not lost during navigation.
  */
 class SemanticSearchPageState {
     working         = $state(false);
@@ -35,7 +34,7 @@ class SemanticSearchPageState {
     items           = $state([]);
 
     /**
-     * Semantische Suche ausführen
+     * Run semantic search.
      */
     async executeSearch() {
         try {
@@ -46,7 +45,7 @@ class SemanticSearchPageState {
             this.working      = true;
             let searchResults = [];
             
-            // Indexdateien herunterladen
+            // Download the index files.
             this.stopWatchState.start("Download", "bi-download");
             
             let indexes = [];
@@ -56,13 +55,13 @@ class SemanticSearchPageState {
                 indexes.push(await(await fetch(this.embeddingPaths.sentences)).json());
             }
     
-            // Einbettung des Suchbegriffs berechnen
+            // Calculate the embedding for the search term.
             this.stopWatchState.start("Embedding", "bi-text-center");
     
             let queryLower = this.query.toLowerCase();
             let queryEmbedding = await modelState.loadedModel.backend.runEmbeddingPipeline(this.query);
     
-            // Index durchsuchen
+            // Search the index.
             this.stopWatchState.start("Suche", "bi-search");
     
             this.progressMax = 0;
@@ -115,7 +114,7 @@ class SemanticSearchPageState {
             this.stopWatchState.stop();
             this.working = false;
     
-            // Aufbereitung für die Anzeige
+            // Prepare the results for display.
             this.items = [];
     
             for (let searchResult of searchResults) {

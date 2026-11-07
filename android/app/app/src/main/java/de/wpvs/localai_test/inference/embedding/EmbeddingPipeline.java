@@ -21,14 +21,14 @@ import de.wpvs.localai_test.inference.InferenceDevice;
 import de.wpvs.localai_test.inference.ModelFiles;
 
 /**
- * Feature-Extraction-Pipeline zur Berechnung von Satz-Embeddings mit ONNX Runtime.
- * Das Verhalten entspricht {@code pipeline("feature-extraction", ...)} von Transformers.js
- * mit {@code {pooling: "mean", normalize: true}}: Tokenisieren, Modell ausführen,
- * Mean Pooling über alle Tokens gemäß Attention Mask und L2-Normalisierung.
+ * Feature extraction pipeline for computing sentence embeddings with ONNX Runtime.
+ * It behaves like {@code pipeline("feature-extraction", ...)} in Transformers.js
+ * with {@code {pooling: "mean", normalize: true}}: tokenize, run the model,
+ * mean-pool all tokens according to the attention mask, and L2-normalize.
  */
 public final class EmbeddingPipeline implements AutoCloseable {
     /**
-     * Ergebnis der Tokenisierung.
+     * Tokenization result.
      */
     static final class Encoding {
         final long[] inputIds;
@@ -41,7 +41,7 @@ public final class EmbeddingPipeline implements AutoCloseable {
     }
 
     /**
-     * Gemeinsame Schnittstelle der Tokenizer-Implementierungen.
+     * Shared interface for tokenizer implementations.
      */
     interface TextTokenizer extends AutoCloseable {
         Encoding encode(String text) throws Exception;
@@ -51,12 +51,12 @@ public final class EmbeddingPipeline implements AutoCloseable {
     }
 
     /**
-     * Ersatz-Tokenizer auf Basis von ORT GenAI für Modelle, die nicht von
-     * {@link WordPieceTokenizer} unterstützt werden (z.B. BPE- oder Unigram-Tokenizer).
+     * Fallback tokenizer based on ORT GenAI for models not supported by
+     * {@link WordPieceTokenizer} (e.g. BPE or Unigram tokenizers).
      */
     private static final class GenAITokenizer implements TextTokenizer {
         /**
-         * Minimale Konfiguration, wenn ORT GenAI nur als Tokenizer genutzt wird.
+         * Minimal configuration when ORT GenAI is used only as a tokenizer.
          */
         private static final String TOKENIZER_ONLY_CONFIG = "{\"model\":{\"type\":\"decoder\",\"vocab_size\":1,\"context_length\":512,"
             + "\"decoder\":{\"filename\":\"unused.onnx\",\"head_size\":1,\"hidden_size\":1,\"num_attention_heads\":1,"
@@ -69,7 +69,7 @@ public final class EmbeddingPipeline implements AutoCloseable {
         private final int maxLength;
 
         GenAITokenizer(File modelDir, JSONObject tokenizerConfig) throws GenAIException, IOException {
-            // ORT GenAI benötigt eine genai_config.json, auch wenn nur der Tokenizer genutzt wird
+            // ORT GenAI requires a genai_config.json even when only the tokenizer is used.
             ModelFiles.writeText(new File(modelDir, "genai_config.json"), TOKENIZER_ONLY_CONFIG);
 
             config    = new ai.onnxruntime.genai.Config(modelDir.getAbsolutePath());
@@ -111,12 +111,12 @@ public final class EmbeddingPipeline implements AutoCloseable {
     private final Set<String> inputNames;
 
     /**
-     * Modell und Tokenizer laden.
+     * Load the model and tokenizer.
      *
-     * @param modelDir Verzeichnis mit den Modelldateien
-     * @param onnxFile Relativer Pfad der ONNX-Datei, z.B. {@code onnx/model.onnx}
-     * @param device   Zu verwendender Execution Provider
-     * @throws Exception wenn das Modell nicht geladen werden kann
+     * @param modelDir Directory containing the model files
+     * @param onnxFile Relative path to the ONNX file, e.g. {@code onnx/model.onnx}
+     * @param device   Execution provider to use
+     * @throws Exception if the model cannot be loaded
      */
     public EmbeddingPipeline(File modelDir, String onnxFile, InferenceDevice device) throws Exception {
         tokenizer = createTokenizer(modelDir);
@@ -136,7 +136,7 @@ public final class EmbeddingPipeline implements AutoCloseable {
     }
 
     /**
-     * Passenden Tokenizer für das Modell erzeugen.
+     * Create the appropriate tokenizer for the model.
      */
     private static TextTokenizer createTokenizer(File modelDir) throws IOException, JSONException, GenAIException {
         JSONObject tokenizerJson   = ModelFiles.readJson(new File(modelDir, "tokenizer.json"));
@@ -150,11 +150,11 @@ public final class EmbeddingPipeline implements AutoCloseable {
     }
 
     /**
-     * Normalisiertes Embedding für einen Text berechnen.
+     * Compute a normalized embedding for a text.
      *
-     * @param text Eingabetext
-     * @return L2-normalisierter Embedding-Vektor
-     * @throws Exception bei Fehlern während der Inferenz
+     * @param text Input text
+     * @return L2-normalized embedding vector
+     * @throws Exception if an error occurs during inference
      */
     public float[] embed(String text) throws Exception {
         Encoding encoding = tokenizer.encode(text);
@@ -184,7 +184,7 @@ public final class EmbeddingPipeline implements AutoCloseable {
                 long[] outputShape = output.getInfo().getShape();
 
                 if (outputShape.length == 2) {
-                    // Modell liefert bereits ein gepooltes Embedding
+                    // The model already returns a pooled embedding.
                     float[] embedding = toArray(output.getFloatBuffer());
                     return normalize(embedding);
                 }
@@ -203,9 +203,9 @@ public final class EmbeddingPipeline implements AutoCloseable {
     }
 
     /**
-     * Ausgabe-Tensor mit den Token-Embeddings suchen. Bevorzugt wird wie in
-     * Transformers.js {@code last_hidden_state}, danach {@code logits} und
-     * {@code token_embeddings}, ansonsten die erste Ausgabe.
+     * Find the output tensor containing the token embeddings. Prefer
+     * {@code last_hidden_state}, as in Transformers.js, followed by {@code logits}
+     * and {@code token_embeddings}; otherwise use the first output.
      */
     private static OnnxTensor findOutput(OrtSession.Result result) {
         for (String name : new String[] { "last_hidden_state", "logits", "token_embeddings" }) {
@@ -225,13 +225,13 @@ public final class EmbeddingPipeline implements AutoCloseable {
     }
 
     /**
-     * Mittelwert aller Token-Embeddings, gewichtet mit der Attention Mask.
+     * Mean of all token embeddings, weighted by the attention mask.
      *
-     * @param hidden     Token-Embeddings der Form {@code [1, tokens, dimensions]}
-     * @param mask       Attention Mask
-     * @param tokens     Anzahl Tokens
-     * @param dimensions Anzahl Dimensionen
-     * @return Gepooltes Embedding
+     * @param hidden     Token embeddings with shape {@code [1, tokens, dimensions]}
+     * @param mask       Attention mask
+     * @param tokens     Number of tokens
+     * @param dimensions Number of dimensions
+     * @return Pooled embedding
      */
     static float[] meanPooling(float[] hidden, long[] mask, int tokens, int dimensions) {
         float[] result = new float[dimensions];
@@ -258,10 +258,10 @@ public final class EmbeddingPipeline implements AutoCloseable {
     }
 
     /**
-     * Vektor auf die Länge 1 normalisieren (L2-Norm).
+     * Normalize a vector to length 1 (L2 norm).
      *
-     * @param vector Vektor, wird direkt verändert
-     * @return Derselbe Vektor
+     * @param vector Vector, modified in place
+     * @return The same vector
      */
     static float[] normalize(float[] vector) {
         double sum = 0;
@@ -278,7 +278,7 @@ public final class EmbeddingPipeline implements AutoCloseable {
         try {
             session.close();
         } catch (OrtException ignored) {
-            // Beim Aufräumen nicht relevant
+            // Not relevant during cleanup.
         }
 
         tokenizer.close();

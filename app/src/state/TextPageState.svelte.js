@@ -1,5 +1,5 @@
 /**
- * Web/Mobile-Test für lokale KI
+ * Web/Mobile Test for Local AI
  * © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
  *
  * This source code is licensed under the BSD 3-Clause License found in the
@@ -9,7 +9,7 @@
 import * as md from "../../shared/markdown.js";
 
 /**
- * Kategorien, verfügbare Seiten und Inhalt der aktuellen Seite.
+ * Categories, available pages, and the current page's content.
  */
 class TextPageState {
     categories  = $state([]);
@@ -17,18 +17,18 @@ class TextPageState {
     wordCount   = $derived.by(this.estimateWordCount.bind(this));
 
     /**
-     * Datei `data/index.json` mit der Liste der Textseiten je Kategorie laden.
-     * Dies verändert das reaktive Attribut `categories`.
+     * Load `data/index.json`, which lists the text pages for each category.
+     * This updates the reactive `categories` attribute.
      */
     async reloadCategories() {
         this.categories = await (await fetch("data/index.json")).json();
     }
 
     /**
-     * Markdown-Datei mit dem darzustellenden Inhalt der aktuellen Seite laden.
-     * Dies verändert das reaktive Attribute `currentPage`.
+     * Load the Markdown file containing the current page's content.
+     * This updates the reactive `currentPage` attribute.
      * 
-     * @param {string} pageFile Markdown-Pfad
+     * @param {string} pageFile Markdown path
      */
     async setCurrentPage(pageFile) {
         this.currentPage.content    = "";
@@ -54,8 +54,8 @@ class TextPageState {
     }
 
     /**
-     * Anzahl Wörter der aktuellen Markdown-Datei schätzen.
-     * @returns {number} Geschätzte Anazhl Wörter
+     * Estimate the number of words in the current Markdown file.
+     * @returns {number} Estimated number of words
      */
     estimateWordCount() {
         let text       = (this.currentPage.content || "").replaceAll("\r\n", "\n").replaceAll("\r", "\n");
@@ -78,10 +78,10 @@ class TextPageState {
     }
 
     /**
-     * Indexeintrag eienr Seite finden.
+     * Find a page's index entry.
      * 
-     * @param {string} pageFile Dateiname der Seite
-     * @returns Indexeintrag mit Seitentitel
+     * @param {string} pageFile Page file name
+     * @returns Index entry with the page title
      */
     findTextPage(pageFile) {
         for (let category of this.categories || []) {
@@ -92,10 +92,10 @@ class TextPageState {
     }
 
     /**
-     * URL zur Anzeige einer Textseite ermitteln.
+     * Get the URL for displaying a text page.
      * 
-     * @param {string} pageFile Dateiname der Seite
-     * @returns URL zur Anzeige
+     * @param {string} pageFile Page file name
+     * @returns URL for display
      */
     getTextPageUrl(pageFile) {
         return `#/page/${pageFile}/content`;

@@ -3,10 +3,10 @@ package de.wpvs.localai_test.inference.generation;
 import org.json.JSONObject;
 
 /**
- * Suchparameter für ORT GenAI, ermittelt wie in Transformers.js: Werte aus dem Aufruf haben
- * Vorrang vor der {@code generation_config.json} des Modells, danach gelten die Standardwerte
- * von Hugging Face Transformers. Längenangaben der {@code generation_config.json} werden wie in
- * der Web-Version ignoriert.
+ * Generation parameters for ORT GenAI, resolved as in Transformers.js: values from the call
+ * take precedence over the model's {@code generation_config.json}, followed by the defaults
+ * from Hugging Face Transformers. Length values from {@code generation_config.json} are
+ * ignored, as they are in the web version.
  */
 final class GenerationOptions {
     final int maxLength;
@@ -26,18 +26,18 @@ final class GenerationOptions {
     }
 
     /**
-     * Suchparameter ermitteln.
+     * Resolve the search parameters.
      *
-     * @param generationConfig  Inhalt der {@code generation_config.json} (ggf. leer)
-     * @param promptLength      Länge des Prompts in Tokens
-     * @param contextLength     Maximale Kontextlänge des Modells
-     * @param maxNewTokens      Maximale Anzahl neuer Tokens oder {@code null}
-     * @param maxLength         Maximale Gesamtlänge oder {@code null}
-     * @param doSample          Sampling statt Greedy Search oder {@code null}
-     * @param temperature       Temperatur oder {@code null}
-     * @param repetitionPenalty Strafe für Wiederholungen oder {@code null}
+     * @param generationConfig  Contents of {@code generation_config.json} (may be empty)
+     * @param promptLength      Prompt length in tokens
+     * @param contextLength     Maximum model context length
+     * @param maxNewTokens      Maximum number of new tokens or {@code null}
+     * @param maxLength         Maximum total length or {@code null}
+     * @param doSample          Sampling instead of greedy search, or {@code null}
+     * @param temperature       Temperature or {@code null}
+     * @param repetitionPenalty Repetition penalty or {@code null}
      * @return Suchparameter
-     * @throws IllegalArgumentException wenn der Prompt das Kontextfenster füllt
+     * @throws IllegalArgumentException if the prompt fills the context window
      */
     static GenerationOptions resolve(JSONObject generationConfig, int promptLength, int contextLength,
                                      Integer maxNewTokens, Integer maxLength, Boolean doSample,

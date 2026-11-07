@@ -1,5 +1,5 @@
 /**
- * Web/Mobile-Test für lokale KI
+ * Web/Mobile Test for Local AI
  * © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
  *
  * This source code is licensed under the BSD 3-Clause License found in the
@@ -13,7 +13,7 @@ import textPageState                   from "../../../state/TextPageState.svelte
 import {randomId}                      from "../../../utils/id.js";
 
 /**
- * Gesicherter Zustand für den Chat, damit dieser bei der Navigation nicht verloren geht.
+ * Persistent state for the chat so it is not lost during navigation.
  */
 class ChatPageState {
     TASKS             = ["text-generation", "text2text-generation"];
@@ -29,8 +29,8 @@ class ChatPageState {
     doSample          = $state(true);
 
     /**
-     * Notwendig, damit die Arrays reaktiv sind. `$derived(... [])` gibt keine
-     * reaktiven Arrays zurück.
+     * Required to make the arrays reactive. `$derived(... [])` does not return
+     * reactive arrays.
      */
     #cb = () => {
         modelState.loadedModel.modelId;
@@ -45,7 +45,7 @@ class ChatPageState {
     messages          = $derived(this.textPage ? this.messagesTextPage : this.messagesHome);
 
     /**
-     * Textaufgabe generieren
+     * Generate text for the current task.
      */
     async execute() {
         let response;
@@ -55,7 +55,7 @@ class ChatPageState {
 
             this.working = true;
 
-            // Kleine Pause, damit wenigstens der Loading-State im UI erscheint!
+            // Briefly yield so the loading state can appear in the UI.
             await new Promise(resolve => window.setTimeout(resolve, 500));
 
             let question = this.question.trim();
@@ -109,7 +109,7 @@ class ChatPageState {
     }
 
     /**
-     * Laufende Generierung stoppen.
+     * Stop the current generation.
      */
     async stop() {
         try {
@@ -121,7 +121,7 @@ class ChatPageState {
     }
 
     /**
-     * Nachrichten zurücksetzen.
+     * Reset the messages.
      */
     reset() {
         this.messages.splice(0);

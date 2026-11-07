@@ -21,25 +21,25 @@ import de.wpvs.localai_test.inference.InferenceDevice;
 import de.wpvs.localai_test.inference.ModelFiles;
 
 /**
- * Textgenerierung mit Decoder-Only-Modellen (CausalLM) über ONNX Runtime GenAI. Das Verhalten
- * entspricht {@code pipeline("text-generation", ...)} von Transformers.js: Chat-Modelle erhalten
- * eine Systemnachricht und die Frage im Chat-Template des Modells und liefern nur die Antwort,
- * andere Modelle vervollständigen den Eingabetext und liefern den gesamten Text.
+ * Text generation with decoder-only models (CausalLM) through ONNX Runtime GenAI. It behaves
+ * like {@code pipeline("text-generation", ...)} in Transformers.js: chat models receive a
+ * system message and the question in the model's chat template and return only the answer;
+ * other models complete the input text and return the entire text.
  */
 public final class TextGenerationPipeline implements AutoCloseable {
     /**
-     * Empfänger der während der Generierung erzeugten Tokens.
+     * Receives tokens generated during text generation.
      */
     public interface TokenListener {
         /**
-         * @param tokenId Erzeugtes Token
-         * @param text    Dekodierter Text des Tokens (ggf. leer)
+         * @param tokenId Generated token
+         * @param text    Decoded text of the token (may be empty)
          */
         void onToken(int tokenId, String text);
     }
 
     /**
-     * Einstellungen aus dem Modellkatalog ({@code app/static/models/index.json}).
+     * Settings from the model catalog ({@code app/static/models/index.json}).
      */
     public static final class ModelSettings {
         boolean instructionTuned;
@@ -49,10 +49,10 @@ public final class TextGenerationPipeline implements AutoCloseable {
         JSONObject tokenizerArgs;
 
         /**
-         * Einstellungen aus dem Katalogeintrag lesen.
+         * Read settings from the catalog entry.
          *
-         * @param modelConfig Katalogeintrag oder {@code null}
-         * @return Einstellungen
+         * @param modelConfig Catalog entry or {@code null}
+         * @return Settings
          */
         public static ModelSettings fromJson(JSONObject modelConfig) {
             ModelSettings settings = new ModelSettings();
@@ -80,7 +80,7 @@ public final class TextGenerationPipeline implements AutoCloseable {
     }
 
     /**
-     * Parameter eines Generierungsaufrufs. Nicht gesetzte Werte sind {@code null}.
+     * Parameters for a generation call. Unset values are {@code null}.
      */
     public static final class Request {
         public String question = "";
@@ -103,14 +103,14 @@ public final class TextGenerationPipeline implements AutoCloseable {
     private final boolean addSpecialTokens;
 
     /**
-     * Modell laden. Die benötigte {@code genai_config.json} wird dabei aus den
-     * Konfigurationsdateien des Modells erzeugt.
+     * Load the model. The required {@code genai_config.json} is generated from
+     * the model's configuration files.
      *
-     * @param modelDir Verzeichnis mit den Modelldateien
-     * @param onnxFile Relativer Pfad der ONNX-Datei, z.B. {@code onnx/model_q4.onnx}
-     * @param device   Zu verwendender Execution Provider
-     * @param settings Einstellungen aus dem Modellkatalog
-     * @throws Exception wenn das Modell nicht geladen werden kann
+     * @param modelDir Directory containing the model files
+     * @param onnxFile Relative path to the ONNX file, e.g. {@code onnx/model_q4.onnx}
+     * @param device   Execution provider to use
+     * @param settings Settings from the model catalog
+     * @throws Exception if the model cannot be loaded
      */
     public TextGenerationPipeline(File modelDir, String onnxFile, InferenceDevice device, ModelSettings settings) throws Exception {
         this.settings = settings;
@@ -120,8 +120,8 @@ public final class TextGenerationPipeline implements AutoCloseable {
         generationConfig = ModelFiles.readJson(new File(modelDir, "generation_config.json"));
         contextLength    = GenAIConfigBuilder.contextLength(modelConfig);
 
-        // Wie in Transformers.js fügt der Tokenizer bei reiner Textvervollständigung nur dann
-        // Sonder-Tokens hinzu, wenn die Tokenizer-Konfiguration das verlangt.
+        // As in Transformers.js, the tokenizer adds special tokens for plain text completion
+        // only when required by the tokenizer configuration.
         addSpecialTokens = tokenizerConfig.optBoolean("add_bos_token", false)
                         || tokenizerConfig.optBoolean("add_eos_token", false);
 
@@ -147,13 +147,13 @@ public final class TextGenerationPipeline implements AutoCloseable {
     }
 
     /**
-     * Text generieren.
+     * Generate text.
      *
-     * @param request  Parameter des Aufrufs
-     * @param listener Empfänger der einzelnen Tokens
-     * @param stopped  Liefert {@code true}, wenn die Generierung abgebrochen werden soll
-     * @return Antwort des Modells (Chat-Modelle) bzw. vervollständigter Text (andere Modelle)
-     * @throws Exception bei Fehlern während der Generierung
+     * @param request  Call parameters
+     * @param listener Receives individual tokens
+     * @param stopped  Returns {@code true} if generation should be stopped
+     * @return Model response (chat models) or completed text (other models)
+     * @throws Exception if an error occurs during generation
      */
     public String generate(Request request, TokenListener listener, BooleanSupplier stopped) throws Exception {
         String question = request.question == null ? "" : request.question;
@@ -189,7 +189,7 @@ public final class TextGenerationPipeline implements AutoCloseable {
                 while (!generator.isDone() && !stopped.getAsBoolean()) {
                     generator.generateNextToken();
 
-                    // Beim End-Token wird die Sequenz nicht verlängert, sondern nur beendet
+                    // The end token terminates the sequence without extending it.
                     long newTokenCount = generator.tokenCount();
                     if (newTokenCount == tokenCount) continue;
                     tokenCount = newTokenCount;
@@ -210,7 +210,7 @@ public final class TextGenerationPipeline implements AutoCloseable {
     }
 
     /**
-     * Prompt erzeugen und tokenisieren.
+     * Build and tokenize the prompt.
      */
     private int[] encodePrompt(String question, String context) throws GenAIException, JSONException {
         String prompt;
@@ -230,8 +230,8 @@ public final class TextGenerationPipeline implements AutoCloseable {
                 tokenizer.updateOptions(templateOptions);
             }
 
-            // Das Chat-Template enthält bereits alle Sonder-Tokens. Leerer String = Template des
-            // Tokenizers verwenden (null führt in der JNI-Schicht von GenAI zum Absturz).
+            // The chat template already contains all special tokens. Use the tokenizer's
+            // template for an empty string (null causes a crash in GenAI's JNI layer).
             prompt        = tokenizer.applyChatTemplate("", messages.toString(), null, true);
             specialTokens = false;
         } else {

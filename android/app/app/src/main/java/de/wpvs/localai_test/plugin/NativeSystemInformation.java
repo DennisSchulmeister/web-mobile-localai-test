@@ -24,22 +24,22 @@ import de.wpvs.localai_test.BuildConfig;
 import de.wpvs.localai_test.inference.InferenceDevice;
 
 /**
- * Systemdiagnose für den Vergleich von Browser- und nativer Inferenz.
- * Die GPU-Abfrage beschreibt den OpenGL-ES-Renderer, nicht dessen Nutzbarkeit für KI.
+ * System diagnostics for comparing browser and native inference.
+ * The GPU query describes the OpenGL ES renderer, not its suitability for AI.
  */
 final class NativeSystemInformation {
     private static final String TAG = "NativeInference";
 
     /**
-     * Instanziierung der statischen Hilfsklasse verhindern.
+     * Prevent instantiation of this static utility class.
      */
     private NativeSystemInformation() {}
 
     /**
-     * Versionen von ONNX Runtime und ONNX Runtime GenAI sowie die verfügbaren
-     * Execution Provider ergänzen.
+     * Add the ONNX Runtime and ONNX Runtime GenAI versions and the available
+     * execution providers.
      *
-     * @param information Liste, an die die Einträge angehängt werden
+     * @param information List to which entries are appended
      */
     private static void addRuntimeInformation(JSArray information) {
         add(information, "onnxRuntimeVersion", "bi-box", "ONNX Runtime",       BuildConfig.ONNXRUNTIME_VERSION);
@@ -63,18 +63,18 @@ final class NativeSystemInformation {
     }
 
     /**
-     * Geräte-, Betriebssystem-, Speicher- und Grafikdiagnose zusammenstellen.
-     * Speicherwerte werden zum Zeitpunkt des Aufrufs ermittelt. Fehler der
-     * GPU-Abfrage werden als Diagnoseeintrag zurückgegeben und protokolliert.
+     * Collect device, operating system, memory, and graphics diagnostics.
+     * Memory values are measured when this method is called. GPU query errors
+     * are returned as diagnostic entries and logged.
      *
-     * @param context Android-Kontext für Systemdienste
-     * @return Liste von Diagnoseobjekten mit {@code field}, {@code icon}, {@code label} und {@code text}
-     * @throws IllegalStateException wenn der ActivityManager nicht verfügbar ist
+     * @param context Android context for system services
+     * @return List of diagnostic objects with {@code field}, {@code icon}, {@code label}, and {@code text}
+     * @throws IllegalStateException if the ActivityManager is unavailable
      */
     static JSArray collect(Context context) {
         JSArray information = new JSArray();
 
-        // Backend und Gerätehardware
+        // Backend and device hardware.
         add(information, "backendType",    "bi-terminal",    "Backend-Typ",         "Android (Native)");
         addRuntimeInformation(information);
         add(information, "manufacturerModel", "bi-phone", "Hersteller / Modell", Build.MANUFACTURER + " / " + Build.MODEL);
@@ -84,7 +84,7 @@ final class NativeSystemInformation {
             add(information, "soc", "bi-cpu", "SoC", Build.SOC_MANUFACTURER + " / " + Build.SOC_MODEL);
         }
 
-        // Betriebssystem und Prozessarchitektur
+        // Operating system and process architecture.
         add(information, "androidVersion",       "bi-display",     "Android-Version",          Build.VERSION.RELEASE);
         add(information, "androidApiLevel",      "bi-info-circle", "Android API-Level",        String.valueOf(Build.VERSION.SDK_INT));
         add(information, "androidSecurityPatch", "bi-info-circle", "Android Security Patch",   Build.VERSION.SECURITY_PATCH);
@@ -92,7 +92,7 @@ final class NativeSystemInformation {
         add(information, "processArchitecture",  "bi-cpu",         "Prozessarchitektur",       Process.is64Bit() ? "64 Bit" : "32 Bit");
         add(information, "hardwareConcurrency",  "bi-cpu",         "Hardware-Nebenläufigkeit", Runtime.getRuntime().availableProcessors() + " für den Prozess verfügbare CPU-Kerne");
 
-        // Systemweiter Speicher und Low-Memory-Zustand
+        // System memory and low-memory status.
         ActivityManager manager = context.getSystemService(ActivityManager.class);
 
         if (manager == null) {
@@ -108,35 +108,35 @@ final class NativeSystemInformation {
         add(information, "lowMemory",          "bi-memory", "Low-Memory-Zustand",   memory.lowMemory ? "Ja" : "Nein");
         add(information, "lowRamDevice",       "bi-memory", "Low-RAM-Gerät",        manager.isLowRamDevice() ? "Ja" : "Nein");
 
-        // Heap-Grenzen und aktuelle Allokationen des App-Prozesses
+        // Heap limits and current allocations of the app process.
         add(information, "javaHeapMemoryClass", "bi-memory", "Android Memory Class (Java-Heap)", manager.getMemoryClass() + " MiB");
         add(information, "javaHeapMaximum",     "bi-memory", "Java-Heap Maximum",                formatBytes(Runtime.getRuntime().maxMemory()));
         add(information, "javaHeapAllocated",   "bi-memory", "Java-Heap belegt",                 formatBytes(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
         add(information, "nativeHeapAllocated", "bi-memory", "Nativer Heap belegt",              formatBytes(Debug.getNativeHeapAllocatedSize()));
 
-        // PSS rechnet gemeinsam genutzte Speicherseiten nur anteilig an.
+        // PSS counts shared memory pages proportionally.
         Debug.MemoryInfo processMemory = new Debug.MemoryInfo();
         Debug.getMemoryInfo(processMemory);
 
         add(information, "processRamPss", "bi-memory", "Prozess-RAM PSS", formatBytes(processMemory.getTotalPss() * 1024L));
 
-        // WebView-Version für den Vergleich mit der Browser-Ausführung
+        // WebView version for comparison with browser execution.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             PackageInfo webView = WebView.getCurrentWebViewPackage();
             add(information, "androidWebView", "bi-info-circle", "Android WebView", webView == null ? "Nicht verfügbar (noch nicht geladen)" : webView.packageName + " / " + webView.versionName);
         }
 
-        // Grafikdiagnose in einem eigenen temporären Kontext
+        // Graphics diagnostics in a separate temporary context.
         collectGpu(information);
 
         return information;
     }
 
     /**
-     * Speichergröße mit binären Einheiten und exakter Byte-Anzahl formatieren.
+     * Format a memory size using binary units and the exact byte count.
      *
-     * @param bytes Speichergröße in Bytes
-     * @return Locale-unabhängige Darstellung in MiB, GiB und Bytes
+     * @param bytes Memory size in bytes
+     * @return Locale-independent representation in MiB, GiB, and bytes
      */
     static String formatBytes(long bytes) {
         return String.format(Locale.ROOT, "%.2f MiB (%.2f GiB; %d Bytes)",
@@ -144,13 +144,13 @@ final class NativeSystemInformation {
     }
 
     /**
-     * Einen Diagnoseeintrag im gemeinsamen Frontend-Format anhängen.
+     * Append a diagnostic entry in the shared frontend format.
      *
-     * @param information Zieldaten für die Diagnose
-     * @param field Technischer Name des Diagnosefeldes
-     * @param icon CSS-Klasse des Bootstrap-Icons
-     * @param label Anzeigename des Wertes
-     * @param text Darzustellender Wert
+     * @param information Target data for diagnostics
+     * @param field Technical name of the diagnostic field
+     * @param icon Bootstrap icon CSS class
+     * @param label Display name of the value
+     * @param text Value to display
      */
     private static void add(JSArray information, String field, String icon, String label, String text) {
         JSObject entry = new JSObject();
@@ -163,11 +163,11 @@ final class NativeSystemInformation {
     }
 
     /**
-     * Fehlgeschlagene EGL-Operationen mit ihrem Fehlercode melden.
+     * Report failed EGL operations with their error code.
      *
-     * @param success Ergebnis der EGL-Operation
-     * @param operation Name der ausgeführten Operation
-     * @throws IllegalStateException wenn die EGL-Operation fehlgeschlagen ist
+     * @param success Result of the EGL operation
+     * @param operation Name of the operation performed
+     * @throws IllegalStateException if the EGL operation failed
      */
     private static void requireEgl(boolean success, String operation) {
         if (!success) {
@@ -176,10 +176,10 @@ final class NativeSystemInformation {
     }
 
     /**
-     * Fehler beim EGL-Aufräumen protokollieren, ohne weitere Freigaben zu verhindern.
+     * Log EGL cleanup failures without preventing further resource releases.
      *
-     * @param success Ergebnis der EGL-Operation
-     * @param operation Name der ausgeführten Freigabe oder Wiederherstellung
+     * @param success Result of the EGL operation
+     * @param operation Name of the release or restoration operation performed
      */
     private static void checkCleanup(boolean success, String operation) {
         if (!success) {
@@ -188,20 +188,20 @@ final class NativeSystemInformation {
     }
 
     /**
-     * Eigenen temporären GLES-2-Kontext ohne sichtbare Oberfläche verwenden.
-     * Ein zuvor aktiver EGL-Kontext wird wiederhergestellt.
-     * Abfragefehler werden protokolliert und als Diagnoseeintrag angehängt.
+     * Use a separate temporary GLES 2 context without a visible surface.
+     * Restore any previously active EGL context.
+     * Log query failures and append them as diagnostic entries.
      *
-     * @param information Zieldaten für Renderer, Anbieter, Version und Texturgrenze
+     * @param information Target data for the renderer, vendor, version, and texture limit
      */
     private static void collectGpu(JSArray information) {
-        // Vorherigen threadlokalen EGL-Zustand für die Wiederherstellung sichern.
+        // Save the previous thread-local EGL state for restoration.
         EGLDisplay previousDisplay = EGL14.eglGetCurrentDisplay();
         EGLContext previousContext = EGL14.eglGetCurrentContext();
         EGLSurface previousDraw    = EGL14.eglGetCurrentSurface(EGL14.EGL_DRAW);
         EGLSurface previousRead    = EGL14.eglGetCurrentSurface(EGL14.EGL_READ);
 
-        // Auch bei teilweise fehlgeschlagener Initialisierung gezielt aufräumen.
+        // Clean up deliberately even if initialization only partially succeeds.
         EGLDisplay display  = EGL14.EGL_NO_DISPLAY;
         EGLContext context  = EGL14.EGL_NO_CONTEXT;
         EGLSurface surface  = EGL14.EGL_NO_SURFACE;
@@ -210,7 +210,7 @@ final class NativeSystemInformation {
         boolean current     = false;
 
         try {
-            // EGL initialisieren und eine Pbuffer-fähige GLES-2-Konfiguration wählen.
+            // Initialize EGL and choose a GLES 2 configuration that supports pbuffers.
             display = EGL14.eglGetDisplay(EGL14.EGL_DEFAULT_DISPLAY);
             requireEgl(!display.equals(EGL14.EGL_NO_DISPLAY), "eglGetDisplay");
 
@@ -233,7 +233,7 @@ final class NativeSystemInformation {
                 throw new IllegalStateException("Keine EGL-Konfiguration für OpenGL ES 2 verfügbar.");
             }
 
-            // Ein Pbuffer erlaubt die Abfrage ohne sichtbare Android-Oberfläche.
+            // A pbuffer allows queries without a visible Android surface.
             context = EGL14.eglCreateContext(display, configs[0], EGL14.EGL_NO_CONTEXT, new int[] {EGL14.EGL_CONTEXT_CLIENT_VERSION, 2, EGL14.EGL_NONE}, 0);
             requireEgl(!context.equals(EGL14.EGL_NO_CONTEXT), "eglCreateContext");
 
@@ -243,7 +243,7 @@ final class NativeSystemInformation {
             requireEgl(EGL14.eglMakeCurrent(display, surface, surface, context), "eglMakeCurrent");
             current = true;
 
-            // Rendererinformationen und Texturgrenze aus dem aktiven Kontext lesen.
+            // Read renderer information and the texture limit from the active context.
             String vendor        = GLES20.glGetString(GLES20.GL_VENDOR);
             String renderer      = GLES20.glGetString(GLES20.GL_RENDERER);
             String glVersion     = GLES20.glGetString(GLES20.GL_VERSION);
@@ -261,11 +261,11 @@ final class NativeSystemInformation {
             add(information, "openGlEsVersion", "bi-gpu-card", "OpenGL-ES-Version", glVersion);
             add(information, "maxTextureSize", "bi-gpu-card", "Max Texture Size",  maxTextureSize[0] + " Pixel pro Dimension");
         } catch (RuntimeException exception) {
-            // Die übrige Systemdiagnose bleibt bei Grafikfehlern verfügbar.
+            // Keep the remaining system diagnostics available if graphics queries fail.
             Log.w(TAG, "GPU-Informationen konnten nicht ermittelt werden.", exception);
             add(information, "gpuInformation", "bi-gpu-card", "GPU-Informationen", "Nicht verfügbar: " + exception.getMessage());
         } finally {
-            // Zuerst den vorherigen Kontext wiederherstellen oder den eigenen lösen.
+            // First restore the previous context or unbind the current one.
             if (current) {
                 if (!previousContext.equals(EGL14.EGL_NO_CONTEXT)) {
                     checkCleanup(EGL14.eglMakeCurrent(previousDisplay, previousDraw, previousRead, previousContext), "EGL-Kontext wiederherstellen");
@@ -274,7 +274,7 @@ final class NativeSystemInformation {
                 }
             }
 
-            // Danach die temporären EGL-Ressourcen in umgekehrter Reihenfolge freigeben.
+            // Then release temporary EGL resources in reverse order.
             if (!surface.equals(EGL14.EGL_NO_SURFACE)) {
                 checkCleanup(EGL14.eglDestroySurface(display, surface), "eglDestroySurface");
             }

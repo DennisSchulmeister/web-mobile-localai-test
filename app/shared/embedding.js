@@ -1,5 +1,5 @@
 /**
- * Web/Mobile-Test für lokale KI
+ * Web/Mobile Test for Local AI
  * © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
  *
  * This source code is licensed under the BSD 3-Clause License found in the
@@ -7,11 +7,11 @@
  */
 
 /**
- * Embedding für die JSON-Serialisierung als Base64-String codieren.
+ * Encode an embedding as a Base64 string for JSON serialization.
  * 
- * @param {TyppedArray} embedding Embeddings im plattform-spezifischen Format
- * @param {string} dtype Datentyp des KI-Modells (aktuell nur `fp32`)
- * @returns {string} Base64-codierte Embeddings
+ * @param {TypedArray} embedding Embeddings in the platform-specific format
+ * @param {string} dtype AI model data type (currently only `fp32`)
+ * @returns {string} Base64-encoded embeddings
  */
 export function encodeEmbedding(embedding, dtype) {
     let bytes = new Uint8Array(embedding.length * 4);
@@ -31,15 +31,15 @@ export function encodeEmbedding(embedding, dtype) {
 }
 
 /**
- * Embedding aus Base64-codiertem String wieder herstellen.
+ * Restore an embedding from a Base64-encoded string.
  * 
- * @param {string} base64 Base64-codierte Embeddings
- * @param {string} dtype Datentyp des KI-Modells (aktuell nur `fp32`)
- * @returns {TypedArray} Embeddings im plattform-spezifischen Format
+ * @param {string} base64 Base64-encoded embeddings
+ * @param {string} dtype AI model data type (currently only `fp32`)
+ * @returns {TypedArray} Embeddings in the platform-specific format
  */
 export function decodeEmbedding(base64, dtype) {
     if (Uint8Array.fromBase64) {
-        // Neuere Browser
+        // Newer browsers
         let bytes = Uint8Array.fromBase64(base64);
         let view  = new DataView(bytes.buffer);
     
@@ -57,7 +57,7 @@ export function decodeEmbedding(base64, dtype) {
                 throw new Error(`Einbettung mit Datentyp ${dtype} kann nicht decodiert werden.`);
         }
     } else {
-        // Android Webview auf Geräten vor 2026
+        // Android WebView on devices released before 2026
         let binary = atob(base64);
         let bytes  = new Uint8Array(binary.length);
         let view   = new DataView(bytes.buffer);

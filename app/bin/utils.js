@@ -1,5 +1,5 @@
 /**
- * Web/Mobile-Test für lokale KI
+ * Web/Mobile Test for Local AI
  * © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
  *
  * This source code is licensed under the BSD 3-Clause License found in the
@@ -11,44 +11,44 @@ import path  from "node:path";
 import shell from "shelljs";
 
 /**
- * Fehlermeldung auf der Konsole ausgeben.
- * @param ...args Meldungstext und zu loggende Elemente
+ * Print an error message to the console.
+ * @param ...args Message text and elements to log
  */
 export function logError(...args) {
     console.error(chalk.bold.red("FEHLER:"), ...args);
 }
 
 /**
- * Warnmeldung auf der Konsole ausgeben.
- * @param ...args Meldungstext und zu loggende Elemente
+ * Print a warning message to the console.
+ * @param ...args Message text and elements to log
  */
 export function logWarning(...args) {
     console.log(chalk.bold.blue("WARNUNG:"), ...args);
 }
 
 /**
- * JSON-Datei einlesen und deserialisieren.
+ * Read and deserialize a JSON file.
  *
- * @param {string} filename Dateipfad
- * @returns Deserialisierte JSON-Daten
+ * @param {string} filename File path
+ * @returns Deserialized JSON data
  */
 export function readJsonFile(filename) {
     return JSON.parse(shell.cat(filename));
 }
 
 /**
- * Hauptkonfigurationsdatei einlesen und optional auch die Daten- und Modellkonfiguration einlesen.
- * Wenn `withData` und/oder `withModels` gleich `true` sind, wird an der entsprechenden Stelle das
- * Attribut mit dem Namen `config` durch den Inhalt der jeweiligen Datei ersetzt.
+ * Read the main configuration file and optionally read the data and model configuration.
+ * If `withData` and/or `withModels` are `true`, replace the `config` attribute at the
+ * corresponding location with the contents of the respective file.
  * 
- * Die Dateipfade sind relativ zur Konfigurationsdatei angegeben. Sie werden beim Einlesen relativ
- * zum Arbeitsverzeichnis gesetzt. Der Originalpfad wird unter demselben Namen mit vorangestelltem
- * Unterstrich gespeichert.
+ * File paths are specified relative to the configuration file. When read, they are
+ * resolved relative to the working directory. The original path is stored under the
+ * same name, prefixed with an underscore.
  * 
- * @param {string} configFile Dateipfad der Hauptkonfiguration
- * @param {boolean} withModels Modellkonfiguration einschließen
- * @param {boolean} withData Datenkonfiguration einschließen
- * @returns Deserialisierte Konfiguration
+ * @param {string} configFile Path to the main configuration file
+ * @param {boolean} withModels Include the model configuration
+ * @param {boolean} withData Include the data configuration
+ * @returns Deserialized configuration
  */
 export function readConfig({configFile, withModels, withData} = {}) {
     let config  = readJsonFile(configFile);
@@ -87,24 +87,24 @@ export function readConfig({configFile, withModels, withData} = {}) {
 }
 
 /**
- * Verzeichnispfad für KI-Modell ermitteln.
+ * Get the directory path for an AI model.
  * 
- * @param {object} config Deserialisierte Konfiguration
- * @param {string} modelId ID des KI-Modells
- * @returns {string} Verzeichnispfad
+ * @param {object} config Deserialized configuration
+ * @param {string} modelId AI model ID
+ * @returns {string} Directory path
  */
 export function modelPath(config, modelId) {
     return path.join(config.models.downloadDir, ...modelId.split("/"));
 }
 
 /**
- * Verzeichnispfade für die vorverarbeiteten Daten einer Seite ermitteln.
- * Liefert ein Objekt mit den Attributen `dir`, `keywords` und `sentences`.
- * `dir` ist das  Verzeichnis, die anderen Dateien darin.
+ * Get directory paths for a page's preprocessed data.
+ * Returns an object with the `dir`, `keywords`, and `sentences` attributes.
+ * `dir` is the directory; the others are files within it.
  * 
- * @param {object} config Deserialisierte Konfiguration
- * @param {string} dataFile Pfad der Datendatei
- * @returns {object} Verzeichnispfade
+ * @param {object} config Deserialized configuration
+ * @param {string} dataFile Data file path
+ * @returns {object} Directory paths
  */
 export function preprocessPaths(config, dataFile) {
     let dir = path.join(config.data.preprocessDir, ...dataFile.split("/"));
@@ -117,16 +117,16 @@ export function preprocessPaths(config, dataFile) {
 }
 
 /**
- * Vgl. `/src/state/Model.svelte.js → ModelState::embeddingPaths()`
+ * See `/src/state/Model.svelte.js → ModelState::embeddingPaths()`
  * 
- * Verzeichnispfade für die Texteinbettungen aller Seiten eines spezifischen
- * KI-Modells ermitteln. Liefert ein Objekt mit den Attributen `dir`, `keywords`
- * und `sentences`. `dir` ist das  Verzeichnis, die anderen Dateien darin.
+ * Get directory paths for the text embeddings of all pages for a specific
+ * AI model. Returns an object with the `dir`, `keywords`, and `sentences`
+ * attributes. `dir` is the directory; the others are files within it.
  * 
- * @param {object} config Deserialisierte Konfiguration
- * @param {string} modelId ID des KI-Modells
- * @param {string} dtype Datentype des KI-Modells (z.B. fp32, int8)
- * @returns {object} Verzeichnispfade
+ * @param {object} config Deserialized configuration
+ * @param {string} modelId AI model ID
+ * @param {string} dtype AI model data type (e.g. fp32, int8)
+ * @returns {object} Directory paths
  */
 export function embeddingsPaths(config, modelId, dtype) {
     let dir = path.join(config.data.embeddingsDir, ...modelId.split("/"), dtype);

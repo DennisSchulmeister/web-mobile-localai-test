@@ -1,5 +1,5 @@
 /**
- * Web/Mobile-Test für lokale KI
+ * Web/Mobile Test for Local AI
  * © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
  *
  * This source code is licensed under the BSD 3-Clause License found in the
@@ -7,40 +7,40 @@
  */
 
 /**
- * Zahlenformatierung mit zwei Nachkommastellen fest.
+ * Format a number with two decimal places.
  */
 export const numberFormatter = new Intl.NumberFormat("de-DE", {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
 /**
- * Zahlformatierung für Ganzzahlen
+ * Format an integer.
  */
 export const integerFormatter = new Intl.NumberFormat("de-DE", {minimumFractionDigits: 0, maximumFractionDigits: 0});
 
 /**
- * Formatierung einer Ganzzahl.
+ * Format an integer.
  * 
- * @param {number} number Zahl
- * @returns {string} Formatierte Zahl
+ * @param {number} number Number
+ * @returns {string} Formatted number
  */
 export function formatInteger(number) {
     return integerFormatter.format(number);
 }
 
 /**
- * Formatierung einer Kommazahl ohne Umrechnung.
+ * Format a decimal number without conversion.
  * 
- * @param {number} number Zahl
- * @returns {string} Formatierte Zahl
+ * @param {number} number Number
+ * @returns {string} Formatted number
  */
 export function formatNumber(number) {
     return numberFormatter.format(number);
 }
 
 /**
- * Formatieren eines Zeitwerts, gemessen in Millisekunden, formatiert in Sekunden.
+ * Format a time value measured in milliseconds as seconds.
  * 
- * @param {number} number Millisekunden
- * @returns {string} Sekunden mit zwei Nachkommastellen
+ * @param {number} number Milliseconds
+ * @returns {string} Seconds with two decimal places
  */
 export function formatSeconds(number) {
     let seconds = Math.round(number / 10) / 100.0;

@@ -17,7 +17,7 @@ Web App
 -[ ] Fetch the API URL from a fixed address (if navigation.host is not localhost, etc.)
 -[ ] New helper class for recording events
 -[ ] Enable localization and translate into English
--[ ] Translate the code into English as well
+-[x] Translate the code into English as well
 
 README
 ======

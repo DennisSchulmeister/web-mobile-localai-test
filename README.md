@@ -27,7 +27,7 @@ The repository contains:
 * [Platform learnings](doc/platform-learnings.md)
 * [AI model and use-case learnings](doc/model-learnings.md)
 * [Initial test results](doc/initial-test-results.md)
-* [Structured test plan](doc/test-plan.md) (stub)
+* [Structured test plan](doc/test-plan.md)
 
 ## Screenshots
 

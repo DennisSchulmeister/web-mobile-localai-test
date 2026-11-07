@@ -1,7 +1,7 @@
 {
     "name": "@dschulmeis/web-mobile-localai-test-android",
     "version": "1.0.0",
-    "description": "Android packaging for Web/Mobile-Test für lokale KI",
+    "description": "Android packaging for Web/Mobile Test for Local AI",
     "author": "Dennis Schulmeister-Zimolong",
     "private": true,
     "type": "module",

@@ -22,29 +22,28 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Bereitstellung der Modelldateien im Dateisystem, da ONNX Runtime und ORT GenAI
- * die Modelle aus echten Dateien laden. Die Dateien werden wie bei Transformers.js
- * zuerst lokal (mit der App ausgelieferte Assets) und dann bei Hugging Face gesucht.
+ * Makes model files available in the file system because ONNX Runtime and ORT GenAI
+ * load models from actual files. As in Transformers.js, files are searched for locally
+ * first (assets bundled with the app) and then on Hugging Face.
  *
- * <p>Ziel ist {@code noBackupFilesDir/models/<modelId>/}. Mit der App ausgelieferte
- * Dateien werden nach jedem App-Update neu kopiert. Heruntergeladene Dateien bleiben
- * erhalten.</p>
+ * <p>The destination is {@code noBackupFilesDir/models/<modelId>/}. Files bundled
+ * with the app are recopied after each app update. Downloaded files are retained.</p>
  */
 public final class ModelFiles {
     private static final String TAG = "NativeInference";
 
     /**
-     * Verzeichnis der Web-Assets innerhalb des APK (Capacitor {@code webDir}).
+     * Directory of the web assets inside the APK (Capacitor {@code webDir}).
      */
     private static final String ASSET_ROOT = "public";
 
     /**
-     * Basis-URL für Downloads, entspricht {@code env.remoteHost} von Transformers.js.
+     * Base URL for downloads, corresponding to {@code env.remoteHost} in Transformers.js.
      */
     private static final String REMOTE_HOST = "https://huggingface.co/";
 
     /**
-     * Datei mit dem Versionsstand der aus den Assets kopierten Dateien.
+     * File containing the version of files copied from the assets.
      */
     private static final String STAMP_FILE = ".bundle-version";
 
@@ -52,9 +51,9 @@ public final class ModelFiles {
     private final String assetDir;
 
     /**
-     * @param context  Android-Kontext für Assets und Dateisystem
-     * @param assetDir Modellverzeichnis innerhalb der Web-Assets, zum Beispiel
-     *                 {@code _generated/models} aus {@code config.models.downloadDir}
+     * @param context  Android context for assets and the file system
+     * @param assetDir Model directory within the web assets, for example
+     *                 {@code _generated/models} from {@code config.models.downloadDir}
      */
     public ModelFiles(Context context, String assetDir) {
         this.context  = context;
@@ -62,12 +61,12 @@ public final class ModelFiles {
     }
 
     /**
-     * Dateinamenszusatz für einen Datentyp, wie {@code DEFAULT_DTYPE_SUFFIX_MAPPING}
-     * von Transformers.js.
+     * File name suffix for a data type, like {@code DEFAULT_DTYPE_SUFFIX_MAPPING}
+     * in Transformers.js.
      *
-     * @param dtype Datentyp, zum Beispiel {@code q4} oder {@code fp32}
-     * @return Zusatz für den Dateinamen der ONNX-Datei
-     * @throws IllegalArgumentException bei unbekanntem Datentyp
+     * @param dtype Data type, for example {@code q4} or {@code fp32}
+     * @return Suffix for the ONNX file name
+     * @throws IllegalArgumentException for an unknown data type
      */
     static String dtypeSuffix(String dtype) {
         if (dtype == null || dtype.isEmpty() || dtype.equals("auto")) return "";
@@ -86,14 +85,14 @@ public final class ModelFiles {
     }
 
     /**
-     * Relative Pfade der ONNX-Datei und ihrer externen Gewichte ermitteln. Die Anzahl der
-     * Gewichtsdateien steht wie bei Transformers.js in {@code transformers.js_config.use_external_data_format}
-     * der {@code config.json}, entweder global oder je Dateiname.
+     * Get the relative paths of the ONNX file and its external weights. As in Transformers.js,
+     * the number of weight files is specified in {@code transformers.js_config.use_external_data_format}
+     * in {@code config.json}, either globally or per file name.
      *
-     * @param config   Inhalt der {@code config.json}
-     * @param baseName Basisname der ONNX-Datei, zum Beispiel {@code model}
-     * @param dtype    Datentyp
-     * @return Erst die ONNX-Datei, danach die externen Gewichtsdateien
+     * @param config   Contents of {@code config.json}
+     * @param baseName Base name of the ONNX file, for example {@code model}
+     * @param dtype    Data type
+     * @return The ONNX file followed by the external weight files
      */
     public static List<String> onnxFiles(JSONObject config, String baseName, String dtype) {
         String fileName = baseName + dtypeSuffix(dtype) + ".onnx";
@@ -126,11 +125,11 @@ public final class ModelFiles {
     }
 
     /**
-     * Modellverzeichnis im Dateisystem.
+     * Model directory in the file system.
      *
-     * @param modelId Modell-ID, zum Beispiel {@code onnx-community/Qwen3-0.6B-ONNX}
-     * @return Verzeichnis (muss nicht existieren)
-     * @throws IllegalArgumentException bei ungültiger Modell-ID
+     * @param modelId Model ID, for example {@code onnx-community/Qwen3-0.6B-ONNX}
+     * @return Directory (does not need to exist)
+     * @throws IllegalArgumentException for an invalid model ID
      */
     File modelDir(String modelId) {
         if (modelId == null || modelId.isEmpty() || modelId.startsWith("/") || modelId.contains("..") || modelId.contains("\\")) {
@@ -141,13 +140,13 @@ public final class ModelFiles {
     }
 
     /**
-     * Sicherstellen, dass alle Dateien eines Modells lokal vorhanden sind.
+     * Ensure that all files for a model are available locally.
      *
-     * @param modelId  Modell-ID
-     * @param required Relative Pfade der benötigten Dateien
-     * @param optional Relative Pfade optionaler Dateien, die fehlen dürfen
-     * @return Modellverzeichnis
-     * @throws IOException wenn eine benötigte Datei weder in den Assets noch online verfügbar ist
+     * @param modelId  Model ID
+     * @param required Relative paths of required files
+     * @param optional Relative paths of optional files that may be missing
+     * @return Model directory
+     * @throws IOException if a required file is unavailable both in the assets and online
      */
     public File ensure(String modelId, List<String> required, List<String> optional) throws IOException {
         File dir = modelDir(modelId);
@@ -168,12 +167,12 @@ public final class ModelFiles {
     }
 
     /**
-     * Inhalt einer optionalen JSON-Datei im Modellverzeichnis lesen.
+     * Read the contents of an optional JSON file in the model directory.
      *
-     * @param file Datei
-     * @return JSON-Objekt oder ein leeres Objekt, wenn die Datei fehlt
-     * @throws IOException bei Lesefehlern
-     * @throws JSONException bei ungültigem JSON
+     * @param file File
+     * @return JSON object or an empty object if the file is missing
+     * @throws IOException if reading fails
+     * @throws JSONException if the JSON is invalid
      */
     public static JSONObject readJson(File file) throws IOException, JSONException {
         if (!file.isFile()) return new JSONObject();
@@ -181,19 +180,19 @@ public final class ModelFiles {
     }
 
     /**
-     * Text in eine Datei schreiben.
+     * Write text to a file.
      *
-     * @param file Datei
-     * @param text Inhalt
-     * @throws IOException bei Schreibfehlern
+     * @param file File
+     * @param text Contents
+     * @throws IOException if writing fails
      */
     public static void writeText(File file, String text) throws IOException {
         Files.write(file.toPath(), text.getBytes(StandardCharsets.UTF_8));
     }
 
     /**
-     * Einzelne Datei aus den Assets kopieren oder herunterladen. Aus den Assets wird nach
-     * einem App-Update erneut kopiert. Heruntergeladene Dateien werden wiederverwendet.
+     * Copy or download a single file. Files from the assets are copied again after
+     * an app update. Downloaded files are reused.
      */
     private void ensureFile(String modelId, File dir, String file, boolean fresh, boolean required) throws IOException {
         File target = new File(dir, file);
@@ -216,7 +215,7 @@ public final class ModelFiles {
             copy(input, target);
             return;
         } catch (FileNotFoundException ignored) {
-            // Nicht mit der App ausgeliefert
+            // Not bundled with the app.
         }
 
         if (target.isFile()) return;
@@ -248,8 +247,8 @@ public final class ModelFiles {
     }
 
     /**
-     * Daten in eine temporäre Datei schreiben und diese erst nach Abschluss umbenennen,
-     * damit abgebrochene Kopien nicht als vollständige Datei gelten.
+     * Write data to a temporary file and rename it only after completion so that
+     * interrupted copies are not treated as complete files.
      */
     private static void copy(InputStream input, File target) throws IOException {
         File part = new File(target.getPath() + ".part");
@@ -277,11 +276,10 @@ public final class ModelFiles {
     }
 
     /**
-     * Größe eines unkomprimiert im APK abgelegten Assets (siehe {@code noCompress} in
-     * {@code build.gradle}), um unveränderte Dateien nach einem App-Update nicht erneut
-     * zu kopieren.
+     * Size of an asset stored uncompressed in the APK (see {@code noCompress} in
+     * {@code build.gradle}), used to avoid copying unchanged files again after an app update.
      *
-     * @return Größe in Bytes oder -1, wenn das Asset fehlt oder komprimiert ist
+     * @return Size in bytes, or -1 if the asset is missing or compressed
      */
     private static long uncompressedAssetLength(AssetManager assets, String assetPath) {
         try (android.content.res.AssetFileDescriptor descriptor = assets.openFd(assetPath)) {
@@ -292,7 +290,7 @@ public final class ModelFiles {
     }
 
     /**
-     * Versionsstand der App, um mitgelieferte Modelle nach einem Update neu zu kopieren.
+     * App version, used to recopy bundled models after an update.
      */
     private String bundleVersion() {
         try {

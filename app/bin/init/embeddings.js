@@ -1,5 +1,5 @@
 /**
- * Web/Mobile-Test für lokale KI
+ * Web/Mobile Test for Local AI
  * © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
  *
  * This source code is licensed under the BSD 3-Clause License found in the
@@ -13,14 +13,14 @@ import * as transformers from '@huggingface/transformers';
 import * as utils        from "../utils.js";
 import {encodeEmbedding} from "../../shared/embedding.js";
 
-console.log("Texteinbettungen berechnen");
-console.log("==========================");
+console.log("Calculate Text Embeddings");
+console.log("=========================");
 console.log("");
 
-// Konfiguration einlesen
+// Read the configuration.
 if (process.argv.length < 3) {
-    utils.logError("Zu wenig Kommandozeilenparameter!");
-    utils.logError(`Aufruf: ${process.argv[0]} ${process.argv[1]} <config.json>`);
+    utils.logError("Too few arguments!");
+    utils.logError(`Usage: ${process.argv[0]} ${process.argv[1]} <config.json>`);
     process.exit(1);
 }
 

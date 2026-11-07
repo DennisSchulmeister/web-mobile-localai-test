@@ -22,20 +22,20 @@ import de.wpvs.localai_test.inference.embedding.EmbeddingPipeline;
 import de.wpvs.localai_test.inference.generation.TextGenerationPipeline;
 
 /**
- * Natives Inferenz-Backend für Android, das die Backend-API über Capacitor bereitstellt.
- * Die Inferenz läuft mit ONNX Runtime außerhalb der Web View und nutzt dieselben
+ * Native inference backend for Android that provides the backend API through Capacitor.
+ * Inference runs with ONNX Runtime outside the WebView and uses the same
  * ONNX-Modelle wie Transformers.js im Browser:
  *
  * <ul>
- *   <li>{@code feature-extraction}: ONNX Runtime mit eigenem WordPiece-Tokenizer
+ *   <li>{@code feature-extraction}: ONNX Runtime with its own WordPiece tokenizer
  *       ({@link EmbeddingPipeline})</li>
- *   <li>{@code text-generation}: ONNX Runtime GenAI für Decoder-Only-Modelle
+ *   <li>{@code text-generation}: ONNX Runtime GenAI for decoder-only models
  *       ({@link TextGenerationPipeline})</li>
  * </ul>
  *
- * <p>Alle anderen Modellarten werden nicht unterstützt und ihre Inferenzaufrufe mit einem
- * UNIMPLEMENTED-Fehler abgelehnt. Modell- und Inferenzaufrufe laufen nacheinander in einem
- * eigenen Hintergrund-Thread, damit der Capacitor-Thread nicht blockiert wird.</p>
+ * <p>All other model types are unsupported, and their inference calls are rejected with an
+ * UNIMPLEMENTED error. Model loading and inference calls run sequentially on a dedicated
+ * background thread so the Capacitor thread is not blocked.</p>
  */
 @CapacitorPlugin(name = "NativeInference")
 public class NativeInferencePlugin extends Plugin {
@@ -45,7 +45,7 @@ public class NativeInferencePlugin extends Plugin {
     private static final String DEFAULT_DOWNLOAD_DIR = "_generated/models";
 
     /**
-     * Hintergrund-Thread für das Laden der Modelle und die Inferenz.
+     * Background thread for model loading and inference.
      */
     private final ExecutorService executor = Executors.newSingleThreadExecutor(runnable -> {
         Thread thread = new Thread(runnable, "NativeInference");
@@ -54,14 +54,14 @@ public class NativeInferencePlugin extends Plugin {
     });
 
     /**
-     * Zuletzt geladenes Modell (nur im Hintergrund-Thread verwendet).
+     * Most recently loaded model (used only on the background thread).
      */
     private EmbeddingPipeline embeddingPipeline;
     private TextGenerationPipeline textGenerationPipeline;
 
     /**
-     * ID der laufenden Textgenerierung und Abbruchanforderung. Werden ohne den
-     * Hintergrund-Thread gelesen und geschrieben, damit der Abbruch sofort wirkt.
+     * ID of the running text generation and its cancellation request. Read and
+     * written outside the background thread so cancellation takes effect immediately.
      */
     private volatile String runningRequestId;
     private volatile boolean stopRequested;
@@ -83,11 +83,11 @@ public class NativeInferencePlugin extends Plugin {
         executor.shutdown();
     }
     /**
-     * Unterstützte Ausführumgebungen als Name/Wert-Paare abfragen. Der Gerätewert
-     * wird {@link #loadModel(PluginCall)} im Feld {@code device} übergeben.
+     * Get supported execution environments as name/value pairs. The device value
+     * is passed in the {@code device} field to {@link #loadModel(PluginCall)}.
      *
-     * @param call Capacitor-Aufruf; erhält ein Objekt mit {@code devices}, einer
-     *             Liste von Objekten mit den String-Feldern {@code device} und {@code label}
+     * @param call Capacitor call; receives an object with {@code devices}, a
+     *             list of objects with the string fields {@code device} and {@code label}
      */
     @PluginMethod
     public void getDevices(PluginCall call) {
@@ -107,8 +107,8 @@ public class NativeInferencePlugin extends Plugin {
 
     /**
      * <p>
-     * Abfragen, ob eine bestimmte Modellart vom Backend unterstützt wird.
-     * Modellarten können sein:
+     * Check whether the backend supports a particular model type.
+     * Model types can include:
      * </p>
      * 
      * <ul>
@@ -120,11 +120,11 @@ public class NativeInferencePlugin extends Plugin {
      *   <li><code>text2text-generation</code></li>
      * </ul>
      * 
-     * <p>Unterstützt werden nur {@code feature-extraction} und {@code text-generation}.</p>
+     * <p>Only {@code feature-extraction} and {@code text-generation} are supported.</p>
      *
-     * @param call Capacitor-Aufruf mit {@code task} (String): Art des Modells;
-     *             erhält ein Objekt mit {@code supported} (Boolean).
-     *             Fehlt {@code task}, wird der Aufruf abgelehnt.
+     * @param call Capacitor call with {@code task} (String): model type;
+     *             receives an object with {@code supported} (Boolean).
+     *             The call is rejected if {@code task} is missing.
      */
     @PluginMethod
     public void supports(PluginCall call) {
@@ -141,13 +141,13 @@ public class NativeInferencePlugin extends Plugin {
     }
 
     /**
-     * Diagnoseinformationen des Backends als Name/Wert-Liste zurückgeben, zum Beispiel
-     * Android-Version, Gerätearchitektur, Speicher, OpenGL-ES-Renderer sowie die Versionen
-     * von ONNX Runtime und ONNX Runtime GenAI mit den verfügbaren Execution Providern.
+     * Return backend diagnostic information as a list of name/value pairs, such as
+     * the Android version, device architecture, memory, OpenGL ES renderer, and the
+     * ONNX Runtime and ONNX Runtime GenAI versions with their available execution providers.
      *
-     * @param call Capacitor-Aufruf; erhält ein Objekt mit {@code information}, einer
-     *             Liste von Objekten mit den String-Feldern {@code icon}, {@code label}
-     *             und {@code text}
+     * @param call Capacitor call; receives an object with {@code information}, a
+     *             list of objects with the string fields {@code icon}, {@code label},
+     *             and {@code text}
      */
     @PluginMethod
     public void getInformation(PluginCall call) {
@@ -162,28 +162,28 @@ public class NativeInferencePlugin extends Plugin {
     }
 
     /**
-     * KI-Modell laden. Da die Modelle sehr groß sind, wird immer nur das zuletzt
-     * geladene Modell im Speicher behalten.
+     * Load an AI model. Since the models are very large, only the most recently
+     * loaded model is kept in memory.
      *
-     * <p>Die Modelldateien werden beim ersten Laden aus den App-Assets
-     * ({@code public/<downloadDir>/<modelId>}) in den privaten Speicher der App kopiert
-     * oder, falls sie nicht mit der App ausgeliefert wurden, von Hugging Face
-     * heruntergeladen. Die ONNX-Datei wird wie in Transformers.js anhand des Datentyps
-     * bestimmt, z.B. {@code onnx/model_q4.onnx} für {@code q4}.</p>
+     * <p>On first load, model files are copied from the app assets
+     * ({@code public/<downloadDir>/<modelId>}) to the app's private storage
+     * or downloaded from Hugging Face if they were not bundled with the app.
+     * As in Transformers.js, the ONNX file is selected based on the data type,
+     * e.g. {@code onnx/model_q4.onnx} for {@code q4}.</p>
      *
-     * <p>Parameter im Capacitor-Aufruf:</p>
+     * <p>Parameters in the Capacitor call:</p>
      * <ul>
-     *   <li>{@code task} (String): Art des Modells</li>
-     *   <li>{@code modelId} (String): Modell-ID</li>
-     *   <li>{@code dtype} (String): Datentyp</li>
-     *   <li>{@code device} (String): Ausführumgebung</li>
-     *   <li>{@code modelConfig} (Objekt): Konfiguration des zu ladenden Modells</li>
-     *   <li>{@code config} (Objekt): Globale Konfiguration aus {@code app/static/config.json}</li>
-     *   <li>{@code models} (Objekt): Modellkonfiguration aus {@code app/static/models/index.json}</li>
+     *   <li>{@code task} (String): Model type</li>
+     *   <li>{@code modelId} (String): Model ID</li>
+     *   <li>{@code dtype} (String): Data type</li>
+     *   <li>{@code device} (String): Execution environment</li>
+     *   <li>{@code modelConfig} (Object): Configuration of the model to load</li>
+     *   <li>{@code config} (Object): Global configuration from {@code app/static/config.json}</li>
+     *   <li>{@code models} (Object): Model configuration from {@code app/static/models/index.json}</li>
      * </ul>
      *
-     * @param call Capacitor-Aufruf; wird nach erfolgreichem Laden ohne Ergebnis aufgelöst
-     *             und bei nicht unterstützten Modellarten oder Ladefehlern abgelehnt
+     * @param call Capacitor call; resolves without a result after successful loading
+     *             and is rejected for unsupported model types or loading errors
      */
     @PluginMethod
     public void loadModel(PluginCall call) {
@@ -249,12 +249,12 @@ public class NativeInferencePlugin extends Plugin {
     }
 
     /**
-     * KI-Inferenz: Normalisierte Worteinbettungen für Cosinus-Vergleich. Wie in
-     * Transformers.js werden die Token-Embeddings gemittelt (Mean Pooling) und
-     * anschließend auf die Länge 1 normalisiert.
+     * AI inference: normalized word embeddings for cosine similarity. As in
+     * Transformers.js, token embeddings are averaged (mean pooling) and then
+     * normalized to length 1.
      *
-     * @param call Capacitor-Aufruf mit {@code input} (String): Eingabetext;
-     *             erhält ein Objekt mit {@code embedding} (Liste numerischer Einbettungen)
+     * @param call Capacitor call with {@code input} (String): input text;
+     *             receives an object with {@code embedding} (list of numeric embeddings)
      */
     @PluginMethod
     public void runEmbeddingPipeline(PluginCall call) {
@@ -282,11 +282,10 @@ public class NativeInferencePlugin extends Plugin {
     }
 
     /**
-     * KI-Inferenz: Frage zu Text beantworten.
+     * AI inference: answer a question about text.
      *
-     * @param call Capacitor-Aufruf mit {@code question} (String): Frage und
-     *             {@code context} (String): Text-Kontext; wird als nicht
-     *             implementiert abgelehnt
+     * @param call Capacitor call with {@code question} (String): question and
+     *             {@code context} (String): text context; rejected as unimplemented
      */
     @PluginMethod
     public void runQuestionAnsweringPipeline(PluginCall call) {
@@ -294,11 +293,10 @@ public class NativeInferencePlugin extends Plugin {
     }
 
     /**
-     * KI-Inferenz: Text zusammenfassen.
+     * AI inference: summarize text.
      *
-     * @param call Capacitor-Aufruf mit {@code input} (String): Eingabetext und
-     *             {@code maxNewTokens} (Zahl): Maximale Anzahl Tokens; wird als nicht
-     *             implementiert abgelehnt
+     * @param call Capacitor call with {@code input} (String): input text and
+     *             {@code maxNewTokens} (Number): maximum number of tokens; rejected as unimplemented
      */
     @PluginMethod
     public void runSummaryPipeline(PluginCall call) {
@@ -306,12 +304,11 @@ public class NativeInferencePlugin extends Plugin {
     }
 
     /**
-     * KI-Inferenz: Text übersetzen.
+     * AI inference: translate text.
      *
-     * @param call Capacitor-Aufruf mit {@code input} (String): Eingabetext,
-     *             {@code sourceLanguage} (String): Quellsprache und
-     *             {@code targetLanguage} (String): Zielsprache; wird als nicht
-     *             implementiert abgelehnt
+     * @param call Capacitor call with {@code input} (String): input text,
+     *             {@code sourceLanguage} (String): source language, and
+     *             {@code targetLanguage} (String): target language; rejected as unimplemented
      */
     @PluginMethod
     public void runTranslationPipeline(PluginCall call) {
@@ -319,32 +316,31 @@ public class NativeInferencePlugin extends Plugin {
     }
 
     /**
-     * KI-Inferenz: Textgenerierung / Chat.
+     * AI inference: text generation / chat.
      *
-     * <p>Für UI-Updates in Echtzeit ersetzen {@code generationChunk}-Events die
-     * JavaScript-Callbacks. Sie enthalten die {@code requestId} zur Zuordnung sowie
-     * {@code tokens} (Liste der zuletzt generierten Tokens) und
-     * {@code text} (String mit dem zuletzt generierten Textabschnitt).
-     * Das abschließende Ergebnis enthält wie in Transformers.js bei Chat-Modellen
-     * die Antwort und bei anderen Modellen den vervollständigten Eingabetext.</p>
+     * <p>For real-time UI updates, {@code generationChunk} events replace the
+     * JavaScript callbacks. They contain the {@code requestId} for association,
+     * {@code tokens} (list of the most recently generated tokens), and
+     * {@code text} (string with the most recently generated text fragment).
+     * As in Transformers.js, the final result contains the answer for chat models
+     * and the completed input text for other models.</p>
      *
-     * <p>Nicht angegebene Parameter werden aus der {@code generation_config.json}
-     * des Modells übernommen.</p>
+     * <p>Unspecified parameters are taken from the model's {@code generation_config.json}.</p>
      *
-     * <p>Parameter im Capacitor-Aufruf:</p>
+     * <p>Parameters in the Capacitor call:</p>
      * <ul>
-     *   <li>{@code requestId} (String): ID der Generierung und ihrer Streaming-Events</li>
-     *   <li>{@code question} (String): Frage</li>
-     *   <li>{@code context} (String): Text-Kontext</li>
-     *   <li>{@code maxNewTokens} (Zahl): Maximale Anzahl zu generierender Tokens</li>
-     *   <li>{@code maxLength} (Zahl): Maximale Länge von Prompt und Antwort in Tokens</li>
-     *   <li>{@code doSample} (Boolean): Sampling ja/nein</li>
-     *   <li>{@code temperature} (Zahl): Temperatur</li>
-     *   <li>{@code repetitionPenalty} (Zahl): Bestrafung für wörtliche Wiederholungen</li>
+     *   <li>{@code requestId} (String): ID of the generation and its streaming events</li>
+     *   <li>{@code question} (String): Question</li>
+     *   <li>{@code context} (String): Text context</li>
+     *   <li>{@code maxNewTokens} (Number): Maximum number of tokens to generate</li>
+     *   <li>{@code maxLength} (Number): Maximum length of the prompt and answer in tokens</li>
+     *   <li>{@code doSample} (Boolean): Whether to use sampling</li>
+     *   <li>{@code temperature} (Number): Temperature</li>
+     *   <li>{@code repetitionPenalty} (Number): Penalty for verbatim repetitions</li>
      * </ul>
      *
-     * @param call Capacitor-Aufruf; erhält ein Objekt mit {@code text} (String):
-     *             Generierter Text, nach einem Abbruch mit dem bis dahin erzeugten Text
+     * @param call Capacitor call; receives an object with {@code text} (String):
+     *             generated text, or the text generated so far if cancelled
      */
     @PluginMethod
     public void runTextGenerationPipeline(PluginCall call) {
@@ -400,11 +396,11 @@ public class NativeInferencePlugin extends Plugin {
     }
 
     /**
-     * Laufende Textgenerierung abbrechen. Die ursprüngliche Generierungsanfrage
-     * wird nach dem aktuellen Token mit dem bis dahin erzeugten Text abgeschlossen.
+     * Cancel the current text generation. The original generation request resolves
+     * after the current token with the text generated so far.
      *
-     * @param call Capacitor-Aufruf mit {@code requestId} (String): ID der laufenden
-     *             Generierung; wird sofort ohne Ergebnis aufgelöst
+     * @param call Capacitor call with {@code requestId} (String): ID of the running
+     *             generation; resolves immediately without a result
      */
     @PluginMethod
     public void stopTextGeneration(PluginCall call) {
@@ -420,23 +416,23 @@ public class NativeInferencePlugin extends Plugin {
     }
 
     /**
-     * Inferenzaufrufe für nicht unterstützte Modellarten explizit ablehnen.
+     * Explicitly reject inference calls for unsupported model types.
      *
-     * @param call Capacitor-Aufruf, der mit einem UNIMPLEMENTED-Fehler abgelehnt wird
+     * @param call Capacitor call to reject with an UNIMPLEMENTED error
      */
     private void rejectInference(PluginCall call) {
         call.unimplemented("Diese Modellart wird von der nativen Inferenz nicht unterstützt.");
     }
 
     /**
-     * Prüfen, ob eine Modellart nativ unterstützt wird.
+     * Check whether a model type is supported natively.
      */
     private static boolean isSupportedTask(String task) {
         return TASK_FEATURE_EXTRACTION.equals(task) || TASK_TEXT_GENERATION.equals(task);
     }
 
     /**
-     * Zuletzt geladenes Modell freigeben (nur im Hintergrund-Thread aufrufen).
+     * Release the most recently loaded model (call only on the background thread).
      */
     private void unloadModel() {
         if (embeddingPipeline != null) {
@@ -452,8 +448,8 @@ public class NativeInferencePlugin extends Plugin {
     }
 
     /**
-     * Positive Ganzzahl aus den Aufrufparametern lesen. JavaScript-Zahlen können als
-     * Integer oder Double ankommen, 0 oder fehlende Werte gelten als nicht gesetzt.
+     * Read a positive integer from the call parameters. JavaScript numbers can arrive
+     * as either Integer or Double; 0 and missing values are treated as unset.
      */
     private static Integer optPositiveInt(JSONObject data, String key) {
         Object value = data.opt(key);
@@ -464,7 +460,7 @@ public class NativeInferencePlugin extends Plugin {
     }
 
     /**
-     * Zahl aus den Aufrufparametern lesen oder {@code null}, wenn sie fehlt.
+     * Read a number from the call parameters, or return {@code null} if it is missing.
      */
     private static Double optNumber(JSONObject data, String key) {
         Object value = data.opt(key);

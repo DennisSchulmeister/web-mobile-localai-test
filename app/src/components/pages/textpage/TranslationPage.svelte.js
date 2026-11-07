@@ -1,5 +1,5 @@
 /**
- * Web/Mobile-Test für lokale KI
+ * Web/Mobile Test for Local AI
  * © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
  *
  * This source code is licensed under the BSD 3-Clause License found in the
@@ -11,8 +11,7 @@ import StopWatchState from "../../../state/StopWatchState.svelte.js";
 import textPageState  from "../../../state/TextPageState.svelte.js";
 
 /**
- * Gesicherter Zustand für die "Übersetzen" Seite, damit dieser bei der
- * Navigation nicht verloren geht.
+ * Persistent state for the "Translate" page so it is not lost during navigation.
  */
 class TranslationPageState {
     working         = $state(false);
@@ -25,7 +24,7 @@ class TranslationPageState {
     result          = $derived(textPageState.currentPage.file ? "" : "");
 
     /**
-     * Text übersetzen
+     * Translate text.
      */
     async execute() {
         try {
@@ -37,7 +36,7 @@ class TranslationPageState {
             this.result       = "";
             this.errorMessage = "";
 
-            // Kleine Pause, damit wenigstens der Loading-State im UI erscheint!
+            // Briefly yield so the loading state can appear in the UI.
             await new Promise(resolve => window.setTimeout(resolve, 500));
 
             this.result = await modelState.loadedModel.backend.runTranslationPipeline({
