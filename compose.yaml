@@ -97,7 +97,7 @@ services:
         image: caddy:2-alpine
         profiles: [full]
         depends_on:
-            backend-full:
+            backend-postgres:
                 condition: service_healthy
             frontend-init:
                 condition: service_completed_successfully

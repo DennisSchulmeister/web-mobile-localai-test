@@ -1,26 +1,26 @@
 Django App
 ==========
 
--[x] Action für Quality Assessment mit LLM
--[x] Deutsche Übersetzung
--[x] Docker Compose für Deployment
+-[x] Action for quality assessment with an LLM
+-[x] German translation
+-[x] Docker Compose for deployment
 
--[x] Link von QA auf Trace
+-[x] Link from QA to trace
 -[x] Event status
 -[x] Stop testrun event
 
 Web App
 =======
 
--[ ] Neuer Start Screen zum Eingeben des Access Code und Event-Aufzeichnung starten/stoppen
--[ ] Access Code und Aufzeichnung aktiv im Page Header zeigen
--[ ] API URL von fester Adresse runterladen (wenn navigation.host nicht localhost ist o.ä.)
--[ ] Neue Hilfsklasse zum Aufzeichnen von Events
--[ ] Übersetzbarkeit ermöglichen und auf Englisch übersetzen
--[ ] Code auch auf Englisch übersetzen
+-[ ] New start screen for entering the access code and starting/stopping event recording
+-[ ] Show the access code and recording status in the page header
+-[ ] Fetch the API URL from a fixed address (if navigation.host is not localhost, etc.)
+-[ ] New helper class for recording events
+-[ ] Enable localization and translate into English
+-[ ] Translate the code into English as well
 
 README
 ======
 
--[x] Auf Englisch übersetzen
--[ ] Dokumentation splitten, und z.B. Django-Installation, Testplan etc. beschreiben
+-[x] Translate into English
+-[x] Split the documentation and describe topics such as Django installation and the test plan
