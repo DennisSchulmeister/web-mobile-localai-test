@@ -11,8 +11,13 @@ import {wrap} from "svelte-spa-router/wrap";
 const routes = new Map();
 export default routes;
 
+// Welcome page
+routes.set("/", wrap({
+    asyncComponent: () => import("./pages/WelcomePage.svelte"),
+}));
+
 // Home page with subpages
-routes.set(/^\/(search|chat|info)?$/, wrap({
+routes.set(/^\/(overview|search|chat|info)$/, wrap({
     asyncComponent: () => import("./pages/HomePage.svelte"),
 }));
 

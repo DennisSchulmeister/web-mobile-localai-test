@@ -34,6 +34,7 @@ Selected text page.
     });
     
     onMount(() => {
+        navigationState.header   = true;
         navigationState.backLink = true;
         
         navigationState.subPages = [

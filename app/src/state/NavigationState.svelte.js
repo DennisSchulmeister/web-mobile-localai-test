@@ -12,6 +12,11 @@
  */
 const navigationState = $state({
     /**
+     * Show page header.
+     */
+    header: false,
+
+    /**
      * Show the back arrow in the navigation bar.
      */
     backLink: false,

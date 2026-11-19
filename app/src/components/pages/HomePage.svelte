@@ -29,14 +29,15 @@ Home page for selecting and searching text pages.
     });
 
     onMount(() => {
-        navigationState.backLink = false;
+        navigationState.header   = true;
+        navigationState.backLink = true;
 
         navigationState.subPages = [
             {
                 id:     "overview",
                 icon:   "bi-card-list",
                 label:  "Übersicht",
-                url:    "#/",
+                url:    "#/overview",
             },
             modelState.config.enabledFeatures.semanticSearch ? {
                 id:     "search",

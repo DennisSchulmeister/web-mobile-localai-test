@@ -17,6 +17,7 @@ Error page for invalid URLs
 
     onMount(() => {
         navigationState.pageTitle      = "Nicht gefunden";
+        navigationState.header         = true;
         navigationState.backLink       = true;
         navigationState.currentSubPage = "";
         navigationState.subPages       = [];

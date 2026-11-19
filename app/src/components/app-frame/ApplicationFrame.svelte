@@ -13,23 +13,30 @@ SPA routing.
 -->
 
 <script>
-    import Router     from "svelte-spa-router";
+    import Router          from "svelte-spa-router";
 
-    import Footer     from "./Footer.svelte";
-    import NavBar     from "./NavBar.svelte";
-    import routes     from "../routes.js";
+    import Footer          from "./Footer.svelte";
+    import NavBar          from "./NavBar.svelte";
+    import routes          from "../routes.js";
+    import navigationState from "../../state/NavigationState.svelte.js"
 </script>
 
 <div id="app-container">
-    <header>
-        <NavBar />
-    </header>
+    {#if navigationState.header}
+        <header>
+            <NavBar />
+        </header>
+    {/if}
+
     <main>
         <Router {routes} />
     </main>
-    <footer>
-        <Footer/>
-    </footer>
+
+    {#if navigationState.subPages?.length}
+        <footer>
+            <Footer/>
+        </footer>
+    {/if}
 </div>
 
 <style>
