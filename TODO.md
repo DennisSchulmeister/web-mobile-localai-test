@@ -18,8 +18,8 @@ Web App
 -[ ] New helper class for recording events
 -[ ] Enable localization and translate into English
 -[x] Translate the code into English as well
--[ ] Bug: Error message from chat with page appears in context-free chat, too.
--[ ] Bug: Starting a new chat doesn't clear error message.
+-[x] Bug: Error message from chat with page appears in context-free chat, too.
+-[x] Bug: Starting a new chat doesn't clear error message.
 
 README
 ======

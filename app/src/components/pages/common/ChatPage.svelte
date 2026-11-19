@@ -111,10 +111,10 @@ AI use case: open-ended LLM chat.
             </div>
         {/each}
 
-        {#if pageState.errorMessage || pageState.messages.length}
+        {#if pageState.error.message || pageState.messages.length}
             <div class="status">
-                {#if pageState.errorMessage}
-                    <IconText type="error" text={pageState.errorMessage}/>
+                {#if pageState.error.message}
+                    <IconText type="error" text={pageState.error.message}/>
                 {/if}
         
                 <div>

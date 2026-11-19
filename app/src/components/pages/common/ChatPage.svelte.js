@@ -6,22 +6,19 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import modelState                      from "../../../state/ModelState.svelte";
-import StopWatchState                  from "../../../state/StopWatchState.svelte.js";
-import TextGenerationStatsState        from "../../../state/TextGenerationStatsState.svelte.js";
-import textPageState                   from "../../../state/TextPageState.svelte.js";
-import {randomId}                      from "../../../utils/id.js";
+import modelState               from "../../../state/ModelState.svelte";
+import StopWatchState           from "../../../state/StopWatchState.svelte.js";
+import TextGenerationStatsState from "../../../state/TextGenerationStatsState.svelte.js";
+import textPageState            from "../../../state/TextPageState.svelte.js";
+import {randomId}               from "../../../utils/id.js";
 
 /**
  * Persistent state for the chat so it is not lost during navigation.
  */
 class ChatPageState {
     TASKS             = ["text-generation", "text2text-generation"];
-
     working           = $state(false);
-    disabled          = $derived(this.working || modelState.loadedModel.status !== "ready" || !this.TASKS.includes(modelState.loadedModel.task))
-    errorMessage      = $state("");
-    
+    disabled          = $derived(this.working || modelState.loadedModel.status !== "ready" || !this.TASKS.includes(modelState.loadedModel.task))   
     question          = $state("");
     maxNewTokens      = $state(1000);
     temperature       = $state(0.3);
@@ -32,17 +29,29 @@ class ChatPageState {
      * Required to make the arrays reactive. `$derived(... [])` does not return
      * reactive arrays.
      */
-    #cb = () => {
+    #messagesCallback = () => {
         modelState.loadedModel.modelId;
 
         let messages = $state([]);
         return messages;
     };
 
-    textPage          = $state(false);
-    messagesHome      = $derived.by(this.#cb);
-    messagesTextPage  = $derived.by(() => {textPageState.currentPage.file; return this.#cb()});
-    messages          = $derived(this.textPage ? this.messagesTextPage : this.messagesHome);
+    #errorCallback = () => {
+        modelState.loadedModel.modelId;
+
+        let error = $state({message: ""});
+        return error;
+    }
+
+    textPage         = $state(false);
+
+    messagesHome     = $derived.by(this.#messagesCallback);
+    messagesTextPage = $derived.by(() => {textPageState.currentPage.file; return this.#messagesCallback()});
+    messages         = $derived(this.textPage ? this.messagesTextPage : this.messagesHome);
+
+    errorHome        = $derived.by(this.#errorCallback);
+    errorTextPage    = $derived.by(() => {textPageState.currentPage.file; return this.#errorCallback()});
+    error            = $derived(this.textPage ? this.errorTextPage : this.errorHome);
 
     /**
      * Generate text for the current task.
@@ -54,6 +63,7 @@ class ChatPageState {
             if (this.disabled) return;
 
             this.working = true;
+            this.error.message = "";
 
             // Briefly yield so the loading state can appear in the UI.
             await new Promise(resolve => window.setTimeout(resolve, 500));
@@ -95,9 +105,8 @@ class ChatPageState {
             this.working  = false;
             this.question = "";
         } catch (error) {
-            debugger;
-            this.errorMessage = error.toString();
-            this.working      = false;
+            this.error.message = error.toString();
+            this.working       = false;
 
             if (response) {
                 response.stopWatch.stop();
@@ -115,7 +124,7 @@ class ChatPageState {
         try {
             await modelState.loadedModel.backend.stopTextGeneration();
         } catch (error) {
-            this.errorMessage = error.toString();
+            this.error.message = error.toString();
             throw error;
         }
     }
@@ -125,6 +134,7 @@ class ChatPageState {
      */
     reset() {
         this.messages.splice(0);
+        this.error.message = "";
     }
 }
 
