@@ -13,7 +13,6 @@ AI use case: open-ended LLM chat.
 
 <script>
     import MarkdownIt        from 'markdown-it'
-    import {onMount}         from "svelte";
     
     import IconText          from "../../basic/IconText.svelte";
     import ModelSelector     from "../../basic/ModelSelector.svelte"
@@ -21,6 +20,7 @@ AI use case: open-ended LLM chat.
     import StopWatch         from "../../basic/StopWatch.svelte";
     
     import navigationState   from "../../../state/NavigationState.svelte.js";
+    import i18n              from "../../../state/i18n.svelte.js";
     import pageState         from "./ChatPage.svelte.js";
 
     let {textPage = false} = $props();
@@ -29,8 +29,8 @@ AI use case: open-ended LLM chat.
     let buttonText   = $derived(pageState.working ? "⏹️" : "✨");
     let md           = new MarkdownIt();
 
-    onMount(() => {
-        navigationState.pageTitle = textPage ? "Chat zur Seite" : "Freier Chat";
+    $effect(() => {
+        navigationState.pageTitle = textPage ? i18n.text.chatPage?.titleTextPage : i18n.text.chatPage?.titleHome;
         pageState.textPage        = textPage;
     });
 
@@ -69,16 +69,12 @@ AI use case: open-ended LLM chat.
     <Section>
         {#if !pageState.messages.length && !pageState.working}
             <div class="placeholder">
-                🤖 Frage mich irgendwas (auf Englisch).
+                🤖  {i18n.text.chatPage?.placeholder1}
             </div>
             <div class="warning">
                 <p>
-                    <b>Beachte:</b>
-                    Ich beantworte zwar deine Fragen, merke mir aber den Inhalt unseres
-                    Gesprächs nicht. Das heißt, jede Frage muss ohne Bezug zu den vorherigen
-                    Nachrichten beantwortbar sein. Außerdem mache ich viele Fehler.
-                    Prüfe daher alle meine Antworten. Manchmal erzähle ich auch Unsinn.
-                    In diesem Fall stelle dieselbe Frage einfach nochmal. 🙃
+                    <b>{i18n.text.chatPage?.placeholder2}</b>
+                    {i18n.text.chatPage?.placeholder3}
                 </p>
             </div>
         {/if}
@@ -87,11 +83,11 @@ AI use case: open-ended LLM chat.
             <div class="message {message.role}">
                 {#if message.role === "user"}
                     <div class="role">
-                        🧑 Benutzer
+                        🧑 {i18n.text.chatPage?.roleUser}
                     </div>
                 {:else if message.role === "assistant"}
                     <div class="role">
-                        🤖 Assistent
+                        🤖 {i18n.text.chatPage?.roleAssistant}
                     </div>
                 {/if}
 
@@ -119,7 +115,7 @@ AI use case: open-ended LLM chat.
         
                 <div>
                     {#if !pageState.working}
-                        <a href="#reset" onclick={onReset}>Neuer Chat</a>
+                        <a href="#reset" onclick={onReset}>{i18n.text.chatPage?.reset}</a>
                     {/if}
                 </div>
             </div>
@@ -131,30 +127,30 @@ AI use case: open-ended LLM chat.
     <!-- svelte-ignore a11y_no_redundant_roles -->
     <form onsubmit={onSubmit}>
         <fieldset role="group">
-            <input placeholder="Nachricht" bind:value={pageState.question} disabled={pageState.disabled}/>
+            <input placeholder={i18n.text.chatPage?.message} bind:value={pageState.question} disabled={pageState.disabled}/>
             <input type="submit" value={buttonText} disabled={pageState.working ? false : pageState.disabled}/>
         </fieldset>
     </form>
 
     <details>
         <summary>
-            Optionen
+            {i18n.text.chatPage?.options}
         </summary>
         <article class="options">
             <label>
-                Max Tokens
+                {i18n.text.chatPage?.maxTokens}
                 <input type="number" bind:value={pageState.maxNewTokens} disabled={pageState.disabled}/>
             </label>
             <label>
-                Temperatur
+                {i18n.text.chatPage?.temperature}
                 <input type="number" step="0.1" bind:value={pageState.temperature} disabled={pageState.disabled}/>
             </label>
             <label>
-                Keine Wdh.
+                {i18n.text.chatPage?.repetitionPenalty}
                 <input type="number" step="0.1" bind:value={pageState.repetitionPenalty} disabled={pageState.disabled}/>
             </label>
             <label>
-                Sampling
+                {i18n.text.chatPage?.sampling}
                 <input type="checkbox" role="switch" bind:checked={pageState.doSample} disabled={pageState.disabled}/>
             </label>
         </article>

@@ -136,11 +136,6 @@ language models for summarization, question answering and translation perform
 poorly on the test data. Hence, they have not been ported to the Android inference
 backend. Default parameters are used unless stated otherwise.
 
-### Device Information
-
-For each device and browser, the device information shall be recorded on the
-info page.
-
 ### Semantic Search
 
 Semantic search can be tested with the following questions:

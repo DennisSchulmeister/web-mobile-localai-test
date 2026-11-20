@@ -11,6 +11,7 @@ import * as transformers from '@huggingface/transformers';
 import modelState        from "../../../state/ModelState.svelte";
 import StopWatchState    from "../../../state/StopWatchState.svelte.js";
 import textPageState     from "../../../state/TextPageState.svelte.js";
+import i18n              from "../../../state/i18n.svelte.js";
 
 import {randomId}        from "../../../utils/id.js";
 import {decodeEmbedding} from "../../../../shared/embedding.js";
@@ -46,7 +47,7 @@ class SemanticSearchPageState {
             let searchResults = [];
             
             // Download the index files.
-            this.stopWatchState.start("Download", "bi-download");
+            this.stopWatchState.start(i18n.text.homePage?.search?.download, "bi-download");
             
             let indexes = [];
             indexes.push(await(await fetch(this.embeddingPaths.keywords)).json());
@@ -56,13 +57,13 @@ class SemanticSearchPageState {
             }
     
             // Calculate the embedding for the search term.
-            this.stopWatchState.start("Embedding", "bi-text-center");
+            this.stopWatchState.start(i18n.text.homePage?.search?.embedding, "bi-text-center");
     
             let queryLower = this.query.toLowerCase();
             let queryEmbedding = await modelState.loadedModel.backend.runEmbeddingPipeline(this.query);
     
             // Search the index.
-            this.stopWatchState.start("Suche", "bi-search");
+            this.stopWatchState.start(i18n.text.homePage?.search?.search, "bi-search");
     
             this.progressMax = 0;
     

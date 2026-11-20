@@ -12,13 +12,13 @@ Backend information.
 -->
 
 <script>
-    import {onMount}       from "svelte";
     import navigationState from "../../../state/NavigationState.svelte.js";
+    import i18n            from "../../../state/i18n.svelte.js";
     import backends        from "../../../backends/index.js";
     import IconText        from "../../basic/IconText.svelte";
 
-    onMount(async () => {
-        navigationState.pageTitle = "Verfügbare Backends";
+    $effect(() => {
+        navigationState.pageTitle = i18n.text.homePage?.info?.pageTitle;
     });
 </script>
 
@@ -31,7 +31,9 @@ Backend information.
 
             {#await backend.getInformation()}
                 <tr>
-                    <td colspan="2">Lädt …</td>
+                    <td colspan="2">
+                        i18n.text.homePage?.info?.loading}
+                    </td>
                 </tr>
             {:then information}
                 {#each information as info}

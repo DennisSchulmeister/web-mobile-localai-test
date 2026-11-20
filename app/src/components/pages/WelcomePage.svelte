@@ -30,7 +30,7 @@ recording test events.
     async function onSubmit(event) {
         event.preventDefault();
         // TODO: Connect to backend
-        location.href = "#/overview"
+        location.href = "#/index"
     }
 </script>
 

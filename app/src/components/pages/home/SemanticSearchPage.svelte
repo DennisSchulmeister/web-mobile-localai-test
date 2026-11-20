@@ -12,8 +12,6 @@ AI use case: semantic search across text pages.
 -->
 
 <script>
-    import {onMount}         from "svelte";
-    
     import IconText          from "../../basic/IconText.svelte";
     import ModelSelector     from "../../basic/ModelSelector.svelte"
     import Section           from "../../basic/Section.svelte";
@@ -21,10 +19,11 @@ AI use case: semantic search across text pages.
     import StopWatch         from "../../basic/StopWatch.svelte";
     
     import navigationState   from "../../../state/NavigationState.svelte.js";
+    import i18n              from "../../../state/i18n.svelte.js";
     import pageState         from "./SemanticSearchPage.svelte.js";
     
-    onMount(() => {
-        navigationState.pageTitle = "Semantische Suche";
+    $effect(() => {
+        navigationState.pageTitle = i18n.text.homePage?.search?.pageTitle;
     });
 
     async function onSubmit(event) {
@@ -39,19 +38,28 @@ AI use case: semantic search across text pages.
 
 <Section>
     <form role="search" onsubmit={onSubmit}>
-        <input type="search" placeholder="Suchbegriff" bind:value={pageState.query} disabled={pageState.disabled}/>
-        <input type="submit" value="Suchen" disabled={pageState.disabled || !pageState.query}/>
+        <input
+            type        = "search"
+            placeholder = {i18n.text.homePage?.search?.placeholder}
+            bind:value  = {pageState.query}
+            disabled    = {pageState.disabled}
+        />
+        <input
+            type     = "submit"
+            value    = {i18n.text.homePage?.search?.submit}
+            disabled = {pageState.disabled || !pageState.query}
+        />
     </form>
 
     <div class="options">
         <label>
             <input type="checkbox" role="switch" bind:checked={pageState.searchAll} disabled={pageState.disabled}/>
-            Volltextsuche
+            {i18n.text.homePage?.search?.searchAll}
         </label>
     
         <label>
             <input type="checkbox" role="switch" bind:checked={pageState.matchText} disabled={pageState.disabled}/>
-            Direkter Textvergleich
+            {i18n.text.homePage?.search?.matchText}
         </label>
     </div>
 </Section>

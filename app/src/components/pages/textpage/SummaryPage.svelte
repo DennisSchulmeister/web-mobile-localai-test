@@ -13,7 +13,6 @@ AI use case: summarization.
 
 <script>
     import MarkdownIt      from 'markdown-it'
-    import {onMount}       from "svelte";
 
     import IconText        from "../../basic/IconText.svelte";
     import Loading         from "../../basic/Loading.svelte";
@@ -22,13 +21,14 @@ AI use case: summarization.
     import StopWatch       from "../../basic/StopWatch.svelte";
 
     import navigationState from "../../../state/NavigationState.svelte.js";
+    import i18n            from "../../../state/i18n.svelte.js";
     import pageState       from "./SummaryPage.svelte.js";
 
     let md = new MarkdownIt();
     let htmlAnswer = $derived(md.render(pageState.answer));
 
-    onMount(() => {
-        navigationState.pageTitle = "Text zusammenfassen";
+    $effect(() => {
+        navigationState.pageTitle = i18n.text.textPage?.summary?.pageTitle;
     });
 
     async function onExecuteClicked() {
@@ -42,7 +42,8 @@ AI use case: summarization.
 
 <Section>
     <label>
-        Länge: {pageState.maxNewTokens} Tokens
+        {i18n.text.textPage?.summary?.length}: {pageState.maxNewTokens} {i18n.text.textPage?.summary?.tokens}
+        
         <input
             type       = "range"
             min        = {pageState.minTokens}
@@ -52,12 +53,14 @@ AI use case: summarization.
         />
     </label>
 
-    <button onclick={onExecuteClicked} disabled={pageState.disabled}>Start</button>
+    <button onclick={onExecuteClicked} disabled={pageState.disabled}>
+        {i18n.text.textPage?.summary?.submit}
+    </button>
 </Section>
 
 {#if pageState.working}
     <Section line={true}>
-        <Loading text="Antwort wird generiert"/>
+        <Loading text={i18n.text.textPage?.summary?.working}/>
     </Section>
 {:else if pageState.answer}
     <Section line={true}>

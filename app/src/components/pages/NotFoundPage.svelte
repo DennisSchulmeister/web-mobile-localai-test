@@ -12,11 +12,11 @@ Error page for invalid URLs
 -->
 
 <script>
-    import {onMount}       from "svelte";
     import navigationState from "../../state/NavigationState.svelte.js";
+    import i18n            from "../../state/i18n.svelte.js";
 
-    onMount(() => {
-        navigationState.pageTitle      = "Nicht gefunden";
+    $effect(() => {
+        navigationState.pageTitle      = i18n.text.notFoundPage?.pageTitle;
         navigationState.header         = true;
         navigationState.backLink       = true;
         navigationState.currentSubPage = "";
@@ -25,12 +25,12 @@ Error page for invalid URLs
 </script>
 
 <div id="page">
-    <h2>Seite nicht gefunden</h2>
+    <h2>{i18n.text.notFoundPage?.title}</h2>
     <p>
-        Die gewünschte Seite wurde nichte gefunden.
+        {i18n.text.notFoundPage?.message}
     </p>
     <p>
-        <a href="#/">Zurück zur Startseite</a>
+        <a href="#/index">{i18n.text.notFoundPage?.backLink}</a>
     </p>
 </div>
 

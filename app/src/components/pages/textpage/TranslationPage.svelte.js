@@ -9,6 +9,7 @@
 import modelState     from "../../../state/ModelState.svelte";
 import StopWatchState from "../../../state/StopWatchState.svelte.js";
 import textPageState  from "../../../state/TextPageState.svelte.js";
+import i18n           from "../../../state/i18n.svelte.js";
 
 /**
  * Persistent state for the "Translate" page so it is not lost during navigation.
@@ -30,7 +31,7 @@ class TranslationPageState {
         try {
             if (this.disabled) return;
     
-            this.stopWatchState.start("Antwort", "bi-pen");
+            this.stopWatchState.start(i18n.text.textPage?.translation?.answer, "bi-pen");
 
             this.working      = true;
             this.result       = "";

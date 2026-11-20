@@ -13,7 +13,6 @@ AI use case: question answering.
 
 <script>
     import MarkdownIt      from 'markdown-it'
-    import {onMount}       from "svelte";
 
     import IconText        from "../../basic/IconText.svelte";
     import Loading         from "../../basic/Loading.svelte";
@@ -22,13 +21,14 @@ AI use case: question answering.
     import StopWatch       from "../../basic/StopWatch.svelte";
 
     import navigationState from "../../../state/NavigationState.svelte.js";
+    import i18n            from "../../../state/i18n.svelte.js";
     import pageState       from "./QuestionAnsweringPage.svelte.js";
 
     let md = new MarkdownIt();
     let htmlAnswer = $derived(md.render(pageState.answer));
 
-    onMount(() => {
-        navigationState.pageTitle = "Fragen beantworten";
+    $effect(() => {
+        navigationState.pageTitle = i18n.text.textPage?.qa?.pageTitle;
     });
 
     async function onExecuteClicked(event) {
@@ -45,15 +45,23 @@ AI use case: question answering.
     <!-- svelte-ignore a11y_no_redundant_roles -->
     <form onsubmit={onExecuteClicked}>
         <fieldset role="group">
-            <input placeholder="Frage" bind:value={pageState.question} disabled={pageState.disabled}/>
-            <input type="submit" value="Start" disabled={pageState.disabled}/>
+            <input
+                placeholder = {i18n.text.textPage?.qa?.placeholder}
+                bind:value  = {pageState.question}
+                disabled    = {pageState.disabled}
+            />
+            <input
+                type     = "submit"
+                value    = {i18n.text.textPage?.qa?.submit}
+                disabled = {pageState.disabled}
+            />
         </fieldset>
     </form>
 </Section>
 
 {#if pageState.working}
     <Section line={true}>
-        <Loading text="Antwort wird generiert"/>
+        <Loading text={i18n.text.textPage?.qa?.working}/>
     </Section>
 {:else if pageState.answer}
     <Section line={true}>
@@ -68,9 +76,3 @@ AI use case: question answering.
 
     <StopWatch measurements={pageState.stopWatchState.measurements}/>
 </Section>
-
-<style>
-    /* label {
-        margin: 0;
-    }    */
-</style>

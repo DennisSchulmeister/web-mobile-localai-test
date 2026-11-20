@@ -13,13 +13,13 @@ Content of a text page.
 
 <script>
     import MarkdownIt      from 'markdown-it'
-    import {onMount}       from "svelte";
     
     import navigationState from "../../../state/NavigationState.svelte.js";
     import textPageState   from "../../../state/TextPageState.svelte.js";
+    import i18n            from "../../../state/i18n.svelte.js";
 
-    onMount(() => {
-        navigationState.pageTitle = "Text anzeigen";
+    $effect(() => {
+        navigationState.pageTitle = i18n.text.textPage?.content?.pageTitle;
     });
 
     let md = new MarkdownIt();

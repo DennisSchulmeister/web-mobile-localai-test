@@ -12,6 +12,7 @@ import * as transformers               from '@huggingface/transformers';
 
 import BaseBackend                     from "./base.js";
 import {formatNumber}                  from "../utils/formatter.js";
+import i18n                            from "../state/i18n.svelte.js";
 
 /**
  * Inference backend based on Transformers.js (ONNX) in the browser. This is
@@ -54,7 +55,7 @@ export default class TransformersBackend extends BaseBackend {
     }
     
     get name() {
-        return "Transformers.js";
+        return i18n.text.backend?.transformers?.name;
     }
 
     get isSupported() {
@@ -76,7 +77,7 @@ export default class TransformersBackend extends BaseBackend {
             devices.push(device.label);
         }
 
-        let userAgentData = "Nicht verfügbar";
+        let userAgentData = i18n.text.backend?.transformers?.info?.notAvailable;
 
         if (navigator.userAgentData) {
             let data = {
@@ -104,9 +105,9 @@ export default class TransformersBackend extends BaseBackend {
             userAgentData = JSON.stringify(data, null, 2);
         }
 
-        let platform            = navigator.platform || navigator.userAgentData?.platform || "Nicht verfügbar";
-        let deviceMemory        = typeof navigator.deviceMemory === "number" ? `ca. ${formatNumber(navigator.deviceMemory)} GiB`  : "Nicht verfügbar";
-        let hardwareConcurrency = typeof navigator.hardwareConcurrency === "number" ? String(navigator.hardwareConcurrency) : "Nicht verfügbar";
+        let platform            = navigator.platform || navigator.userAgentData?.platform || i18n.text.backend?.transformers?.info?.notAvailable;
+        let deviceMemory        = typeof navigator.deviceMemory === "number" ? `ca. ${formatNumber(navigator.deviceMemory)} GiB`  : i18n.text.backend?.transformers?.info?.notAvailable;
+        let hardwareConcurrency = typeof navigator.hardwareConcurrency === "number" ? String(navigator.hardwareConcurrency) : i18n.text.backend?.transformers?.info?.notAvailable;
 
         let adapter      = null;
         let adapterError = null;
@@ -120,16 +121,16 @@ export default class TransformersBackend extends BaseBackend {
         }
 
         let gpuCount = !navigator.gpu
-            ? "Nicht verfügbar (WebGPU wird nicht unterstützt)"
+            ? i18n.text.backend?.transformers?.info?.noWebGpuSupport
             : adapter
-                ? "1 WebGPU-Adapter"
+                ? i18n.text.backend?.transformers?.info?.webGpuCount1
                 : adapterError
-                    ? `Nicht verfügbar (${adapterError})`
-                    : "0 WebGPU-Adapter";
+                    ? `${i18n.text.backend?.transformers?.info?.notAvailable} (${adapterError})`
+                    : i18n.text.backend?.transformers?.info?.webGpuCount0;
 
-        let gpuDescription = "Nicht verfügbar";
-        let maxBufferSize = "Nicht verfügbar";
-        let maxStorageBufferBindingSize = "Nicht verfügbar";
+        let gpuDescription = i18n.text.backend?.transformers?.info?.notAvailable;
+        let maxBufferSize = i18n.text.backend?.transformers?.info?.notAvailable;
+        let maxStorageBufferBindingSize = i18n.text.backend?.transformers?.info?.notAvailable;
 
         if (adapter) {
             let info = adapter.info;
@@ -138,7 +139,7 @@ export default class TransformersBackend extends BaseBackend {
                 try {
                     info = await adapter.requestAdapterInfo();
                 } catch (error) {
-                    gpuDescription = `Nicht verfügbar (${error?.message || String(error)})`;
+                    gpuDescription = `${i18n.text.backend?.transformers?.info?.notAvailable} (${error?.message || String(error)})`;
                 }
             }
 
@@ -153,7 +154,7 @@ export default class TransformersBackend extends BaseBackend {
                 Object.entries(description).filter(([, value]) => value),
             );
 
-            if (Object.keys(availableInfo).length > 0 && gpuDescription === "Nicht verfügbar") {
+            if (Object.keys(availableInfo).length > 0 && gpuDescription === i18n.text.backend?.transformers?.info?.notAvailable) {
                 gpuDescription = JSON.stringify(availableInfo);
             }
 
@@ -165,21 +166,71 @@ export default class TransformersBackend extends BaseBackend {
                 maxStorageBufferBindingSize = `${formatNumber(adapter.limits.maxStorageBufferBindingSize / 1024 / 1024 / 1024.0)} GiB`;
             }
         } else if (adapterError) {
-            maxBufferSize = `Nicht verfügbar (${adapterError})`;
-            maxStorageBufferBindingSize = `Nicht verfügbar (${adapterError})`;
+            maxBufferSize = `${i18n.text.backend?.transformers?.info?.notAvailable} (${adapterError})`;
+            maxStorageBufferBindingSize = `${i18n.text.backend?.transformers?.info?.notAvailable} (${adapterError})`;
         }
 
         return [
-            {field: "backendType",                 icon: "bi-terminal",    label: "Backend-Typ",                     text: "Browser"},
-            {field: "devices",                     icon: "bi-cpu",         label: "Ausführung",                      text: devices.join(", ")},
-            {field: "userAgentData",               icon: "bi-info-circle", label: "User Agent",                      text: userAgentData},
-            {field: "platform",                    icon: "bi-display",     label: "Plattform",                       text: platform},
-            {field: "deviceMemory",                icon: "bi-memory",      label: "Device Memory",                   text: deviceMemory},
-            {field: "hardwareConcurrency",         icon: "bi-cpu",         label: "Hardware-Nebenläufigkeit",        text: hardwareConcurrency},
-            {field: "gpuCount",                    icon: "bi-gpu-card",    label: "GPU-Adapter",                     text: gpuCount},
-            {field: "gpuDescription",              icon: "bi-gpu-card",    label: "GPU-Beschreibung",                text: gpuDescription},
-            {field: "maxBufferSize",               icon: "bi-memory",      label: "Max Buffer Size",                 text: maxBufferSize},
-            {field: "maxStorageBufferBindingSize", icon: "bi-memory",      label: "Max Storage Buffer Binding Size", text: maxStorageBufferBindingSize},
+            {
+                field: "backendType",
+                icon:  "bi-terminal",
+                label: i18n.text.backend?.transformers?.info?.backendType,
+                text:  i18n.text.backend?.transformers?.info?.browser
+            },
+            {
+                field: "devices",
+                icon:  "bi-cpu",
+                label: i18n.text.backend?.transformers?.info?.devices,
+                text:  devices.join(", ")
+            },
+            {
+                field: "userAgentData",
+                icon:  "bi-info-circle",
+                label: i18n.text.backend?.transformers?.info?.userAgentData,
+                text:  userAgentData
+            },
+            {
+                field: "platform",
+                icon:  "bi-display",
+                label: i18n.text.backend?.transformers?.info?.platform,
+                text:  platform
+            },
+            {
+                field: "deviceMemory",
+                icon:  "bi-memory",
+                label: i18n.text.backend?.transformers?.info?.deviceMemory,
+                text:  deviceMemory
+            },
+            {
+                field: "hardwareConcurrency",
+                icon:  "bi-cpu",
+                label: i18n.text.backend?.transformers?.info?.hardwareConcurrency,
+                text:  hardwareConcurrency
+            },
+            {
+                field: "gpuCount",
+                icon:  "bi-gpu-card",
+                label: i18n.text.backend?.transformers?.info?.gpuCount,
+                text:  gpuCount
+            },
+            {
+                field: "gpuDescription",
+                icon:  "bi-gpu-card",
+                label: i18n.text.backend?.transformers?.info?.gpuDescription,
+                text:  gpuDescription
+            },
+            {
+                field: "maxBufferSize",
+                icon:  "bi-memory",
+                label: i18n.text.backend?.transformers?.info?.maxBufferSize,
+                text:  maxBufferSize
+            },
+            {
+                field: "maxStorageBufferBindingSize",
+                icon:  "bi-memory",
+                label: i18n.text.backend?.transformers?.info?.maxStorageBufferBindingSize,
+                text:  maxStorageBufferBindingSize
+            },
         ];
     }
 
@@ -244,8 +295,8 @@ export default class TransformersBackend extends BaseBackend {
         let result = output?.answer || "";
 
         if (!result) {
-            console.error("Ungültige Antwort des Modells", output);
-            this.errorMessage = "Das Modell hat keinen Text erzeugt";
+            console.error(i18n.text.backend?.transformers?.invalidAnswer, output);
+            this.errorMessage = i18n.text.backend?.transformers?.noTextOutput;
         }
 
         return result;
@@ -264,8 +315,8 @@ export default class TransformersBackend extends BaseBackend {
         let result = output?.[0]?.summary_text || "";
 
         if (!result) {
-            console.error("Ungültige Antwort des Modells", output);
-            this.errorMessage = "Das Modell hat keinen Text erzeugt";
+            console.error(i18n.text.backend?.transformers?.invalidAnswer, output);
+            this.errorMessage = i18n.text.backend?.transformers?.noTextOutput;
         }
 
         return result;
@@ -280,8 +331,8 @@ export default class TransformersBackend extends BaseBackend {
         let result = output?.[0]?.translation_text || output?.translation_text || "";
 
         if (!result) {
-            console.error("Ungültige Antwort des Modells", output);
-            this.errorMessage = "Das Modell hat keinen Text erzeugt";
+            console.error(i18n.text.backend?.transformers?.invalidAnswer, output);
+            this.errorMessage = i18n.text.backend?.transformers?.noTextOutput;
         }
 
         return result;
@@ -292,7 +343,7 @@ export default class TransformersBackend extends BaseBackend {
                                     } = {}) {
         
         if (this.#running) {
-            throw new Error("Textgenerierung läuft bereits");
+            throw new Error(i18n.text.backend?.transformers?.alreadyRunning);
         }
         
         try {
@@ -327,7 +378,7 @@ export default class TransformersBackend extends BaseBackend {
                 // These are usually CausalLM (decoder-only) models, such as the GPT family.
                 // Seq2Seq models such as the T5 family are generally not instruction-tuned.
                 input = [
-                    {role: "system", content: this.#modelConfig.systemPrompt || "Du bist ein hilfreicher Assistent."},
+                    {role: "system", content: this.#modelConfig.systemPrompt || i18n.text.backend?.transformers?.defaultPrompt},
                     {role: "user",   content: question}
                 ];
 
@@ -358,8 +409,8 @@ export default class TransformersBackend extends BaseBackend {
                             : generatedText;
 
             if (!result) {
-                console.error("Ungültige Antwort des Modells", output);
-                this.errorMessage = "Das Modell hat keinen Text erzeugt";
+                console.error(i18n.text.backend?.transformers?.invalidAnswer, output);
+                this.errorMessage = i18n.text.backend?.transformers?.noTextOutput;
             }
 
             return result;

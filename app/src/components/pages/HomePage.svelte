@@ -12,7 +12,6 @@ Home page for selecting and searching text pages.
 -->
 
 <script>
-    import {onMount}          from "svelte";
     import ChatPage           from "./common/ChatPage.svelte";
     import ChoosePage         from "./home/ChoosePage.svelte";
     import InformationPage    from "./home/InformationPage.svelte";
@@ -20,41 +19,39 @@ Home page for selecting and searching text pages.
 
     import modelState         from "../../state/ModelState.svelte.js";
     import navigationState    from "../../state/NavigationState.svelte.js";
+    import i18n               from "../../state/i18n.svelte.js";
 
     let {params = []} = $props()
     let subPageId = $derived(params[1] || "overview");
 
     $effect(() => {
         navigationState.currentSubPage = subPageId;
-    });
-
-    onMount(() => {
-        navigationState.header   = true;
-        navigationState.backLink = true;
+        navigationState.header         = true;
+        navigationState.backLink       = true;
 
         navigationState.subPages = [
             {
-                id:     "overview",
+                id:     "index",
                 icon:   "bi-card-list",
-                label:  "Übersicht",
-                url:    "#/overview",
+                label:  i18n.text.homePage?.index?.shortName,
+                url:    "#/index",
             },
             modelState.config.enabledFeatures.semanticSearch ? {
                 id:     "search",
                 icon:   "bi-search",
-                label:  "Suche",
+                label:  i18n.text.homePage?.search?.shortName,
                 url:    "#/search",
             } : null,
             modelState.config.enabledFeatures.chat ? {
                 id:     "chat",
                 icon:   "bi-chat-dots",
-                label:  "Chat",
+                label:  i18n.text.chatPage?.shortName,
                 url:    "#/chat",
             } : null,
             {
                 id:     "info",
                 icon:   "bi-info-circle",
-                label:  "Info",
+                label:  i18n.text.homePage?.info?.shortName,
                 url:    "#/info",
             },
         ].filter(e => e !== null);
@@ -62,7 +59,7 @@ Home page for selecting and searching text pages.
 </script>
 
 <div id="page">
-    {#if subPageId === "overview"}
+    {#if subPageId === "index"}
         <ChoosePage/>
     {:else if subPageId === "search"}
         <SemanticSearchPage/>

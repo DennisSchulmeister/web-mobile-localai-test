@@ -24,10 +24,16 @@ class I18N {
     language = $state(window.localStorage.getItem("language") || "en");
     
     /**
+     * Shadow copy of the text catalogue to prevent flickering when the
+     * language is changed.
+     */
+    #text = $state({});
+
+    /**
      * Text catalogue
      */
     text = $derived.by(() => {
-        let result = $state({});
+        let result = this.#text;
         window.localStorage.setItem("language", this.language);
 
         import(`./i18n/${this.language}.js`).then(module => {

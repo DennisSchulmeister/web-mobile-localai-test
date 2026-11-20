@@ -6,6 +6,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+import i18n from "../state/i18n.svelte.js";
+
 /**
  * Base class for all inference backends.
  * 
@@ -40,7 +42,7 @@ export default class BaseBackend {
      * @returns {string} Backend name
      */
     get name() {
-        return "Kein Name";
+        return i18n.text.backend?.base?.name;
     }
 
     /**
@@ -117,7 +119,7 @@ export default class BaseBackend {
      * @param {object} config Model configuration
      */
     async loadModel({task, modelId, dtype, device, config} = {}) {
-        throw new Error("Nicht implementiert!");
+        throw new Error(i18n.text.backend?.base?.notImplemented);
     }
 
     /**
@@ -127,7 +129,7 @@ export default class BaseBackend {
      * @returns {Array} Numeric embeddings
      */
     async runEmbeddingPipeline(input) {
-        throw new Error("Nicht implementiert!");
+        throw new Error(i18n.text.backend?.base?.notImplemented);
     }
 
     /**
@@ -138,7 +140,7 @@ export default class BaseBackend {
      * @returns {string} Answer
      */
     async runQuestionAnsweringPipeline({question, context} = {}) {
-        throw new Error("Nicht implementiert");
+        throw new Error(i18n.text.backend?.base?.notImplemented);
     }
 
     /**
@@ -149,7 +151,7 @@ export default class BaseBackend {
      * @returns {string} Summary
      */
     async runSummaryPipeline({input, maxNewTokens} = {}) {
-        throw new Error("Nicht implementiert");
+        throw new Error(i18n.text.backend?.base?.notImplemented);
     }
 
     /**
@@ -161,7 +163,7 @@ export default class BaseBackend {
      * @returns {string} Translation
      */
     async runTranslationPipeline({input, sourceLanguage, targetLanguage} = {}) {
-        throw new Error("Nicht implementiert");
+        throw new Error(i18n.text.backend?.base?.notImplemented);
     }
 
     /**
@@ -185,13 +187,13 @@ export default class BaseBackend {
     async runTextGenerationPipeline({question, context, tokenCallback, textCallback,
                                      maxNewTokens, maxLength, doSample, temperature, repetitionPenalty
                                     } = {}) {
-        throw new Error("Nicht implementiert");
+        throw new Error(i18n.text.backend?.base?.notImplemented);
     }
 
     /**
      * Stop the current text generation.
      */
     stopTextGeneration() {
-        throw new Error("Nicht implementiert");
+        throw new Error(i18n.text.backend?.base?.notImplemented);
     }
 }

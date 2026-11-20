@@ -15,6 +15,7 @@ AI model selection
     import IconText   from "../basic/IconText.svelte";
     import Loading    from "../basic/Loading.svelte";
     import modelState from "../../state/ModelState.svelte.js";
+    import i18n       from "../../state/i18n.svelte.js";
 
     let {
         task = "",               // First parameter for `transformers.pipeline()` as a string or string array
@@ -68,20 +69,22 @@ AI model selection
 </script>
 
 <details>
-    <summary>Sprachmodell auswählen</summary>
+    <summary>
+        {i18n.text.modelSelector?.title}
+    </summary>
 
     <!-- Information about the loaded model -->
     <article>
         <header>
-            Aktuell verwendet
+            {i18n.text.modelSelector?.current?.title}
         </header>
 
         {#if modelState.loadedModel.status === "loading"}
-            <Loading text="Modell wird geladen"/>
+            <Loading text={i18n.text.modelSelector?.current?.loading}/>
         {:else if modelState.loadedModel.status === "error"}
             <IconText type="error" text={modelState.loadedModel.message}/>
         {:else if !modelState.loadedModel.modelId || !available_tasks.includes(modelState.loadedModel.task)}
-            <IconText text="Es wurde noch kein Modell geladen." textColor="darkgrey"/>
+            <IconText text={i18n.text.modelSelector?.current?.noneLoaded} textColor="darkgrey"/>
         {:else}
             <div class="loadedModel">
                 <div class="modelId">
@@ -100,11 +103,11 @@ AI model selection
     <!-- Load a model -->
     <article>
         <header>
-            Modell laden
+            {i18n.text.modelSelector?.load?.title}
         </header>
         <fieldset>
             <label>
-                <span>Inferenz-Backend</span>
+                <span>{i18n.text.modelSelector?.load?.backend}</span>
                 <select bind:value={selected_backendId} {disabled}>
                     {#each modelState.backends as backend}
                         <option value="{backend.id}">
@@ -115,7 +118,7 @@ AI model selection
             </label>
 
             <label>
-                <span>Sprachmodell</span>
+                <span>{i18n.text.modelSelector?.load?.model}</span>
                 <select bind:value={selected_modelId} {disabled}>
                     {#each available_models as model}
                         <option value="{model.modelId}">
@@ -127,7 +130,7 @@ AI model selection
 
             <div class="modelOptions">
                 <label>
-                    <span>Datentyp</span>
+                    <span>{i18n.text.modelSelector?.load?.dtype}</span>
                     <select bind:value={selected_dtype} {disabled}>
                         {#each selected_dtypes as dtype}
                             <option value={dtype}>{dtype}</option>
@@ -136,7 +139,7 @@ AI model selection
                 </label>
 
                 <label>
-                    <span>Ausführumgebung</span>
+                    <span>{i18n.text.modelSelector?.load?.device}</span>
                     <select bind:value={selected_device} {disabled}>
                         {#each modelState.devices as device}
                             <option value={device.device}>{device.label}</option>
@@ -146,7 +149,9 @@ AI model selection
             </div>
         </fieldset>
 
-        <button onclick={onLoadClicked} disabled={disabled || !selected_modelId}>Laden</button>
+        <button onclick={onLoadClicked} disabled={disabled || !selected_modelId}>
+            {i18n.text.modelSelector?.load?.load}
+        </button>
     </article>
 </details>
 

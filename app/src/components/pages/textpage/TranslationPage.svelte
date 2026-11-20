@@ -13,7 +13,6 @@ AI use case: translation.
 
 <script>
     import MarkdownIt      from 'markdown-it'
-    import {onMount}       from "svelte";
 
     import IconText        from "../../basic/IconText.svelte";
     import Loading         from "../../basic/Loading.svelte";
@@ -23,13 +22,14 @@ AI use case: translation.
 
     import navigationState from "../../../state/NavigationState.svelte.js";
     import modelState      from "../../../state/ModelState.svelte.js";
+    import i18n            from "../../../state/i18n.svelte.js";
     import pageState       from "./TranslationPage.svelte.js";
 
     let md = new MarkdownIt();
     let htmlResult = $derived(md.render(pageState.result));
 
-    onMount(() => {
-        navigationState.pageTitle = "Text übersetzen";
+    $effect(() => {
+        navigationState.pageTitle = i18n.text.textPage?.translation?.pageTitle;
     });
 
     async function onSubmit(event) {
@@ -45,7 +45,7 @@ AI use case: translation.
 <Section>
     <form onsubmit={onSubmit} class="grid">
         <label>
-            Von
+            {i18n.text.textPage?.translation?.source}
             <select value={pageState.sourceLanguage} disabled>
                 {#each Object.keys(modelState.config.translation.languages) as language}
                     <option value={language}>{modelState.config.translation.languages[language]}</option>
@@ -53,20 +53,25 @@ AI use case: translation.
             </select>
         </label>
         <label>
-            Nach
+            {i18n.text.textPage?.translation?.target}
             <select bind:value={pageState.targetLanguage} disabled={pageState.disabled}>
                 {#each modelState.loadedModel?.config?.languages as language}
                     <option value={language}>{modelState.config.translation.languages[language]}</option>
                 {/each}
             </select>
         </label>
-        <input type="submit" value="Start" disabled={pageState.disabled || !pageState.targetLanguage}/>
+
+        <input
+            type     = "submit"
+            value    = {i18n.text.textPage?.translation?.submit}
+            disabled = {pageState.disabled || !pageState.targetLanguage}
+        />
     </form>
 </Section>
 
 {#if pageState.working}
     <Section line={true}>
-        <Loading text="Antwort wird generiert"/>
+        <Loading text={i18n.text.textPage?.translation?.working}/>
     </Section>
 {:else if pageState.result}
     <Section line={true}>

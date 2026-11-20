@@ -12,8 +12,6 @@ Selected text page.
 -->
 
 <script>
-    import {onMount}             from "svelte";
-    
     import ChatPage              from "./common/ChatPage.svelte";
     import QuestionAnsweringPage from "./textpage/QuestionAnsweringPage.svelte";
     import SummaryPage           from "./textpage/SummaryPage.svelte";
@@ -23,6 +21,7 @@ Selected text page.
     import modelState            from "../../state/ModelState.svelte.js";
     import navigationState       from "../../state/NavigationState.svelte.js";
     import textPageState         from "../../state/TextPageState.svelte.js";
+    import i18n                  from "../../state/i18n.svelte.js";
 
     let {params = []} = $props()
     let textPageId = $derived(params[1]);
@@ -33,7 +32,7 @@ Selected text page.
         await textPageState.setCurrentPage(textPageId)
     });
     
-    onMount(() => {
+    $effect(() => {
         navigationState.header   = true;
         navigationState.backLink = true;
         
@@ -41,31 +40,31 @@ Selected text page.
             {
                 id:     "content",
                 icon:   "bi-text-left",
-                label:  "Inhalt",
+                label:  i18n.text.textPage?.content?.shortName,
                 url:    `#/page/${textPageId}/content`,
             },
             modelState.config.enabledFeatures.summary ? {
                 id:     "summary",
                 icon:   "bi-list-ol",
-                label:  "Kürzen",
+                label:  i18n.text.textPage?.summary?.shortName,
                 url:    `#/page/${textPageId}/summary`,
             } : null,
             modelState.config.enabledFeatures.qa ? {
                 id:     "qa",
                 icon:   "bi-chat",
-                label:  "Fragen",
+                label:  i18n.text.textPage?.qa?.shortName,
                 url:    `#/page/${textPageId}/qa`,
             } : null,
             modelState.config.enabledFeatures.translation ? {
                 id:     "translation",
                 icon:   "bi-translate",
-                label:  "Übersetzen",
+                label:  i18n.text.textPage?.translation?.shortName,
                 url:    `#/page/${textPageId}/translation`,
             } : null,
             modelState.config.enabledFeatures.chat ? {
                 id:     "chat",
                 icon:   "bi-chat-dots",
-                label:  "Chat",
+                label:  i18n.text.chatPage?.shortName,
                 url:    `#/page/${textPageId}/chat`,
             } : null,
         ].filter(e => e !== null);

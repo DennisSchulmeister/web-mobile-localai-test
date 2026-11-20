@@ -6,8 +6,11 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import BaseBackend from "./base.js";
-import {Capacitor, registerPlugin} from "@capacitor/core";
+import {Capacitor}      from "@capacitor/core";
+import {registerPlugin} from "@capacitor/core";
+
+import BaseBackend      from "./base.js";
+import i18n             from "../state/i18n.svelte.js";
 
 const nativeInference = registerPlugin("NativeInference");
 let nextRequestId = 0;
@@ -41,7 +44,7 @@ export default class AndroidBackend extends BaseBackend {
     }
 
     get name() {
-        return "ONNX Runtime (Android native)";
+        return i18n.text.backend?.android?.name;
     }
 
     get isSupported() {
@@ -104,7 +107,7 @@ export default class AndroidBackend extends BaseBackend {
                                      maxNewTokens, maxLength, doSample, temperature, repetitionPenalty
                                     } = {}) {
         if (this.#generationRequestId !== null) {
-            throw new Error("Textgenerierung läuft bereits.");
+            throw new Error(i18n.text.backend?.android?.alreadyRunning);
         }
 
         const requestId = `generation-${++nextRequestId}`;
@@ -119,7 +122,7 @@ export default class AndroidBackend extends BaseBackend {
             });
 
             if (this.#cancelRequested) {
-                throw new Error("Textgenerierung abgebrochen.");
+                throw new Error(i18n.text.backend?.android?.generationCancelled);
             }
 
             this.#generationStarted = true;

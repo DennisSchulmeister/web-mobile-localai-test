@@ -17,7 +17,7 @@ routes.set("/", wrap({
 }));
 
 // Home page with subpages
-routes.set(/^\/(overview|search|chat|info)$/, wrap({
+routes.set(/^\/(index|search|chat|info)$/, wrap({
     asyncComponent: () => import("./pages/HomePage.svelte"),
 }));
 

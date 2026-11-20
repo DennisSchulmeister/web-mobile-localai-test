@@ -12,21 +12,21 @@ Simple selection menu for the text page to display.
 -->
 
 <script>
-    import {onMount}       from "svelte";
     import SelectionList   from "../../basic/SelectionList.svelte"
     import navigationState from "../../../state/NavigationState.svelte.js";
     import textPageState   from "../../../state/TextPageState.svelte.js";
+    import i18n            from "../../../state/i18n.svelte.js";
     import {randomId}      from "../../../utils/id.js";
 
-    onMount(async () => {
-        navigationState.pageTitle = "Textseite auswählen";
+    $effect(() => {
+        navigationState.pageTitle = i18n.text.homePage?.index?.pageTitle;
     });
 
     let items = $derived.by(() => {
         if (!textPageState.categories) {
             return [{
                 type: "section",
-                text: "Liste wird geladen ...",
+                text: i18n.text.homePage?.index?.loading,
                 href: "",
             }];
         }
