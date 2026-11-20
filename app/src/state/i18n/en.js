@@ -145,4 +145,9 @@ export default {
             },
         },
     },
+    textGenerationStats: {
+        numberTokens:    "Tokens",
+        firstToken:      "First Token",
+        tokensPerSecond: "Tokens/Sec",
+    },
 };

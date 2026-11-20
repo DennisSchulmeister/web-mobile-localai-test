@@ -143,4 +143,9 @@ export default {
             },
         },
     },
+    textGenerationStats: {
+        numberTokens:    "Tokens",
+        firstToken:      "Erstes Token",
+        tokensPerSecond: "Tokens/Sek",
+    },
 };

@@ -6,6 +6,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+import i18n            from "./i18n.svelte.js";
 import {formatInteger} from "../utils/formatter.js";
 import {formatNumber}  from "../utils/formatter.js";
 import {formatSeconds} from "../utils/formatter.js";
@@ -21,19 +22,19 @@ export default class TextGenerationStatsState {
      */
     values = $state([
         {
-            name:      "Tokens",
+            name:      i18n.text.textGenerationStats?.numberTokens,
             icon:      "bi-braces",
             value:     0,
             formatted: "",
         },
         {
-            name:      "Erstes Token",
+            name:      i18n.text.textGenerationStats?.firstToken,
             icon:      "bi-stopwatch",
             value:     0.0,
             formatted: "",
         },
         {
-            name:      "Tokens/Sek",
+            name:      i18n.text.textGenerationStats?.tokensPerSecond,
             icon:      "bi-speedometer",
             value:     0.0,
             formatted: "",
