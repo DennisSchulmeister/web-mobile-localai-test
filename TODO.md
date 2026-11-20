@@ -32,6 +32,6 @@ README
 Docker
 ======
 
--[ ] Import fixtures during setup
--[ ] Create Django super user
+-[x] Import fixtures during setup
+-[x] Create Django super user
 -[ ] Inject backend URL into frontend app

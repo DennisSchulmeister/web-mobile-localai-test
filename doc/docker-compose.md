@@ -23,6 +23,16 @@ details as needed. The available variables are documented in `.env.template`. Re
 the `SECRET_KEY` in `server/wmlt/local_settings.py`; adjust its other deployment settings
 if needed. Do not use the template's example secret key for a deployed instance.
 
+On the first startup, the backend imports the fixtures listed in `DJANGO_FIXTURES`
+(comma-separated; defaults to the bundled prompt templates). To create an admin
+account, set `DJANGO_CREATE_SUPERUSER=true` and provide
+`DJANGO_SUPERUSER_USERNAME`, `DJANGO_SUPERUSER_EMAIL`, and
+`DJANGO_SUPERUSER_PASSWORD` in `.env`. Keep the password secret.
+
+Each step runs once per `python-dependencies` volume, which stores its completion
+marker. To rerun a step, remove its marker (`/opt/poetry/superuser-created` or
+`/opt/poetry/fixtures-imported`) from the backend container before restarting it.
+
 ## Start a profile
 
 Run these commands from the repository root:
