@@ -148,4 +148,11 @@ export default {
         firstToken:      "Erstes Token",
         tokensPerSecond: "Tokens/Sek",
     },
+    api: {
+        testRun: {
+            invalidAccessCode: "Üngültiger Zugangscode!",
+            accessCodeExpired: "Der Zugangscode ist abgelaufen!",
+            saveFailed:        "Fehler beim Speichern des Testereignisses (Status Code $STATUS$)!",
+        },
+    },
 };

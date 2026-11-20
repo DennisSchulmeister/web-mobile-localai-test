@@ -46,6 +46,8 @@ class TestRun(models.Model):
     installation    = models.CharField(_("Installation"), max_length=10)
     device_type     = models.CharField(_("Device Type"), max_length=25, choices=DeviceType)
     device_model    = models.CharField(_("Device Model"), max_length=100)
+    device_cpu      = models.CharField(_("Device CPU"), max_length=100, blank=True)
+    device_year     = models.IntegerField(_("Device Year"), null=True)
     os_family       = models.CharField(_("Operating System Family"), max_length=25, choices=OperatingSystemFamily)
     os_version      = models.CharField(_("Operating System Version"), max_length=25)
     browser_family  = models.CharField(_("Browser Family"), max_length=25, choices=BrowserFamily)

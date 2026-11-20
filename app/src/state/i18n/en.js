@@ -150,4 +150,11 @@ export default {
         firstToken:      "First Token",
         tokensPerSecond: "Tokens/Sec",
     },
+    api: {
+        testRun: {
+            invalidAccessCode: "Invalid access code!",
+            accessCodeExpired: "The access code has expired!",
+            saveFailed:        "Error when saving test event (status code $STATUS$)!",
+        },
+    },
 };

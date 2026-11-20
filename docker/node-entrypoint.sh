@@ -17,4 +17,8 @@ if [ ! -d static/_generated ]; then
     npm run init
 fi
 
+if [ -n "$API_PUBLIC_URL" ]; then
+    echo "$API_PUBLIC_URL" > static/api.url
+fi
+
 npm run build

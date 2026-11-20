@@ -74,6 +74,7 @@ class TestRunAdmin(admin.CustomModelAdmin):
         (_("Device Information"), {
             "fields": (
                 ("device_type", "device_model"),
+                ("device_cpu", "device_year"),
                 ("os_family", "os_version"),
                 ("browser_family", "browser_version"),
             ),
