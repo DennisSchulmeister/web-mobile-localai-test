@@ -4,8 +4,10 @@
 # This source code is licensed under the BSD 3-Clause License found in the
 # LICENSE file in the root directory of this source tree.
 
-from .              import models, serializers
-from rest_framework import viewsets
+from .                         import models, serializers
+from rest_framework            import viewsets
+from rest_framework.decorators import action
+from rest_framework.response   import Response
 
 class TestRunViewSet(viewsets.ModelViewSet):
     queryset         = models.TestRun.objects.all()
@@ -18,6 +20,16 @@ class TestRunViewSet(viewsets.ModelViewSet):
             return self.queryset.filter(access_code__access_code = access_code)
         else:
             return self.queryset
+
+    @action(detail=False, methods=["get"])
+    def last(self, request):
+        """Return the most recently saved test run visible to this request."""
+        testrun = self.get_queryset().order_by("-start_date", "-pk").first()
+
+        if testrun is None:
+            return Response(None)
+
+        return Response(self.get_serializer(testrun).data)
 
 class AbstractEventViewSet(viewsets.ModelViewSet):
     def get_testrun_lookup_path(self):

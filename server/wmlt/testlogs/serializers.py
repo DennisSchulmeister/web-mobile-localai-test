@@ -8,6 +8,8 @@ from .                          import models
 from ..auth.serializers         import AccessCodeCheckingModelSerializer
 
 from django.db                  import transaction
+from django.db.models           import Max
+from rest_framework             import serializers
 from rest_framework.serializers import ModelSerializer
 
 class TestRunSerializer(AccessCodeCheckingModelSerializer):
@@ -42,9 +44,26 @@ class EventSerializer(AbstractEventSerializer):
         fields = "__all__"
 
 class EventExceptionSerializer(AbstractEventSerializer):
+    seqnr = serializers.IntegerField(required=False, allow_null=True)
+
     class Meta:
         model  = models.EventException
         fields = "__all__"
+
+    def to_internal_value(self, data):
+        if data.get("seqnr") == "":
+            data = data.copy()
+            data["seqnr"] = None
+
+        return super().to_internal_value(data)
+
+    def validate(self, attrs):
+        if self.instance is None and attrs.get("seqnr") is None:
+            event = attrs["event"]
+            previous_seqnr = models.EventException.objects.filter(event=event).aggregate(max_seqnr=Max("seqnr"))["max_seqnr"]
+            attrs["seqnr"] = 1 if previous_seqnr is None else previous_seqnr + 1
+
+        return super().validate(attrs)
 
     def get_testrun(self, attrs):
         """``EventException`` is no event in itself, but is related to an event whose testrun

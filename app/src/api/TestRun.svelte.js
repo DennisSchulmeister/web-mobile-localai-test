@@ -122,14 +122,7 @@ class TestRunAPI {
      * @returns Last test run or `null`
      */
     async getPreviousTestRun() {
-        // TODO: Implement endpoint that returns the last test run only
-        let testRuns = await (await this.#fetch("GET", "testlogs/test_runs")).json();
-
-        if (Array.isArray(testRuns) && testRuns.length > 0) {
-            return testRuns.at(-1);
-        } else {
-            return null;
-        }
+        return await (await this.#fetch("GET", "testlogs/test_runs/last")).json();
     }
 
     /**
@@ -201,7 +194,19 @@ class TestRunAPI {
      */
     async saveEventException(event, id, error) {
         if (!this.enabled) return;
-        // TODO: Implement
+
+        let response = await this.#fetch("POST", "testlogs/event_exceptions", {
+            event:   id,
+            name:    error.name,
+            message: error.message,
+            stack:   error.stack,
+        });
+
+        if (response.status < 200 || response.status > 299) {
+            throw new Error(`${i18n.text.api?.testRun?.saveFailed}`.replaceAll("$STATUS$", response.status.toString()));
+        }
+
+        return await response.json();
     }
 }
 

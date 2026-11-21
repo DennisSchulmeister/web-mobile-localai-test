@@ -49,6 +49,26 @@ class PermissionTests(TestCase):
         response = self.client.get(reverse("test_run-detail", args=[self.second_testrun.pk]))
         self.assertEqual(response.status_code, 404)
 
+    def test_last_test_run_returns_latest_run_for_access_code(self):
+        self.first_testrun.start_date = timezone.now() - datetime.timedelta(days=1)
+        self.first_testrun.save(update_fields=["start_date"])
+        latest_testrun = self.create_testrun(self.first_access_code)
+
+        self.client.credentials(HTTP_AUTHORIZATION="access-code FIRST")
+        response = self.client.get(reverse("test_run-last"))
+
+        self.assertEqual(response.status_code, 200, response.data)
+        self.assertEqual(response.data["id"], latest_testrun.pk)
+
+    def test_last_test_run_returns_null_when_access_code_has_no_runs(self):
+        access_code = AccessCode.objects.create(access_code="EMPTY")
+        self.client.credentials(HTTP_AUTHORIZATION=f"access-code {access_code.access_code}")
+
+        response = self.client.get(reverse("test_run-last"))
+
+        self.assertEqual(response.status_code, 200, response.data)
+        self.assertIsNone(response.data)
+
     def test_invalid_and_expired_access_codes_are_denied(self):
         now = timezone.now()
 
