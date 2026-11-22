@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using these metadata."
+title: "Web/Mobile Test for Local AI"
+type: software
+authors:
+  - family-names: "Schulmeister-Zimolong"
+    given-names: "Dennis"
+    email: "dennis@windows3.de"
+repository-code: "https://github.com/DennisSchulmeister/web-mobile-localai-test"
+url: "https://github.com/DennisSchulmeister/web-mobile-localai-test"
+abstract: "A prototype exploring whether small AI language models can run locally in a web application on mobile devices with acceptable performance."
+license: "BSD-3-Clause"
+version: "1.0.0"
+date-released: "2026-11-22"
+keywords:
+  - "local-ai"
+  - "web"
+  - "mobile"
+  - "android"
+  - "django"
+  - "svelte"
+preferred-citation:
+  type: software
+  title: "Web/Mobile Test for Local AI"
+  authors:
+    - family-names: "Schulmeister-Zimolong"
+      given-names: "Dennis"
+      email: "dennis@windows3.de"
+  year: 2026
+  url: "https://github.com/DennisSchulmeister/web-mobile-localai-test"
+  version: "1.0.0"
