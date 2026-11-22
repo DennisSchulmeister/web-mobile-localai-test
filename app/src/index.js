@@ -32,3 +32,11 @@ document.documentElement.classList.toggle("native-app", Capacitor.isNativePlatfo
 
 // Mount the application frame to show the UI
 mount(ApplicationFrame, {target: document.body});
+
+// Record navigation events
+window.addEventListener("hashchange", async () => {
+    await testRunAPI.saveEvent("page_navigation", {
+        status:   "SUCCESS",
+        page_url: location.hash,
+    });
+});
