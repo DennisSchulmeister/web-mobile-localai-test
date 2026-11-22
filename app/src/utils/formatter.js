@@ -46,3 +46,21 @@ export function formatSeconds(number) {
     let seconds = Math.round(number / 10) / 100.0;
     return `${numberFormatter.format(seconds)}s`;
 }
+
+/**
+ * Format a time value measured in milliseconds as a duration string expected
+ * by the testrun API.
+ * 
+ * @param {number} number Milliseconds
+ * @returns {string} Time duration string
+ */
+export function formatDuration(number) {
+    let totalMicroseconds = Math.round(Math.abs(number) * 1000);
+    let hours             = Math.floor(totalMicroseconds / 3_600_000_000);
+    let minutes           = Math.floor(totalMicroseconds / 60_000_000) % 60;
+    let seconds           = Math.floor(totalMicroseconds / 1_000_000) % 60;
+    let microseconds      = totalMicroseconds % 1_000_000;
+    let sign              = number < 0 ? "-" : "";
+
+    return `${sign}${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}.${String(microseconds).padStart(6, "0")}`;
+}

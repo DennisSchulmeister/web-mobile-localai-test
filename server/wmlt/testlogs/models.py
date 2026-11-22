@@ -244,6 +244,9 @@ class SemanticSearchEvent(EventMixin, Event):
     include_sentences    = models.BooleanField(_("Include Sentences"))
     compare_embeddings   = models.BooleanField(_("Compare Embeddings"))
     compare_strings      = models.BooleanField(_("Compare Strings"))
+    download             = models.DurationField(_("Download Duration"), blank=True, null=True)
+    embedding            = models.DurationField(_("Embedding Duration"), blank=True, null=True)
+    search               = models.DurationField(_("Search Duration"), blank=True, null=True)
 
     class Meta:
         verbose_name        = _("Semantic Search Event")
@@ -261,13 +264,13 @@ class SemanticSearchResult(models.Model):
         KEYWORD  = "KEYWORD",  _("Keyword")
         SENTENCE = "SENTENCE", _("Sentence")
 
-    parent     = models.ForeignKey(SemanticSearchEvent, on_delete=models.CASCADE, related_name="results")
-    seqnr      = models.IntegerField(_("Sequence Number"))
-    page_url   = models.CharField("Page URL", max_length=50)
-    page_title = models.CharField(_("Page Title"), max_length=255)
-    text       = models.CharField(_("Matched Text"), max_length=255)
-    text_type  = models.CharField(_("Text Type"), max_length=15, choices=TextType)
-    similarity = models.SmallIntegerField(_("Similarity in %"), validators=[MinValueValidator(0), MaxValueValidator(100)], blank=True, null=True)
+    parent = models.ForeignKey(SemanticSearchEvent, on_delete=models.CASCADE, related_name="results")
+    seqnr  = models.IntegerField(_("Sequence Number"))
+    file   = models.CharField(_("Page File"), max_length=50)
+    title  = models.CharField(_("Page Title"), max_length=255)
+    text   = models.CharField(_("Matched Text"), max_length=255)
+    type   = models.CharField(_("Text Type"), max_length=15, choices=TextType)
+    fit    = models.SmallIntegerField(_("Similarity in %"), validators=[MinValueValidator(0), MaxValueValidator(100)], blank=True, null=True)
 
     class Meta:
         verbose_name        = _("Result Line")
@@ -276,7 +279,7 @@ class SemanticSearchResult(models.Model):
         get_latest_by       = ["parent__timestamp", "seqnr"]
 
     def __str__(self):
-        return f"{self.page_title}: {self.text} ({self.similarity}%)"
+        return f"{self.title}: {self.text} ({self.fit}%)"
 
 class RunPipelineEvent(EventMixin, Event):
     """Event: Run pipeline (not chat) event"""

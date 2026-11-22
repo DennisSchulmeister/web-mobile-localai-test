@@ -102,6 +102,7 @@ recording test events.
                 for (let backend of backends) {
                     let lines  = [];
                     let seqnr  = 0;
+                    let error1 = null;
 
                     try {
                         for (let line of await backend.getInformation()) {
@@ -116,24 +117,17 @@ recording test events.
                     } catch (error) {
                         console.error(error);
                         errorMessage = error.message || error.toString();
-
-                        let event = await testRunAPI.saveEvent("get_information", {
-                            status:      "ERROR",
-                            engine_id:   backend.id,
-                            engine_name: backend.name,
-                            lines:       lines,
-                        });
-
-                        await testRunAPI.saveEventException(event.id, error);
-                        continue;
+                        error1 = error;
                     }
 
-                    await testRunAPI.saveEvent("get_information", {
-                        status:      "SUCCESS",
+                    let event = await testRunAPI.saveEvent("get_information", {
+                        status:      error1 ? "ERROR" : "SUCCESS",
                         engine_id:   backend.id,
                         engine_name: backend.name,
                         lines:       lines,
                     });
+
+                    if (error1) await testRunAPI.saveEventException(event.id, error1);
                 }
             }
         } catch (error) {
@@ -258,6 +252,12 @@ recording test events.
                     <label>
                         {i18n.text.welcomePage?.browserVersion}
                         <input bind:value={testRunData.browser_version}/>
+                    </label>
+                </div>
+                <div class="grid">
+                    <label>
+                        {i18n.text.welcomePage?.remarks}
+                        <input bind:value={testRunData.remarks}/>
                     </label>
                 </div>
                 <div class="grid">

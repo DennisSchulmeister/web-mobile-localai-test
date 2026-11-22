@@ -543,7 +543,7 @@ class LoadModelEventAdmin(EventAdmin):
 
 class SemanticSearchResultInline(TabularInline):
     model  = models.SemanticSearchResult
-    fields = ("seqnr", "page_url", "page_title", "text", "text_type", "similarity")
+    fields = ("seqnr", "file", "title", "text", "type", "fit")
     extra  = 0
 
 class SemanticSearchEventAdmin(EventAdmin):
@@ -568,6 +568,11 @@ class SemanticSearchEventAdmin(EventAdmin):
                 ("include_keywords", "include_sentences", "compare_embeddings", "compare_strings"),
             ),
         }),
+        (_("Measurement"), {
+            "fields": (
+                ("download", "embedding", "search"),
+            ),
+        }),
     ]
 
     fieldsets_add = [
@@ -582,6 +587,11 @@ class SemanticSearchEventAdmin(EventAdmin):
             "fields": (
                 "query",
                 ("include_keywords", "include_sentences", "compare_embeddings", "compare_strings"),
+            ),
+        }),
+        (_("Measurement"), {
+            "fields": (
+                ("download", "embedding", "search"),
             ),
         }),
     ]

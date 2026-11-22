@@ -6,6 +6,7 @@
 
 from .base                import NestedObjectsAPITestCase
 
+from datetime             import timedelta
 from django.urls          import reverse
 
 from wmlt.testlogs.models import SemanticSearchEvent
@@ -22,14 +23,17 @@ class SemanticSearchEventNestedObjectsTests(NestedObjectsAPITestCase):
                 "include_sentences":  True,
                 "compare_embeddings": True,
                 "compare_strings":    False,
+                "download":           "00:00:00.217000",
+                "embedding":          "00:00:00.080000",
+                "search":             "00:00:00.001000",
                 "results": [
                     {
-                        "seqnr":      1,
-                        "page_url":   "https://example.test/one",
-                        "page_title": "First",
-                        "text":       "matched keyword",
-                        "text_type":  "KEYWORD",
-                        "similarity":  90,
+                        "seqnr": 1,
+                        "file":  "https://example.test/one",
+                        "title": "First",
+                        "text":  "matched keyword",
+                        "type":  "KEYWORD",
+                        "fit":   90,
                     }
                 ],
             },
@@ -38,19 +42,22 @@ class SemanticSearchEventNestedObjectsTests(NestedObjectsAPITestCase):
         event = SemanticSearchEvent.objects.get(pk=response.data["id"])
         result = event.results.get()
 
+        self.assertEqual(event.download, timedelta(microseconds=217000))
+        self.assertEqual(event.embedding, timedelta(microseconds=80000))
+        self.assertEqual(event.search, timedelta(microseconds=1000))
         self.assertEqual(
-            (result.seqnr, result.text, result.text_type, result.similarity),
+            (result.seqnr, result.text, result.type, result.fit),
             (1, "matched keyword", "KEYWORD", 90),
         )
         self.assertEqual(
             response.data["results"][0],
             {
-                "seqnr":      1,
-                "page_url":   "https://example.test/one",
-                "page_title": "First",
-                "text":       "matched keyword",
-                "text_type":  "KEYWORD",
-                "similarity": 90,
+                "seqnr": 1,
+                "file":  "https://example.test/one",
+                "title": "First",
+                "text":  "matched keyword",
+                "type":  "KEYWORD",
+                "fit":   90,
             },
         )
 
@@ -65,12 +72,12 @@ class SemanticSearchEventNestedObjectsTests(NestedObjectsAPITestCase):
                 "compare_strings":    False,
                 "results": [
                     {
-                        "seqnr":      1,
-                        "page_url":   "https://example.test/old",
-                        "page_title": "Old",
-                        "text":       "old match",
-                        "text_type":  "KEYWORD",
-                        "similarity": 70,
+                        "seqnr": 1,
+                        "file":  "https://example.test/old",
+                        "title": "Old",
+                        "text":  "old match",
+                        "type":  "KEYWORD",
+                        "fit":   70,
                     }
                 ],
             },
@@ -81,12 +88,12 @@ class SemanticSearchEventNestedObjectsTests(NestedObjectsAPITestCase):
         old_result_id  = old_result.pk
 
         replacement = {
-            "seqnr":      2,
-            "page_url":   "https://example.test/new",
-            "page_title": "New",
-            "text":       "new match",
-            "text_type":  "SENTENCE",
-            "similarity": 88,
+            "seqnr": 2,
+            "file":  "https://example.test/new",
+            "title": "New",
+            "text":  "new match",
+            "type":  "SENTENCE",
+            "fit":   88,
         }
         response = self.client.patch(
             reverse(f"{self.route_name}-detail", args=[event_id]),
@@ -102,7 +109,7 @@ class SemanticSearchEventNestedObjectsTests(NestedObjectsAPITestCase):
         new_result = event.results.get()
 
         self.assertEqual(
-            (new_result.text, new_result.text_type, new_result.similarity),
+            (new_result.text, new_result.type, new_result.fit),
             ("new match", "SENTENCE", 88),
         )
 
@@ -125,12 +132,12 @@ class SemanticSearchEventNestedObjectsTests(NestedObjectsAPITestCase):
                 "compare_strings":    False,
                 "results": [
                     {
-                        "seqnr":      1,
-                        "page_url":   "https://example.test/one",
-                        "page_title": "First",
-                        "text":       "match",
-                        "text_type":  "KEYWORD",
-                        "similarity": 90,
+                        "seqnr": 1,
+                        "file":  "https://example.test/one",
+                        "title": "First",
+                        "text":  "match",
+                        "type":  "KEYWORD",
+                        "fit":   90,
                     }
                 ],
             },

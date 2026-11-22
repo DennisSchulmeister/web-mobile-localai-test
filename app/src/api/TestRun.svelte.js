@@ -115,7 +115,13 @@ class TestRunAPI {
      * @returns Last test run or `null`
      */
     async getPreviousTestRun() {
-        return await (await this.#fetch("GET", "testlogs/test_runs/last")).json();
+        let response = await this.#fetch("GET", "testlogs/test_runs/last");
+
+        if (response.headers.get("content-type")?.includes("json")) {
+            return await response.json();
+        } else {
+            return null;
+        }
     }
 
     /**

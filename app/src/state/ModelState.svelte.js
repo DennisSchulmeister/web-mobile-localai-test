@@ -6,7 +6,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import backends from "../backends/index.js";
+import testRunAPI       from "../api/TestRun.svelte.js";
+import backends         from "../backends/index.js";
+import {formatDuration} from "../utils/formatter.js";
 
 /**
  * Configured AI models.
@@ -44,6 +46,7 @@ class ModelState {
         message: "",            // Error message when status is "error"
         config:  {},            // JSON configuration from the `models.json` file
         backend: null,          // Inference backend with methods for using the model
+        event:   null,          // Recorded Load Model event
     });
 
     /**
@@ -104,6 +107,9 @@ class ModelState {
      * @param {string} device Execution environment
      */
     async loadModel({task, modelId, backendId, dtype, device} = {}) {
+        let rethrow  = null;
+        let loadtime = new Date();
+
         try {
             if (modelId) {
                 this.loadedModel.status  = "loading";
@@ -126,7 +132,24 @@ class ModelState {
         } catch (error) {
             this.loadedModel.status  = "error";
             this.loadedModel.message = error.message || error.toString();
-            throw error;
+            rethrow = error;
+        }
+
+        loadtime = new Date() - loadtime;
+
+        this.loadedModel.event = await testRunAPI.saveEvent("load_model", {
+            status:    rethrow ? "ERROR" : "SUCCESS",
+            pipeline:  task,
+            engine_id: this.loadedModel.backend.id,
+            model_id:  modelId,
+            dtype:     dtype,
+            device:    device,
+            loadtime:  formatDuration(loadtime),
+        });
+
+        if (rethrow) {
+            await testRunAPI.saveEventException(this.loadedModel.event.id, rethrow);
+            throw rethrow;
         }
     }
 }

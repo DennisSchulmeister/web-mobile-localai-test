@@ -13,6 +13,8 @@ import StopWatchState    from "../../../state/StopWatchState.svelte.js";
 import textPageState     from "../../../state/TextPageState.svelte.js";
 import i18n              from "../../../state/i18n.svelte.js";
 
+import testRunAPI        from "../../../api/TestRun.svelte.js";
+import {formatDuration}  from "../../../utils/formatter.js";
 import {randomId}        from "../../../utils/id.js";
 import {decodeEmbedding} from "../../../../shared/embedding.js";
 
@@ -38,22 +40,30 @@ class SemanticSearchPageState {
      * Run semantic search.
      */
     async executeSearch() {
+        let rethrow = null;
+        let searchResults = [];
+
         try {
             if (!this.query) return;
             if (!modelState.loadedModel.status === "ready") return;
             if (!modelState.loadedModel.task === "feature-extraction") return;
     
-            this.working      = true;
-            let searchResults = [];
+            this.working = true;
             
             // Download the index files.
             this.stopWatchState.start(i18n.text.homePage?.search?.download, "bi-download");
             
             let indexes = [];
-            indexes.push(await(await fetch(this.embeddingPaths.keywords)).json());
+            indexes.push({
+                type:  "KEYWORD",
+                files: await(await fetch(this.embeddingPaths.keywords)).json(),
+            });
     
             if (this.searchAll) {
-                indexes.push(await(await fetch(this.embeddingPaths.sentences)).json());
+                indexes.push({
+                    type:  "SENTENCE",
+                    files: await(await fetch(this.embeddingPaths.sentences)).json(),
+                });
             }
     
             // Calculate the embedding for the search term.
@@ -74,7 +84,7 @@ class SemanticSearchPageState {
             }
     
             for (let index of indexes) {
-                for (let file in index) {
+                for (let file in index.files) {
                     let existingResult = true;
                     let searchResult   = searchResults.find(e => e.file === file);
     
@@ -83,7 +93,7 @@ class SemanticSearchPageState {
                         searchResult   = {file, title: "", fit: 0, texts: []};
                     }
     
-                    for (let entry of index[file]) {
+                    for (let entry of index.files[file]) {
                         this.progressValue += 1;
                         let fit = 0;
     
@@ -96,7 +106,7 @@ class SemanticSearchPageState {
                         if (fit < modelState.config.semanticSearch.fitThreshold) continue;
     
                         searchResult.fit = Math.max(searchResult.fit, fit);
-                        searchResult.texts.push({text: entry.text, fit});
+                        searchResult.texts.push({text: entry.text, fit, type: index.type});
                     }
     
                     searchResult.texts.sort((a, b) => a.fit - b.fit).reverse();
@@ -142,7 +152,58 @@ class SemanticSearchPageState {
             this.working      = false;
 
             this.stopWatchState.stop();
-            throw error;
+            rethrow = error;
+        }
+
+        // Log semantic search event
+        let results      = [];
+        let seqnr        = 0;
+        let measurements = {download: "", embedding: "", search: ""};
+
+        for (let searchResult of searchResults) {
+            for (let text of searchResult.texts) {
+                results.push({
+                    seqnr: ++seqnr,
+                    file:  searchResult.file,
+                    title: searchResult.title,
+                    text:  text.text,
+                    type:  text.type,
+                    fit:   Math.round(text.fit * 100),
+                });
+            }
+        }
+
+        for (let measurement of this.stopWatchState.measurements) {
+            switch (measurement.name) {
+                case i18n.text.homePage?.search?.download:
+                    measurements.download = formatDuration(measurement.runtime);
+                    break;
+                case i18n.text.homePage?.search?.embedding:
+                    measurements.embedding = formatDuration(measurement.runtime);
+                    break;
+                case i18n.text.homePage?.search?.search:
+                    measurements.search = formatDuration(measurement.runtime);
+                    break;
+            }
+        }
+
+        let event = await testRunAPI.saveEvent("semantic_search", {
+            status:             rethrow ? "ERROR" : "SUCCESS",
+            model:              modelState.loadedModel.event.id,
+            query:              this.query,
+            include_keywords:   true,
+            include_sentences:  this.searchAll,
+            compare_embeddings: true,
+            compare_strings:    this.matchText,
+            results:            results,
+            download:           measurements.download,
+            embedding:          measurements.embedding,
+            search:             measurements.search,
+        });
+
+        if (rethrow) {
+            await testRunAPI.saveEventException(event.id, rethrow);
+            throw rethrow;
         }
     }
 }

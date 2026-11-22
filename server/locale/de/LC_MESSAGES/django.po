@@ -846,6 +846,10 @@ msgstr "Satz"
 msgid "Page Title"
 msgstr "Seitentitel"
 
+#: wmlt/testlogs/models.py:266
+msgid "Page File"
+msgstr "Seiten-Datei"
+
 #: wmlt/testlogs/models.py:268
 msgid "Matched Text"
 msgstr "Übereinstimmender Text"
