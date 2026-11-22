@@ -40,7 +40,7 @@ class SemanticSearchPageState {
      * Run semantic search.
      */
     async executeSearch() {
-        let rethrow = null;
+        let rethrow;
         let searchResults = [];
 
         try {

@@ -29,7 +29,7 @@ class QuestionAnsweringPageState {
      * Answer the entered question.
      */
     async execute() {
-        let rethrow = null;
+        let rethrow;
 
         try {
             if (!this.question) return;

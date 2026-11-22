@@ -41,7 +41,7 @@ AI use case: open-ended LLM chat.
 
     async function onReset(event) {
         event.preventDefault();
-        pageState.reset();
+        return pageState.reset();
     }
 
     /**

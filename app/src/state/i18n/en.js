@@ -140,7 +140,7 @@ export default {
         title: "Language Model",
         current: {
             title:      "Currently Used",
-            loading:    "Model is being loaded.",
+            loading:    "Loading model.",
             noneLoaded: "No model has been loaded."
         },
         load: {

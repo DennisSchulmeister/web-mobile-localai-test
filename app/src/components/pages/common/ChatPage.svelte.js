@@ -6,11 +6,14 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+import testRunAPI               from "../../../api/TestRun.svelte.js";
+import i18n                     from "../../../state/i18n.svelte.js";
 import modelState               from "../../../state/ModelState.svelte";
 import StopWatchState           from "../../../state/StopWatchState.svelte.js";
 import TextGenerationStatsState from "../../../state/TextGenerationStatsState.svelte.js";
 import textPageState            from "../../../state/TextPageState.svelte.js";
 import {randomId}               from "../../../utils/id.js";
+import {formatDuration}         from "../../../utils/formatter.js";
 
 /**
  * Persistent state for the chat so it is not lost during navigation.
@@ -43,33 +46,41 @@ class ChatPageState {
         return error;
     }
 
-    textPage         = $state(false);
+    textPage                  = $state(false);
+    
+    #messagesHome             = $derived.by(this.#messagesCallback);
+    #messagesTextPage         = $derived.by(() => {textPageState.currentPage.file; return this.#messagesCallback()});
+    messages                  = $derived(this.textPage ? this.#messagesTextPage : this.#messagesHome);
+    
+    #errorHome                = $derived.by(this.#errorCallback);
+    #errorTextPage            = $derived.by(() => {textPageState.currentPage.file; return this.#errorCallback()});
+    error                     = $derived(this.textPage ? this.#errorTextPage : this.#errorHome);
 
-    messagesHome     = $derived.by(this.#messagesCallback);
-    messagesTextPage = $derived.by(() => {textPageState.currentPage.file; return this.#messagesCallback()});
-    messages         = $derived(this.textPage ? this.messagesTextPage : this.messagesHome);
-
-    errorHome        = $derived.by(this.#errorCallback);
-    errorTextPage    = $derived.by(() => {textPageState.currentPage.file; return this.#errorCallback()});
-    error            = $derived(this.textPage ? this.errorTextPage : this.errorHome);
+    #startChatEventIdHome     = $state(0);
+    #startChatEventIdTextPage = $derived.by(() => {textPageState.currentPage.file; return 0});
+    #startChatEventId         = $derived(this.textPage ? this.#startChatEventIdTextPage : this.#startChatEventIdHome);
 
     /**
      * Generate text for the current task.
      */
     async execute() {
+        let question;
+        let context;
         let response;
+        let rethrow;
 
         try {
             if (this.disabled) return;
+            if (!this.#startChatEventId) await this.reset();
 
-            this.working = true;
+            this.working       = true;
             this.error.message = "";
 
             // Briefly yield so the loading state can appear in the UI.
             await new Promise(resolve => window.setTimeout(resolve, 500));
 
-            let question = this.question.trim();
-            let context  = this.textPage ? textPageState.currentPage.content : "";
+            question = this.question.trim();
+            context  = this.textPage ? textPageState.currentPage.content : "";
 
             this.messages.push({
                 id:        randomId(),
@@ -113,7 +124,49 @@ class ChatPageState {
                 response.stats.stop();
             }
             
-            throw error;
+            rethrow = error;
+        }
+
+        // Log chat message event
+        let measurements = {
+            firstToken:      "",
+            runtime:         formatDuration(response.stopWatch.measurements[0].runtime),
+            numberTokens:    0,
+            tokensPerSecond: 0.0,
+        }
+
+        for (let value of response?.stats.values) {
+            switch (value.name) {
+                case i18n.text.textGenerationStats?.numberTokens:
+                    measurements.numberTokens = value.value;
+                    break;
+                case i18n.text.textGenerationStats?.firstToken:
+                    measurements.firstToken = formatDuration(value.value);
+                    break;
+                case i18n.text.textGenerationStats?.tokensPerSecond:
+                    measurements.tokensPerSecond = value.value;
+                    break;
+            }
+        }
+
+        let event = await testRunAPI.saveEvent("chat_message", {
+            status:            rethrow ? "ERROR" : "SUCCESS",
+            chat:              this.#startChatEventId,
+            model:             modelState.loadedModel.event?.id || 0,
+            user_message:      question,
+            context:           context,
+            max_tokens:        this.maxNewTokens,
+            sampling:          this.doSample,
+            assistant_message: response?.content || "",
+            first_token:       measurements.firstToken,
+            runtime:           measurements.runtime,
+            tokens:            measurements.numberTokens,
+            tokens_per_second: measurements.tokensPerSecond,
+        });
+
+        if (rethrow) {
+            await testRunAPI.saveEventException(event.id, rethrow);
+            throw rethrow;
         }
     }
 
@@ -132,9 +185,21 @@ class ChatPageState {
     /**
      * Reset the messages.
      */
-    reset() {
+    async reset() {
         this.messages.splice(0);
         this.error.message = "";
+
+        // Log start chat event
+        let event = await testRunAPI.saveEvent("start_chat", {
+            status:    "SUCCESS",
+            page_file: textPageState.currentPage?.file || "",
+        });
+
+        if (this.textPage) {
+            this.#startChatEventIdTextPage = event.id;
+        } else {
+            this.#startChatEventIdHome = event.id;
+        }
     }
 }
 

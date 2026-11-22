@@ -305,7 +305,7 @@ class RunPipelineEvent(EventMixin, Event):
 
 class StartChatEvent(EventMixin, Event):
     """Event: Start Chat"""
-    page_file = models.CharField(_("Page File"), max_length=50)
+    page_file = models.CharField(_("Page File"), max_length=50, blank=True)
 
     class Meta:
         verbose_name        = _("Start Chat Event")

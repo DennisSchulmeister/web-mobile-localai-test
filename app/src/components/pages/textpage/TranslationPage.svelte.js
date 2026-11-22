@@ -30,7 +30,7 @@ class TranslationPageState {
      * Translate text.
      */
     async execute() {
-        let rethrow = null;
+        let rethrow;
 
         try {
             if (this.disabled) return;

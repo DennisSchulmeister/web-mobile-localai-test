@@ -547,19 +547,31 @@ class SemanticSearchResultInline(TabularInline):
     extra  = 0
 
 class SemanticSearchEventAdmin(EventAdmin):
-    model   = models.SemanticSearchEvent
+    model              = models.SemanticSearchEvent
     list_display       = ["testrun", "timestamp", "model", "query", *testrun_display]
     list_display_links = ["testrun", "timestamp", "model", "query", *testrun_display]
     ordering           = ["testrun", "timestamp", "id"]
     list_filter        = ["testrun", "timestamp", "model", *testrun_filter]
     inlines            = [SemanticSearchResultInline, *EventAdmin.inlines]
 
+    readonly_fields = [
+        *EventAdmin.readonly_fields,
+        "model__pipeline",
+        "model__pipeline_display",
+        "model__engine_id",
+        "model__model_id",
+        "model__dtype",
+        "model__device",
+    ]
+
     fieldsets = [
         *testrun_fieldsets,
         *event_fieldsets,
         (_("Model"), {
             "fields": (
-                "model",
+                "model__pipeline_display",
+                ("model__engine_id", "model__model_id"),
+                ("model__dtype", "model__device"),
             ),
         }),
         (_("Search Request"), {
@@ -595,6 +607,34 @@ class SemanticSearchEventAdmin(EventAdmin):
             ),
         }),
     ]
+
+    @display(description=_("Model ID"))
+    def model__model_id(self, obj):
+        return obj.model.model_id
+
+    @display(description=_("Pipeline"))
+    def model__pipeline(self, obj):
+        return obj.model.pipeline
+
+    @display(description=_("Pipeline"))
+    def model__pipeline_display(self, obj):
+        return obj.model.get_pipeline_display()
+
+    @display(description=_("Engine ID"))
+    def model__engine_id(self, obj):
+        return obj.model.engine_id
+
+    @display(description=_("Model ID"))
+    def model__model_id(self, obj):
+        return obj.model.model_id
+
+    @display(description=_("Quantization"))
+    def model__dtype(self, obj):
+        return obj.model.dtype
+
+    @display(description=_("Device"))
+    def model__device(self, obj):
+        return obj.model.device
 
 class RunPipelineEventAdmin(EventAdmin):
     model              = models.RunPipelineEvent
