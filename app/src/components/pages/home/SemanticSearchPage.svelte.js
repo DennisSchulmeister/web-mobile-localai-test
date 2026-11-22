@@ -78,8 +78,8 @@ class SemanticSearchPageState {
             this.progressMax = 0;
     
             for (let index of indexes) {            
-                for (let file in index) {
-                    this.progressMax += index[file].length;
+                for (let file in index.files) {
+                    this.progressMax += index.files[file].length;
                 }
             }
     
@@ -187,9 +187,10 @@ class SemanticSearchPageState {
             }
         }
 
+        // Log semantic search event
         let event = await testRunAPI.saveEvent("semantic_search", {
             status:             rethrow ? "ERROR" : "SUCCESS",
-            model:              modelState.loadedModel.event.id,
+            model:              modelState.loadedModel.event?.id || 0,
             query:              this.query,
             include_keywords:   true,
             include_sentences:  this.searchAll,

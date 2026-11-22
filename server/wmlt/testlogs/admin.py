@@ -625,7 +625,7 @@ class RunPipelineEventAdmin(EventAdmin):
         }),
         (_("Context"), {
             "fields": (
-                "page_url",
+                "page_file",
                 "context",
             ),
         }),
@@ -652,7 +652,7 @@ class RunPipelineEventAdmin(EventAdmin):
         *event_fieldsets_add,
         (_("Model and Context"), {
             "fields": (
-                ("model", "page_url"),
+                ("model", "page_file"),
                 "context",
             ),
         }),
@@ -704,17 +704,17 @@ class RunPipelineEventAdmin(EventAdmin):
     
 class StartChatEventAdmin(EventAdmin):
     model              = models.StartChatEvent
-    list_display       = ["testrun", "timestamp", "page_url", *testrun_display]
-    list_display_links = ["testrun", "timestamp", "page_url", *testrun_display]
+    list_display       = ["testrun", "timestamp", "page_file", *testrun_display]
+    list_display_links = ["testrun", "timestamp", "page_file", *testrun_display]
     ordering           = ["testrun", "timestamp", "id"]
-    list_filter        = ["timestamp", "page_url", *testrun_filter]
+    list_filter        = ["timestamp", "page_file", *testrun_filter]
 
     fieldsets = [
         *testrun_fieldsets,
         *event_fieldsets,
         (_("Start Chat"), {
             "fields": (
-                "page_url",
+                "page_file",
             )
         }),
     ]
@@ -724,7 +724,7 @@ class StartChatEventAdmin(EventAdmin):
         *event_fieldsets_add,
         (_("Start Chat"), {
             "fields": (
-                "page_url",
+                "page_file",
             )
         }),
     ]
@@ -764,7 +764,7 @@ class ChatMessageEventAdmin(EventAdmin):
 
     readonly_fields = [
         *EventAdmin.readonly_fields,
-        "chat__page_url",
+        "chat__page_file",
         "chat__timestamp_display",
         "model__pipeline",
         "model__pipeline_display",
@@ -779,7 +779,7 @@ class ChatMessageEventAdmin(EventAdmin):
         *event_fieldsets,
         (_("Chat"), {
             "fields": (
-                ("chat__page_url", "chat__timestamp_display"),
+                ("chat__page_file", "chat__timestamp_display"),
             ),
         }),
         (_("Model"), {
@@ -835,9 +835,9 @@ class ChatMessageEventAdmin(EventAdmin):
         }),
     ]
 
-    @display(description=_("Page URL"))
-    def chat__page_url(self, obj):
-        return obj.chat.page_url
+    @display(description=_("Page File"))
+    def chat__page_file(self, obj):
+        return obj.chat.page_file
 
     @display(description=_("Timestamp"))
     def chat__timestamp_display(self, obj):

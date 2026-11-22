@@ -42,7 +42,7 @@ class TestRun(models.Model):
         OTHER   = "OTHER",   _("Other")
 
     start_date      = models.DateTimeField(_("Started at"), default=timezone.now)
-    access_code     = models.ForeignKey("wmlt_auth.AccessCode", on_delete=models.SET_NULL, null=True)
+    access_code     = models.ForeignKey("wmlt_auth.AccessCode", on_delete=models.CASCADE, null=True)
     app_type        = models.CharField(_("App Type"), max_length=25, choices=AppType)
     device_type     = models.CharField(_("Device Type"), max_length=25, choices=DeviceType)
     device_model    = models.CharField(_("Device Model"), max_length=100)
@@ -283,7 +283,7 @@ class SemanticSearchResult(models.Model):
 
 class RunPipelineEvent(EventMixin, Event):
     """Event: Run pipeline (not chat) event"""
-    page_url        = models.CharField(_("Page URL"), max_length=50)
+    page_file       = models.CharField(_("Page File"), max_length=50)
     model           = models.ForeignKey(LoadModelEvent, on_delete=models.SET_NULL, blank=True, null=True)
     query           = models.CharField(_("Query"), max_length=255, blank=True)
     context         = models.TextField(_("Context"), blank=True)
@@ -298,14 +298,14 @@ class RunPipelineEvent(EventMixin, Event):
         verbose_name_plural = _("Run Pipeline Events")
 
     def __str__(self):
-        return f"{self.page_url}: {self.model.pipeline if self.model else ''}"
+        return f"{self.page_file}: {self.model.pipeline if self.model else ''}"
 
     def save(self, *args, **kwargs):
         return super().save(self.EventType.RUN_PIPELINE, *args, **kwargs)
 
 class StartChatEvent(EventMixin, Event):
     """Event: Start Chat"""
-    page_url = models.CharField(_("Page URL"), max_length=50)
+    page_file = models.CharField(_("Page File"), max_length=50)
 
     class Meta:
         verbose_name        = _("Start Chat Event")
@@ -313,7 +313,7 @@ class StartChatEvent(EventMixin, Event):
 
     def __str__(self):
         timestamp = date_format(self.timestamp, "DATETIME_FORMAT")
-        return f"{self.page_url}: {timestamp}"
+        return f"{self.page_file}: {timestamp}"
     
     def save(self, *args, **kwargs):
         return super().save(self.EventType.START_CHAT, *args, **kwargs)

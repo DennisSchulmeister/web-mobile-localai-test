@@ -6,10 +6,12 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import modelState     from "../../../state/ModelState.svelte";
-import StopWatchState from "../../../state/StopWatchState.svelte.js";
-import textPageState  from "../../../state/TextPageState.svelte.js";
-import i18n           from "../../../state/i18n.svelte.js";
+import testRunAPI       from "../../../api/TestRun.svelte.js";
+import modelState       from "../../../state/ModelState.svelte";
+import StopWatchState   from "../../../state/StopWatchState.svelte.js";
+import textPageState    from "../../../state/TextPageState.svelte.js";
+import i18n             from "../../../state/i18n.svelte.js";
+import {formatDuration} from "../../../utils/formatter.js";
 
 /**
  * Persistent state for the "Translate" page so it is not lost during navigation.
@@ -28,6 +30,8 @@ class TranslationPageState {
      * Translate text.
      */
     async execute() {
+        let rethrow = null;
+
         try {
             if (this.disabled) return;
     
@@ -53,7 +57,24 @@ class TranslationPageState {
             this.working      = false;
 
             this.stopWatchState.stop();
-            throw error;
+            rethrow = error;
+        }
+
+        // Log run pipeline event
+        let event = await testRunAPI.saveEvent("run_pipeline", {
+            status:          rethrow ? "ERROR" : "SUCCESS",
+            page_file:       textPageState.currentPage.file,
+            model:           modelState.loadedModel.event?.id || 0,
+            context:         textPageState.currentPage.simplified,
+            source_language: this.sourceLanguage,
+            target_language: this.targetLanguage,
+            result:          this.result,
+            runtime:         formatDuration(this.stopWatchState.measurements[0].runtime),
+        });
+
+        if (rethrow) {
+            await testRunAPI.saveEventException(event.id, rethrow);
+            throw rethrow;
         }
     }
 }
