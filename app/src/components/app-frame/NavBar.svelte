@@ -37,6 +37,7 @@ Top navigation bar
     {#if testRunAPI.accessCode}
         <label>
             <input type="checkbox" role="switch" bind:checked={testRunAPI.recording}/>
+            <span class="recording bi-record-fill" class:active={testRunAPI.recording} class:inactive={!testRunAPI.recording}></span>
             {testRunAPI.accessCode}
         </label>
     {/if}
@@ -81,5 +82,26 @@ Top navigation bar
 
     label {
         color: var(--color4);
+    }
+
+    @keyframes blink {
+        0% {
+            color: darkred;
+        }
+        100% {
+            color: red;
+        }
+    }
+
+    .recording {
+        transition: color 2s;
+
+        &.inactive {
+            color: rgba(255,255,255, 0.25);
+        }
+
+        &.active {
+            animation: blink 1.5s alternate infinite;
+        }
     }
 </style>
