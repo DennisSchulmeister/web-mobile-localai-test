@@ -33,7 +33,6 @@ class NestedObjectsAPITestCase(TestCase):
         self.testrun = TestRun.objects.create(
             access_code     = access_code,
             app_type        = TestRun.AppType.BROWSER,
-            installation    = "test",
             device_type     = TestRun.DeviceType.PC,
             device_model    = "Test computer",
             os_family       = TestRun.OperatingSystemFamily.LINUX,

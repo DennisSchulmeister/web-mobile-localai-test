@@ -47,7 +47,7 @@ class TextPageState {
             let page = this.findTextPage(pageFile);
             this.currentPage.language = page?.language || "";
         } catch (error) {
-            this.currentPage.content  = error.toString();
+            this.currentPage.content  = error.message || error.toString();
             this.currentPage.language = "en";
             throw error;
         }

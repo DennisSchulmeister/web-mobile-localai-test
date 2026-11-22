@@ -105,7 +105,7 @@ class ChatPageState {
             this.working  = false;
             this.question = "";
         } catch (error) {
-            this.error.message = error.toString();
+            this.error.message = error.message || error.toString();
             this.working       = false;
 
             if (response) {
@@ -124,7 +124,7 @@ class ChatPageState {
         try {
             await modelState.loadedModel.backend.stopTextGeneration();
         } catch (error) {
-            this.error.message = error.toString();
+            this.error.message = error.message || error.toString();
             throw error;
         }
     }

@@ -37,6 +37,9 @@ class IsValidAccessCode(BasePermission):
     keyword = "access-code"
 
     def has_permission(self, request, view):
+        if request.method == "OPTIONS":
+            return True
+        
         authorization_header = get_authorization_header(request).split()
 
         if authorization_header and authorization_header[0].lower() == self.keyword.lower().encode():
@@ -57,6 +60,6 @@ class IsValidAccessCode(BasePermission):
                 request.access_code = access_code
                 return True
             else:
-                return False
+                raise PermissionDenied(_("Invalid access code received."))
         else:
             return DjangoModelPermissionsWithRead().has_permission(request, view)

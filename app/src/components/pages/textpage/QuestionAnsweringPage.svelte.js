@@ -47,7 +47,7 @@ class QuestionAnsweringPageState {
             this.stopWatchState.stop();
             this.working = false;
         } catch (error) {
-            this.errorMessage = error.toString();
+            this.errorMessage = error.message || error.toString();
             this.working      = false;
 
             this.stopWatchState.stop();

@@ -138,7 +138,7 @@ class SemanticSearchPageState {
                 this.items.push(item);
             }
         } catch (error) {
-            this.errorMessage = error.toString();
+            this.errorMessage = error.message || error.toString();
             this.working      = false;
 
             this.stopWatchState.stop();

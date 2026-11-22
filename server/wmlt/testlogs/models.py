@@ -21,6 +21,7 @@ class TestRun(models.Model):
         PHONE  = "PHONE",  _("Smartphone")
         TABLET = "TABLET", _("Tablet")
         PC     = "PC",     _("Personal Computer")
+        OTHER  = "OTHER",  _("Other")
 
     class OperatingSystemFamily(models.TextChoices):
         ANDROID  = "ANDROID",  _("Android")
@@ -43,11 +44,10 @@ class TestRun(models.Model):
     start_date      = models.DateTimeField(_("Started at"), default=timezone.now)
     access_code     = models.ForeignKey("wmlt_auth.AccessCode", on_delete=models.SET_NULL, null=True)
     app_type        = models.CharField(_("App Type"), max_length=25, choices=AppType)
-    installation    = models.CharField(_("Installation"), max_length=10)
     device_type     = models.CharField(_("Device Type"), max_length=25, choices=DeviceType)
     device_model    = models.CharField(_("Device Model"), max_length=100)
-    device_cpu      = models.CharField(_("Device CPU"), max_length=100, blank=True)
-    device_year     = models.IntegerField(_("Device Year"), null=True)
+    device_year     = models.IntegerField(_("Model Year"), null=True, blank=True)
+    device_cpu      = models.CharField(_("CPU"), max_length=100, blank=True)
     os_family       = models.CharField(_("Operating System Family"), max_length=25, choices=OperatingSystemFamily)
     os_version      = models.CharField(_("Operating System Version"), max_length=25)
     browser_family  = models.CharField(_("Browser Family"), max_length=25, choices=BrowserFamily)

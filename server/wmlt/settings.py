@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "wmlt.testlogs",
 
     "rest_framework",
+    "corsheaders",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -45,6 +46,7 @@ X_FRAME_OPTIONS = "SAMEORIGIN"
 SILENCED_SYSTEM_CHECKS = ["security.W019"]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -54,6 +56,9 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = "wmlt.urls"
 
@@ -108,6 +113,10 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTH_USER_MODEL = "wmlt_auth.User"
 
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.BasicAuthentication",
+    ],
+
     # NOTE: This list works different than the Django auth backends. Django auth
     # backends are chained, so that a failed check falls through to the next auth
     # backend. DRF permissions are ANDed, however. They all must return True for

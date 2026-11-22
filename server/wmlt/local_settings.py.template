@@ -18,6 +18,11 @@ CSRF_COOKIE_DOMAIN = os.environ.get("CSRF_COOKIE_DOMAIN") or None
 SESSION_COOKIE_DOMAIN = os.environ.get("SESSION_COOKIE_DOMAIN") or None
 FORCE_SCRIPT_NAME = os.environ.get("DJANGO_SCRIPT_NAME") or None
 
+# CORS Headers
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGINS = []
+CORS_ALLOWED_ORIGIN_REGEXES = []
+
 # Built-in database engines:
 #   * "django.db.backends.postgresql"
 #   * "django.db.backends.mysql"

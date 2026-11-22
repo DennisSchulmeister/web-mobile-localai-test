@@ -30,7 +30,6 @@ class PermissionTests(TestCase):
         return TestRun.objects.create(
             access_code     = access_code,
             app_type        = TestRun.AppType.BROWSER,
-            installation    = "test",
             device_type     = TestRun.DeviceType.PC,
             device_model    = "Test computer",
             os_family       = TestRun.OperatingSystemFamily.LINUX,
@@ -45,9 +44,32 @@ class PermissionTests(TestCase):
         response = self.client.get(reverse("test_run-list"))
         self.assertEqual(response.status_code, 200, response.data)
         self.assertEqual([item["id"] for item in response.data], [self.first_testrun.pk])
+        self.assertEqual(response.data[0]["access_code"], "FIRST")
 
         response = self.client.get(reverse("test_run-detail", args=[self.second_testrun.pk]))
         self.assertEqual(response.status_code, 404)
+
+    def test_testrun_accepts_access_code_value_when_creating(self):
+        self.client.credentials(HTTP_AUTHORIZATION="access-code FIRST")
+
+        response = self.client.post(
+            reverse("test_run-list"),
+            {
+                "access_code": "FIRST",
+                "app_type": TestRun.AppType.BROWSER,
+                "device_type": TestRun.DeviceType.PC,
+                "device_model": "Test computer",
+                "os_family": TestRun.OperatingSystemFamily.LINUX,
+                "os_version": "1",
+                "browser_family": TestRun.BrowserFamily.FIREFOX,
+                "browser_version": "1",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 201, response.data)
+        self.assertEqual(response.data["access_code"], "FIRST")
+        self.assertEqual(TestRun.objects.get(pk=response.data["id"]).access_code, self.first_access_code)
 
     def test_last_test_run_returns_latest_run_for_access_code(self):
         self.first_testrun.start_date = timezone.now() - datetime.timedelta(days=1)

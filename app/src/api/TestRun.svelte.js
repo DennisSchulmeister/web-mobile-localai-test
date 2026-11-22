@@ -66,11 +66,13 @@ class TestRunAPI {
         };
 
         if (body) {
-            options.body = JSON.serialize(body);
+            options.body = JSON.stringify(body);
+            options.headers["content-type"] = "application/json";
+            options.headers["accept"] = "application/json";
         }
 
         if (accessCode || this.accessCode) {
-            options.headers["Authentication"] = `access-code ${accessCode || this.accessCode}`;
+            options.headers["Authorization"] = `access-code ${accessCode || this.accessCode}`;
         }
 
         return fetch(`${this.#apiUrl}/api/${url}`, options);
@@ -85,23 +87,16 @@ class TestRunAPI {
      * @throws On connection error or invalid access code
      */
     async connect(accessCode) {
-        // Check access code exists and is valid
+        // Check access code exists and is valid (actually checked by the server)
         this.#apiUrl = await (await fetch("api.url")).text();
-        let response = await this.#fetch("GET", "auth/access_codes", none, false, accessCode);
+        let response = await this.#fetch("GET", "auth/access_codes", null, false, accessCode);
 
         if (response.status !== 200) {
             throw new Error(i18n.text.api?.testRun?.invalidAccessCode);
         }
 
-        let data = await response.json();
-        let validFrom = new Date(data.valid_from);
-        let validTo   = new Date(data.valid_to);
-        let now       = new Date();
-
-        if (validFrom > now || validTo < now) {
-            throw new Error(i18n.text.api?.testRun?.accessCodeExpired);
-        }
-
+        await response.json();
+        
         // Confirm connection
         this.accessCode = accessCode;
         this.recording  = true;
@@ -136,7 +131,7 @@ class TestRunAPI {
         if (!data) data = {};
         data.access_code = this.accessCode;
 
-        let response = await this.#fetch("POST", "testlogs/test_runs", data);
+        let response = await this.#fetch("POST", "testlogs/test_runs/", data);
 
         if (response.status < 200 || response.status > 299) {
             throw new Error(`${i18n.text.api?.testRun?.saveFailed}`.replaceAll("$STATUS$", response.status.toString()));
@@ -174,7 +169,7 @@ class TestRunAPI {
         if (!data) data = {};
         data.testrun = this.#testRunId;
 
-        let response = await this.#fetch("POST", `testlogs/${event}_events`, data, keepAlive);
+        let response = await this.#fetch("POST", `testlogs/${event}_events/`, data, keepAlive);
 
         if (response.status < 200 || response.status > 299) {
             throw new Error(`${i18n.text.api?.testRun?.saveFailed}`.replaceAll("$STATUS$", response.status.toString()));
@@ -187,16 +182,15 @@ class TestRunAPI {
      * Attach a catched exception to a previously saved event. Like `saveEvent()` has
      * no effect, when no access code is given or recording is disabled.
      * 
-     * @param {string} event Event name in snake-case
-     * @param {number} id Event ID
+     * @param {number} eventId Event ID
      * @param {Error} error Catch error object
      * @returns Saved exception data
      */
-    async saveEventException(event, id, error) {
+    async saveEventException(eventId, error) {
         if (!this.enabled) return;
 
-        let response = await this.#fetch("POST", "testlogs/event_exceptions", {
-            event:   id,
+        let response = await this.#fetch("POST", "testlogs/event_exceptions/", {
+            event:   eventId,
             name:    error.name,
             message: error.message,
             stack:   error.stack,

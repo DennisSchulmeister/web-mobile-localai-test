@@ -125,7 +125,7 @@ class ModelState {
             }
         } catch (error) {
             this.loadedModel.status  = "error";
-            this.loadedModel.message = error.toString();
+            this.loadedModel.message = error.message || error.toString();
             throw error;
         }
     }

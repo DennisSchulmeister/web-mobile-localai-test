@@ -5,6 +5,7 @@
 # LICENSE file in the root directory of this source tree.
 
 from .                          import models
+from ..auth.models              import AccessCode
 from ..auth.serializers         import AccessCodeCheckingModelSerializer
 
 from django.db                  import transaction
@@ -13,6 +14,13 @@ from rest_framework             import serializers
 from rest_framework.serializers import ModelSerializer
 
 class TestRunSerializer(AccessCodeCheckingModelSerializer):
+    access_code = serializers.SlugRelatedField(
+        slug_field = "access_code",
+        queryset   = AccessCode.objects.all(),
+        required   = False,
+        allow_null = True,
+    )
+
     class Meta:
         model  = models.TestRun
         fields = "__all__"
@@ -21,7 +29,8 @@ class TestRunSerializer(AccessCodeCheckingModelSerializer):
         """Since this is the testrun itself, the access code is not read from
         database but the request body here.
         """
-        return attrs.get("access_code", None)
+        access_code = attrs.get("access_code")
+        return access_code.access_code if access_code is not None else None
 
 class AbstractEventSerializer(AccessCodeCheckingModelSerializer):
     def get_testrun(self, attrs):

@@ -16,10 +16,10 @@ Tests are recorded using the provided server backend, which is deployed on a pub
 host with Docker Compose. The backend records test runs which contain events for each
 test step. Access is granted via access codes, which are recorded as part of the test
 runs. The first step is therefore to log into the administration UI and create access
-codes for each tested combination of device and runtime environment:
+codes for each tested device.
 
-1. If the device is an Android device: One access code for the Capacitor Android App
-2. For each tested browser on the device: One separate access code for each browser
+1. Log into the administration UI
+2. Create new access code
 
 Recording can be started by entering the access code during app startup. The collected
 test data can be analyzed in the administration backend of the server.

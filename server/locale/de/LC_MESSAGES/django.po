@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wmlt-server 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-06 21:38+0000\n"
+"POT-Creation-Date: 2026-11-22 13:03+0000\n"
 "PO-Revision-Date: 2026-11-06 22:31+0100\n"
 "Last-Translator: Copilot\n"
 "Language-Team: German\n"
@@ -139,9 +139,9 @@ msgstr "Parallele Tool-Aufrufe"
 msgid "OpenAI Responses API Tools"
 msgstr "OpenAI-Responses-API-Tools"
 
-#: wmlt/ai/models.py:27 wmlt/testlogs/admin.py:660 wmlt/testlogs/admin.py:676
-#: wmlt/testlogs/admin.py:829 wmlt/testlogs/admin.py:845
-#: wmlt/testlogs/models.py:212
+#: wmlt/ai/models.py:27 wmlt/testlogs/admin.py:661 wmlt/testlogs/admin.py:677
+#: wmlt/testlogs/admin.py:830 wmlt/testlogs/admin.py:846
+#: wmlt/testlogs/models.py:214
 msgid "Model ID"
 msgstr "Modell-ID"
 
@@ -192,7 +192,7 @@ msgstr "Anbieterspezifische Parameter"
 msgid "AI Model"
 msgstr "KI-Modell"
 
-#: wmlt/ai/models.py:69 wmlt/testlogs/models.py:380
+#: wmlt/ai/models.py:69 wmlt/testlogs/models.py:382
 msgid "Quality Assessment"
 msgstr "Qualitätsbewertung"
 
@@ -200,8 +200,8 @@ msgstr "Qualitätsbewertung"
 msgid "Use Case"
 msgstr "Anwendungsfall"
 
-#: wmlt/ai/models.py:75 wmlt/testlogs/models.py:123 wmlt/testlogs/models.py:185
-#: wmlt/testlogs/models.py:263
+#: wmlt/ai/models.py:75 wmlt/testlogs/models.py:125 wmlt/testlogs/models.py:187
+#: wmlt/testlogs/models.py:265
 msgid "Sequence Number"
 msgstr "Reihenfolge"
 
@@ -226,8 +226,8 @@ msgstr "Platzhalter: {user_message}, {assistant_message}"
 msgid "Prompt Template"
 msgstr "Prompt-Vorlage"
 
-#: wmlt/ai/models.py:97 wmlt/testlogs/admin.py:825 wmlt/testlogs/models.py:82
-#: wmlt/testlogs/models.py:364
+#: wmlt/ai/models.py:97 wmlt/testlogs/admin.py:826 wmlt/testlogs/models.py:84
+#: wmlt/testlogs/models.py:366
 msgid "Timestamp"
 msgstr "Zeitstempel"
 
@@ -267,7 +267,7 @@ msgstr "Nachrichtennummer"
 msgid "Message number within a flow"
 msgstr "Nummer der Nachricht innerhalb eines Ablaufs"
 
-#: wmlt/ai/models.py:123 wmlt/testlogs/models.py:125
+#: wmlt/ai/models.py:123 wmlt/testlogs/models.py:127
 msgid "Message"
 msgstr "Nachricht"
 
@@ -303,8 +303,8 @@ msgstr ""
 "Die Gruppen, denen dieser Benutzer angehört. Benutzer erhalten alle "
 "Berechtigungen, die ihren Gruppen gewährt wurden."
 
-#: wmlt/auth/models.py:46 wmlt/auth/models.py:52 wmlt/testlogs/admin.py:174
-#: wmlt/testlogs/admin.py:335
+#: wmlt/auth/models.py:46 wmlt/auth/models.py:52 wmlt/testlogs/admin.py:175
+#: wmlt/testlogs/admin.py:336
 msgid "Access Code"
 msgstr "Zugangscode"
 
@@ -316,8 +316,8 @@ msgstr "Gültig ab"
 msgid "Valid Until"
 msgstr "Gültig bis"
 
-#: wmlt/auth/models.py:49 wmlt/testlogs/admin.py:222 wmlt/testlogs/admin.py:383
-#: wmlt/testlogs/models.py:53
+#: wmlt/auth/models.py:49 wmlt/testlogs/admin.py:223 wmlt/testlogs/admin.py:384
+#: wmlt/testlogs/models.py:55
 msgid "Remarks"
 msgstr "Anmerkungen"
 
@@ -345,6 +345,14 @@ msgstr ""
 "Der Zugangscode im Anfrage-Header muss mit dem Zugangscode des angeforderten "
 "Objekts übereinstimmen."
 
+#: wmlt/settings.py:123
+msgid "English"
+msgstr ""
+
+#: wmlt/settings.py:124
+msgid "German"
+msgstr ""
+
 #: wmlt/testlogs/actions.py:136
 #, python-format
 msgid "Quality Assessment for Chat Message %(chat_message)s"
@@ -354,9 +362,9 @@ msgstr "Qualitätsbewertung für Chat-Nachricht %(chat_message)s"
 msgid "Error during AI quality assessment"
 msgstr "Fehler bei der KI-Qualitätsbewertung"
 
-#: wmlt/testlogs/admin.py:43 wmlt/testlogs/admin.py:157
-#: wmlt/testlogs/admin.py:247 wmlt/testlogs/admin.py:294
-#: wmlt/testlogs/admin.py:309 wmlt/testlogs/models.py:87
+#: wmlt/testlogs/admin.py:43 wmlt/testlogs/admin.py:158
+#: wmlt/testlogs/admin.py:248 wmlt/testlogs/admin.py:295
+#: wmlt/testlogs/admin.py:310 wmlt/testlogs/models.py:89
 msgid "Event"
 msgstr "Ereignis"
 
@@ -364,175 +372,175 @@ msgstr "Ereignis"
 msgid "Device Information"
 msgstr "Geräteinformationen"
 
-#: wmlt/testlogs/admin.py:81
+#: wmlt/testlogs/admin.py:82
 msgid "Others"
 msgstr "Sonstiges"
 
-#: wmlt/testlogs/admin.py:110 wmlt/testlogs/admin.py:123
-#: wmlt/testlogs/admin.py:284 wmlt/testlogs/admin.py:323
-#: wmlt/testlogs/models.py:56 wmlt/testlogs/models.py:97
+#: wmlt/testlogs/admin.py:111 wmlt/testlogs/admin.py:124
+#: wmlt/testlogs/admin.py:285 wmlt/testlogs/admin.py:324
+#: wmlt/testlogs/models.py:58 wmlt/testlogs/models.py:99
 msgid "Test Run"
 msgstr "Testlauf"
 
-#: wmlt/testlogs/admin.py:166 wmlt/testlogs/admin.py:170
-#: wmlt/testlogs/admin.py:327 wmlt/testlogs/admin.py:331
+#: wmlt/testlogs/admin.py:167 wmlt/testlogs/admin.py:171
+#: wmlt/testlogs/admin.py:328 wmlt/testlogs/admin.py:332
 msgid "Start Date"
 msgstr "Startdatum"
 
-#: wmlt/testlogs/admin.py:178 wmlt/testlogs/admin.py:182
-#: wmlt/testlogs/admin.py:339 wmlt/testlogs/admin.py:343
-#: wmlt/testlogs/models.py:45
+#: wmlt/testlogs/admin.py:179 wmlt/testlogs/admin.py:183
+#: wmlt/testlogs/admin.py:340 wmlt/testlogs/admin.py:344
+#: wmlt/testlogs/models.py:46
 msgid "App Type"
 msgstr "App-Typ"
 
-#: wmlt/testlogs/admin.py:186 wmlt/testlogs/admin.py:190
-#: wmlt/testlogs/admin.py:347 wmlt/testlogs/admin.py:351
+#: wmlt/testlogs/admin.py:187 wmlt/testlogs/admin.py:191
+#: wmlt/testlogs/admin.py:348 wmlt/testlogs/admin.py:352
 #: wmlt/testlogs/models.py:47
 msgid "Device Type"
 msgstr "Gerätetyp"
 
-#: wmlt/testlogs/admin.py:194 wmlt/testlogs/admin.py:355
+#: wmlt/testlogs/admin.py:195 wmlt/testlogs/admin.py:356
 #: wmlt/testlogs/models.py:48
 msgid "Device Model"
 msgstr "Gerätemodell"
 
-#: wmlt/testlogs/admin.py:198 wmlt/testlogs/admin.py:202
-#: wmlt/testlogs/admin.py:359 wmlt/testlogs/admin.py:363
-#: wmlt/testlogs/models.py:49
+#: wmlt/testlogs/admin.py:199 wmlt/testlogs/admin.py:203
+#: wmlt/testlogs/admin.py:360 wmlt/testlogs/admin.py:364
+#: wmlt/testlogs/models.py:51
 msgid "Operating System Family"
 msgstr "Betriebssystemfamilie"
 
-#: wmlt/testlogs/admin.py:206 wmlt/testlogs/admin.py:367
-#: wmlt/testlogs/models.py:50
+#: wmlt/testlogs/admin.py:207 wmlt/testlogs/admin.py:368
+#: wmlt/testlogs/models.py:52
 msgid "Operating System Version"
 msgstr "Betriebssystemversion"
 
-#: wmlt/testlogs/admin.py:210 wmlt/testlogs/admin.py:214
-#: wmlt/testlogs/admin.py:371 wmlt/testlogs/admin.py:375
-#: wmlt/testlogs/models.py:51
+#: wmlt/testlogs/admin.py:211 wmlt/testlogs/admin.py:215
+#: wmlt/testlogs/admin.py:372 wmlt/testlogs/admin.py:376
+#: wmlt/testlogs/models.py:53
 msgid "Browser Family"
 msgstr "Browserfamilie"
 
-#: wmlt/testlogs/admin.py:218 wmlt/testlogs/admin.py:379
-#: wmlt/testlogs/models.py:52
+#: wmlt/testlogs/admin.py:219 wmlt/testlogs/admin.py:380
+#: wmlt/testlogs/models.py:54
 msgid "Browser Version"
 msgstr "Browserversion"
 
-#: wmlt/testlogs/admin.py:299 wmlt/testlogs/admin.py:314
-#: wmlt/testlogs/models.py:129
+#: wmlt/testlogs/admin.py:300 wmlt/testlogs/admin.py:315
+#: wmlt/testlogs/models.py:131
 msgid "Exception"
 msgstr "Ausnahme"
 
-#: wmlt/testlogs/admin.py:431 wmlt/testlogs/admin.py:441
+#: wmlt/testlogs/admin.py:432 wmlt/testlogs/admin.py:442
 msgid "Navigation"
 msgstr "Navigation"
 
-#: wmlt/testlogs/admin.py:464 wmlt/testlogs/admin.py:474
-#: wmlt/testlogs/models.py:70
+#: wmlt/testlogs/admin.py:465 wmlt/testlogs/admin.py:475
+#: wmlt/testlogs/models.py:72
 msgid "Get Information"
 msgstr "Informationen abrufen"
 
-#: wmlt/testlogs/admin.py:506 wmlt/testlogs/admin.py:523
-#: wmlt/testlogs/models.py:71
+#: wmlt/testlogs/admin.py:507 wmlt/testlogs/admin.py:524
+#: wmlt/testlogs/models.py:73
 msgid "Load Model"
 msgstr "Modell laden"
 
-#: wmlt/testlogs/admin.py:513 wmlt/testlogs/admin.py:530
-#: wmlt/testlogs/admin.py:626 wmlt/testlogs/admin.py:653
-#: wmlt/testlogs/admin.py:786 wmlt/testlogs/admin.py:813
+#: wmlt/testlogs/admin.py:514 wmlt/testlogs/admin.py:531
+#: wmlt/testlogs/admin.py:627 wmlt/testlogs/admin.py:654
+#: wmlt/testlogs/admin.py:787 wmlt/testlogs/admin.py:814
 msgid "Measurement"
 msgstr "Messung"
 
-#: wmlt/testlogs/admin.py:553 wmlt/testlogs/admin.py:569
-#: wmlt/testlogs/admin.py:602 wmlt/testlogs/admin.py:768
+#: wmlt/testlogs/admin.py:554 wmlt/testlogs/admin.py:570
+#: wmlt/testlogs/admin.py:603 wmlt/testlogs/admin.py:769
 msgid "Model"
 msgstr "Modell"
 
-#: wmlt/testlogs/admin.py:558 wmlt/testlogs/admin.py:574
+#: wmlt/testlogs/admin.py:559 wmlt/testlogs/admin.py:575
 msgid "Search Request"
 msgstr "Suchanfrage"
 
-#: wmlt/testlogs/admin.py:609 wmlt/testlogs/models.py:284
-#: wmlt/testlogs/models.py:321
+#: wmlt/testlogs/admin.py:610 wmlt/testlogs/models.py:286
+#: wmlt/testlogs/models.py:323
 msgid "Context"
 msgstr "Kontext"
 
-#: wmlt/testlogs/admin.py:615 wmlt/testlogs/admin.py:642
-#: wmlt/testlogs/admin.py:775 wmlt/testlogs/admin.py:802
+#: wmlt/testlogs/admin.py:616 wmlt/testlogs/admin.py:643
+#: wmlt/testlogs/admin.py:776 wmlt/testlogs/admin.py:803
 msgid "Model Input"
 msgstr "Modelleingabe"
 
-#: wmlt/testlogs/admin.py:621 wmlt/testlogs/admin.py:648
-#: wmlt/testlogs/admin.py:781 wmlt/testlogs/admin.py:808
+#: wmlt/testlogs/admin.py:622 wmlt/testlogs/admin.py:649
+#: wmlt/testlogs/admin.py:782 wmlt/testlogs/admin.py:809
 msgid "Model Output"
 msgstr "Modellausgabe"
 
-#: wmlt/testlogs/admin.py:636
+#: wmlt/testlogs/admin.py:637
 msgid "Model and Context"
 msgstr "Modell und Kontext"
 
-#: wmlt/testlogs/admin.py:664 wmlt/testlogs/admin.py:668
-#: wmlt/testlogs/admin.py:833 wmlt/testlogs/admin.py:837
-#: wmlt/testlogs/models.py:210
+#: wmlt/testlogs/admin.py:665 wmlt/testlogs/admin.py:669
+#: wmlt/testlogs/admin.py:834 wmlt/testlogs/admin.py:838
+#: wmlt/testlogs/models.py:212
 msgid "Pipeline"
 msgstr "Pipeline"
 
-#: wmlt/testlogs/admin.py:672 wmlt/testlogs/admin.py:841
-#: wmlt/testlogs/models.py:211
+#: wmlt/testlogs/admin.py:673 wmlt/testlogs/admin.py:842
+#: wmlt/testlogs/models.py:213
 msgid "Engine ID"
 msgstr "Engine-ID"
 
-#: wmlt/testlogs/admin.py:680 wmlt/testlogs/admin.py:849
-#: wmlt/testlogs/models.py:213
+#: wmlt/testlogs/admin.py:681 wmlt/testlogs/admin.py:850
+#: wmlt/testlogs/models.py:215
 msgid "Quantization"
 msgstr "Quantisierung"
 
-#: wmlt/testlogs/admin.py:684 wmlt/testlogs/admin.py:853
-#: wmlt/testlogs/models.py:214
+#: wmlt/testlogs/admin.py:685 wmlt/testlogs/admin.py:854
+#: wmlt/testlogs/models.py:216
 msgid "Device"
 msgstr "Gerät"
 
-#: wmlt/testlogs/admin.py:698 wmlt/testlogs/admin.py:708
-#: wmlt/testlogs/models.py:74
+#: wmlt/testlogs/admin.py:699 wmlt/testlogs/admin.py:709
+#: wmlt/testlogs/models.py:76
 msgid "Start Chat"
 msgstr "Chat starten"
 
-#: wmlt/testlogs/admin.py:716
+#: wmlt/testlogs/admin.py:717
 msgid "Meta-data"
 msgstr "Metadaten"
 
-#: wmlt/testlogs/admin.py:722
+#: wmlt/testlogs/admin.py:723
 msgid "Assessment"
 msgstr "Bewertung"
 
-#: wmlt/testlogs/admin.py:763
+#: wmlt/testlogs/admin.py:764
 msgid "Chat"
 msgstr "Chat"
 
-#: wmlt/testlogs/admin.py:797
+#: wmlt/testlogs/admin.py:798
 msgid "Chat and Model"
 msgstr "Chat und Modell"
 
-#: wmlt/testlogs/admin.py:821 wmlt/testlogs/models.py:155
-#: wmlt/testlogs/models.py:281 wmlt/testlogs/models.py:303
+#: wmlt/testlogs/admin.py:822 wmlt/testlogs/models.py:157
+#: wmlt/testlogs/models.py:283 wmlt/testlogs/models.py:305
 msgid "Page URL"
 msgstr "Seiten-URL"
 
-#: wmlt/testlogs/admin.py:860
+#: wmlt/testlogs/admin.py:861
 msgid "Run AI Quality Assessment"
 msgstr "KI-Qualitätsbewertung ausführen"
 
-#: wmlt/testlogs/admin.py:861
+#: wmlt/testlogs/admin.py:862
 msgid "Run AI Quality Assessments"
 msgstr "KI-Qualitätsbewertungen ausführen"
 
-#: wmlt/testlogs/admin.py:869
+#: wmlt/testlogs/admin.py:870
 #: wmlt/testlogs/management/commands/run_ai_assessments.py:61
 #, python-format
 msgid "Created Quality Assessments: %(created)i, Errors: %(errors)i"
 msgstr "Erstellte Qualitätsbewertungen: %(created)i, Fehler: %(errors)i"
 
-#: wmlt/testlogs/admin.py:877
+#: wmlt/testlogs/admin.py:878
 #, python-format
 msgid "Error while running AI quality assessments: %(error)s"
 msgstr "Fehler beim Ausführen der KI-Qualitätsbewertungen: %(error)s"
@@ -561,11 +569,11 @@ msgid "Ok"
 msgstr "OK"
 
 #: wmlt/testlogs/management/commands/run_ai_assessments.py:55
-#: wmlt/testlogs/models.py:79
+#: wmlt/testlogs/models.py:81
 msgid "Error"
 msgstr "Fehler"
 
-#: wmlt/testlogs/models.py:17 wmlt/testlogs/models.py:26
+#: wmlt/testlogs/models.py:17 wmlt/testlogs/models.py:27
 msgid "Android"
 msgstr "Android"
 
@@ -585,428 +593,436 @@ msgstr "Tablet"
 msgid "Personal Computer"
 msgstr "Desktop-PC"
 
-#: wmlt/testlogs/models.py:27
-msgid "iOS"
-msgstr "iOS"
-
-#: wmlt/testlogs/models.py:28
-msgid "Linux"
-msgstr "Linux"
-
-#: wmlt/testlogs/models.py:29
-msgid "mac OS"
-msgstr "macOS"
-
-#: wmlt/testlogs/models.py:30
-msgid "Sailfish"
-msgstr "Sailfish"
-
-#: wmlt/testlogs/models.py:31
-msgid "Windows"
-msgstr "Windows"
-
-#: wmlt/testlogs/models.py:32 wmlt/testlogs/models.py:41
+#: wmlt/testlogs/models.py:24 wmlt/testlogs/models.py:33
+#: wmlt/testlogs/models.py:42
 msgid "Other"
 msgstr "Sonstiges"
 
-#: wmlt/testlogs/models.py:35
+#: wmlt/testlogs/models.py:28
+msgid "iOS"
+msgstr "iOS"
+
+#: wmlt/testlogs/models.py:29
+msgid "Linux"
+msgstr "Linux"
+
+#: wmlt/testlogs/models.py:30
+msgid "mac OS"
+msgstr "macOS"
+
+#: wmlt/testlogs/models.py:31
+msgid "Sailfish"
+msgstr "Sailfish"
+
+#: wmlt/testlogs/models.py:32
+msgid "Windows"
+msgstr "Windows"
+
+#: wmlt/testlogs/models.py:36
 msgid "Brave"
 msgstr "Brave"
 
-#: wmlt/testlogs/models.py:36
+#: wmlt/testlogs/models.py:37
 msgid "Chrome"
 msgstr "Chrome"
 
-#: wmlt/testlogs/models.py:37
+#: wmlt/testlogs/models.py:38
 msgid "Edge"
 msgstr "Edge"
 
-#: wmlt/testlogs/models.py:38
+#: wmlt/testlogs/models.py:39
 msgid "Firefox"
 msgstr "Firefox"
 
-#: wmlt/testlogs/models.py:39
+#: wmlt/testlogs/models.py:40
 msgid "Opera"
 msgstr "Opera"
 
-#: wmlt/testlogs/models.py:40
+#: wmlt/testlogs/models.py:41
 msgid "Safari"
 msgstr "Safari"
 
-#: wmlt/testlogs/models.py:43
+#: wmlt/testlogs/models.py:44
 msgid "Started at"
 msgstr "Gestartet am"
 
-#: wmlt/testlogs/models.py:46
-msgid "Installation"
-msgstr "Installation"
+#: wmlt/testlogs/models.py:49
+msgid "Model Year"
+msgstr "Modelljahr"
 
-#: wmlt/testlogs/models.py:57
+#: wmlt/testlogs/models.py:50
+msgid "CPU"
+msgstr "CPU"
+
+#: wmlt/testlogs/models.py:59
 msgid "Test Runs"
 msgstr "Testläufe"
 
-#: wmlt/testlogs/models.py:67
+#: wmlt/testlogs/models.py:69
 msgid "Start Testrun"
 msgstr "Testlauf starten"
 
-#: wmlt/testlogs/models.py:68
+#: wmlt/testlogs/models.py:70
 msgid "Stop Testrun"
 msgstr "Testlauf beenden"
 
-#: wmlt/testlogs/models.py:69
+#: wmlt/testlogs/models.py:71
 msgid "Page Navigation"
 msgstr "Seitennavigation"
 
-#: wmlt/testlogs/models.py:72
+#: wmlt/testlogs/models.py:74
 msgid "Semantic Search"
 msgstr "Semantische Suche"
 
-#: wmlt/testlogs/models.py:73
+#: wmlt/testlogs/models.py:75
 msgid "Run Pipeline"
 msgstr "Pipeline ausführen"
 
-#: wmlt/testlogs/models.py:75
+#: wmlt/testlogs/models.py:77
 msgid "Chat Message"
 msgstr "Chat-Nachricht"
 
-#: wmlt/testlogs/models.py:78
+#: wmlt/testlogs/models.py:80
 msgid "Success"
 msgstr "Erfolg"
 
-#: wmlt/testlogs/models.py:83
+#: wmlt/testlogs/models.py:85
 msgid "Event Type"
 msgstr "Ereignistyp"
 
-#: wmlt/testlogs/models.py:84
+#: wmlt/testlogs/models.py:86
 msgid "Status"
 msgstr "Status"
 
-#: wmlt/testlogs/models.py:88
+#: wmlt/testlogs/models.py:90
 msgid "Events"
 msgstr "Ereignisse"
 
-#: wmlt/testlogs/models.py:124 wmlt/testlogs/models.py:170
+#: wmlt/testlogs/models.py:126 wmlt/testlogs/models.py:172
 msgid "Name"
 msgstr "Name"
 
-#: wmlt/testlogs/models.py:126
+#: wmlt/testlogs/models.py:128
 msgid "Stack Trace"
 msgstr "Stacktrace"
 
-#: wmlt/testlogs/models.py:130
+#: wmlt/testlogs/models.py:132
 msgid "Exceptions"
 msgstr "Ausnahmen"
 
-#: wmlt/testlogs/models.py:138
+#: wmlt/testlogs/models.py:140
 msgid "Start Testrun Event"
 msgstr "Ereignis: Testlauf starten"
 
-#: wmlt/testlogs/models.py:139
+#: wmlt/testlogs/models.py:141
 msgid "Start Testrun Events"
 msgstr "Ereignisse: Testlauf starten"
 
-#: wmlt/testlogs/models.py:147
+#: wmlt/testlogs/models.py:149
 msgid "Stop Testrun Event"
 msgstr "Ereignis: Testlauf beenden"
 
-#: wmlt/testlogs/models.py:148
+#: wmlt/testlogs/models.py:150
 msgid "Stop Testrun Events"
 msgstr "Ereignisse: Testlauf beenden"
 
-#: wmlt/testlogs/models.py:158
+#: wmlt/testlogs/models.py:160
 msgid "Page Navigation Event"
 msgstr "Ereignis: Seitennavigation"
 
-#: wmlt/testlogs/models.py:159
+#: wmlt/testlogs/models.py:161
 msgid "Page Navigation Events"
 msgstr "Ereignisse: Seitennavigation"
 
-#: wmlt/testlogs/models.py:169
+#: wmlt/testlogs/models.py:171
 msgid "Technical Id"
 msgstr "Technische ID"
 
-#: wmlt/testlogs/models.py:173
+#: wmlt/testlogs/models.py:175
 msgid "Get Information Event"
 msgstr "Ereignis: Informationen abrufen"
 
-#: wmlt/testlogs/models.py:174
+#: wmlt/testlogs/models.py:176
 msgid "Get Information Events"
 msgstr "Ereignisse: Informationen abrufen"
 
-#: wmlt/testlogs/models.py:186
+#: wmlt/testlogs/models.py:188
 msgid "Field"
 msgstr "Feld"
 
-#: wmlt/testlogs/models.py:187
+#: wmlt/testlogs/models.py:189
 msgid "Icon"
 msgstr "Symbol"
 
-#: wmlt/testlogs/models.py:188
+#: wmlt/testlogs/models.py:190
 msgid "Label"
 msgstr "Beschriftung"
 
-#: wmlt/testlogs/models.py:189
+#: wmlt/testlogs/models.py:191
 msgid "Value"
 msgstr "Wert"
 
-#: wmlt/testlogs/models.py:192
+#: wmlt/testlogs/models.py:194
 msgid "Information Line"
 msgstr "Informationszeile"
 
-#: wmlt/testlogs/models.py:193
+#: wmlt/testlogs/models.py:195
 msgid "Information Lines"
 msgstr "Informationszeilen"
 
-#: wmlt/testlogs/models.py:203
+#: wmlt/testlogs/models.py:205
 msgid "Summarization"
 msgstr "Zusammenfassung"
 
-#: wmlt/testlogs/models.py:204
+#: wmlt/testlogs/models.py:206
 msgid "Translation"
 msgstr "Übersetzung"
 
-#: wmlt/testlogs/models.py:205
+#: wmlt/testlogs/models.py:207
 msgid "Question Answering"
 msgstr "Fragebeantwortung"
 
-#: wmlt/testlogs/models.py:206
+#: wmlt/testlogs/models.py:208
 msgid "Feature Extraction"
 msgstr "Merkmalsextraktion"
 
-#: wmlt/testlogs/models.py:207
+#: wmlt/testlogs/models.py:209
 msgid "Text Generation"
 msgstr "Textgenerierung"
 
-#: wmlt/testlogs/models.py:208
+#: wmlt/testlogs/models.py:210
 msgid "Text-to-Text Generation"
 msgstr "Text-zu-Text-Generierung"
 
-#: wmlt/testlogs/models.py:215
+#: wmlt/testlogs/models.py:217
 msgid "Loading Duration"
 msgstr "Ladedauer"
 
-#: wmlt/testlogs/models.py:218
+#: wmlt/testlogs/models.py:220
 msgid "Load Model Event"
 msgstr "Ereignis: Modell laden"
 
-#: wmlt/testlogs/models.py:219
+#: wmlt/testlogs/models.py:221
 msgid "Load Model Events"
 msgstr "Ereignisse: Modell laden"
 
-#: wmlt/testlogs/models.py:240 wmlt/testlogs/models.py:283
+#: wmlt/testlogs/models.py:242 wmlt/testlogs/models.py:285
 msgid "Query"
 msgstr "Abfrage"
 
-#: wmlt/testlogs/models.py:241
+#: wmlt/testlogs/models.py:243
 msgid "Include Keywords"
 msgstr "Schlüsselwörter einbeziehen"
 
-#: wmlt/testlogs/models.py:242
+#: wmlt/testlogs/models.py:244
 msgid "Include Sentences"
 msgstr "Sätze einbeziehen"
 
-#: wmlt/testlogs/models.py:243
+#: wmlt/testlogs/models.py:245
 msgid "Compare Embeddings"
 msgstr "Embeddings vergleichen"
 
-#: wmlt/testlogs/models.py:244
+#: wmlt/testlogs/models.py:246
 msgid "Compare Strings"
 msgstr "Zeichenketten vergleichen"
 
-#: wmlt/testlogs/models.py:247
+#: wmlt/testlogs/models.py:249
 msgid "Semantic Search Event"
 msgstr "Ereignis: Semantische Suche"
 
-#: wmlt/testlogs/models.py:248
+#: wmlt/testlogs/models.py:250
 msgid "Semantic Search Events"
 msgstr "Ereignisse: Semantische Suche"
 
-#: wmlt/testlogs/models.py:259
+#: wmlt/testlogs/models.py:261
 msgid "Keyword"
 msgstr "Schlüsselwort"
 
-#: wmlt/testlogs/models.py:260
+#: wmlt/testlogs/models.py:262
 msgid "Sentence"
 msgstr "Satz"
 
-#: wmlt/testlogs/models.py:265
+#: wmlt/testlogs/models.py:267
 msgid "Page Title"
 msgstr "Seitentitel"
 
-#: wmlt/testlogs/models.py:266
+#: wmlt/testlogs/models.py:268
 msgid "Matched Text"
 msgstr "Übereinstimmender Text"
 
-#: wmlt/testlogs/models.py:267
+#: wmlt/testlogs/models.py:269
 msgid "Text Type"
 msgstr "Texttyp"
 
-#: wmlt/testlogs/models.py:268
+#: wmlt/testlogs/models.py:270
 msgid "Similarity in %"
 msgstr "Ähnlichkeit in %"
 
-#: wmlt/testlogs/models.py:271
+#: wmlt/testlogs/models.py:273
 msgid "Result Line"
 msgstr "Ergebniszeile"
 
-#: wmlt/testlogs/models.py:272
+#: wmlt/testlogs/models.py:274
 msgid "Result Lines"
 msgstr "Ergebniszeilen"
 
-#: wmlt/testlogs/models.py:285 wmlt/testlogs/models.py:322
+#: wmlt/testlogs/models.py:287 wmlt/testlogs/models.py:324
 msgid "Max Tokens"
 msgstr "Maximale Tokenanzahl"
 
-#: wmlt/testlogs/models.py:286
+#: wmlt/testlogs/models.py:288
 msgid "Source Language"
 msgstr "Ausgangssprache"
 
-#: wmlt/testlogs/models.py:287
+#: wmlt/testlogs/models.py:289
 msgid "Target Language"
 msgstr "Zielsprache"
 
-#: wmlt/testlogs/models.py:288
+#: wmlt/testlogs/models.py:290
 msgid "Result"
 msgstr "Ergebnis"
 
-#: wmlt/testlogs/models.py:289 wmlt/testlogs/models.py:326
+#: wmlt/testlogs/models.py:291 wmlt/testlogs/models.py:328
 msgid "Run Time"
 msgstr "Laufzeit"
 
-#: wmlt/testlogs/models.py:292
+#: wmlt/testlogs/models.py:294
 msgid "Run Pipeline Event"
 msgstr "Ereignis: Pipeline ausführen"
 
-#: wmlt/testlogs/models.py:293
+#: wmlt/testlogs/models.py:295
 msgid "Run Pipeline Events"
 msgstr "Ereignisse: Pipeline ausführen"
 
-#: wmlt/testlogs/models.py:306
+#: wmlt/testlogs/models.py:308
 msgid "Start Chat Event"
 msgstr "Ereignis: Chat starten"
 
-#: wmlt/testlogs/models.py:307
+#: wmlt/testlogs/models.py:309
 msgid "Start Chat Events"
 msgstr "Ereignisse: Chat starten"
 
-#: wmlt/testlogs/models.py:320
+#: wmlt/testlogs/models.py:322
 msgid "User Message"
 msgstr "Benutzernachricht"
 
-#: wmlt/testlogs/models.py:323
+#: wmlt/testlogs/models.py:325
 msgid "Sampling"
 msgstr "Sampling"
 
-#: wmlt/testlogs/models.py:324
+#: wmlt/testlogs/models.py:326
 msgid "Assistant Message"
 msgstr "Assistentennachricht"
 
-#: wmlt/testlogs/models.py:325
+#: wmlt/testlogs/models.py:327
 msgid "First Token"
 msgstr "Erstes Token"
 
-#: wmlt/testlogs/models.py:327
+#: wmlt/testlogs/models.py:329
 msgid "Number of Tokens"
 msgstr "Anzahl der Tokens"
 
-#: wmlt/testlogs/models.py:328
+#: wmlt/testlogs/models.py:330
 msgid "Tokens / Second"
 msgstr "Tokens pro Sekunde"
 
-#: wmlt/testlogs/models.py:331
+#: wmlt/testlogs/models.py:333
 msgid "Chat Message Event"
 msgstr "Ereignis: Chat-Nachricht"
 
-#: wmlt/testlogs/models.py:332
+#: wmlt/testlogs/models.py:334
 msgid "Chat Message Events"
 msgstr "Ereignisse: Chat-Nachricht"
 
-#: wmlt/testlogs/models.py:343
+#: wmlt/testlogs/models.py:345
 msgid "Human"
 msgstr "Mensch"
 
-#: wmlt/testlogs/models.py:344
+#: wmlt/testlogs/models.py:346
 msgid "LLM"
 msgstr "LLM"
 
-#: wmlt/testlogs/models.py:347
+#: wmlt/testlogs/models.py:349
 msgid "Completely Wrong"
 msgstr "Vollständig falsch"
 
-#: wmlt/testlogs/models.py:348
+#: wmlt/testlogs/models.py:350
 msgid "Minor Flaws"
 msgstr "Kleinere Mängel"
 
-#: wmlt/testlogs/models.py:349
+#: wmlt/testlogs/models.py:351
 msgid "No Errors Found"
 msgstr "Keine Fehler gefunden"
 
-#: wmlt/testlogs/models.py:352
+#: wmlt/testlogs/models.py:354
 msgid "Response shows no relation to the user input"
 msgstr "Die Antwort hat keinen Bezug zur Benutzereingabe."
 
-#: wmlt/testlogs/models.py:353
+#: wmlt/testlogs/models.py:355
 msgid "Only very little relation to the user input"
 msgstr "Die Antwort hat nur einen sehr geringen Bezug zur Benutzereingabe."
 
-#: wmlt/testlogs/models.py:354
+#: wmlt/testlogs/models.py:356
 msgid "Response but goes beyond user input"
 msgstr "Die Antwort geht über die Benutzereingabe hinaus."
 
-#: wmlt/testlogs/models.py:355
+#: wmlt/testlogs/models.py:357
 msgid "Response exactly addresses the user input"
 msgstr "Die Antwort geht genau auf die Benutzereingabe ein."
 
-#: wmlt/testlogs/models.py:358
+#: wmlt/testlogs/models.py:360
 msgid "No response"
 msgstr "Keine Antwort"
 
-#: wmlt/testlogs/models.py:359
+#: wmlt/testlogs/models.py:361
 msgid "Too short, missing information"
 msgstr "Zu kurz, Informationen fehlen"
 
-#: wmlt/testlogs/models.py:360
+#: wmlt/testlogs/models.py:362
 msgid "Too long, more than what was asked"
 msgstr "Zu lang, mehr als angefragt"
 
-#: wmlt/testlogs/models.py:361
+#: wmlt/testlogs/models.py:363
 msgid "Perfect size to answer the question"
 msgstr "Perfekte Länge zur Beantwortung der Frage"
 
-#: wmlt/testlogs/models.py:365
+#: wmlt/testlogs/models.py:367
 msgid "Judge Type"
 msgstr "Bewertungstyp"
 
-#: wmlt/testlogs/models.py:366
+#: wmlt/testlogs/models.py:368
 msgid "Judge Name"
 msgstr "Name des Bewertenden"
 
-#: wmlt/testlogs/models.py:368
+#: wmlt/testlogs/models.py:370
 msgid "Correct Syntax"
 msgstr "Korrekte Syntax"
 
-#: wmlt/testlogs/models.py:369 wmlt/testlogs/models.py:371
-#: wmlt/testlogs/models.py:373 wmlt/testlogs/models.py:375
-#: wmlt/testlogs/models.py:377
+#: wmlt/testlogs/models.py:371 wmlt/testlogs/models.py:373
+#: wmlt/testlogs/models.py:375 wmlt/testlogs/models.py:377
+#: wmlt/testlogs/models.py:379
 msgid "Explanation"
 msgstr "Erklärung"
 
-#: wmlt/testlogs/models.py:370
+#: wmlt/testlogs/models.py:372
 msgid "Correct Lingua"
 msgstr "Korrekte Sprache"
 
-#: wmlt/testlogs/models.py:372
+#: wmlt/testlogs/models.py:374
 msgid "Correct Content"
 msgstr "Korrekte Inhalte"
 
-#: wmlt/testlogs/models.py:374
+#: wmlt/testlogs/models.py:376
 msgid "Thematic Relevance"
 msgstr "Thematische Relevanz"
 
-#: wmlt/testlogs/models.py:376
+#: wmlt/testlogs/models.py:378
 msgid "Message Length"
 msgstr "Nachrichtenlänge"
 
-#: wmlt/testlogs/models.py:381
+#: wmlt/testlogs/models.py:383
 msgid "Quality Assessments"
 msgstr "Qualitätsbewertungen"
+
+#~ msgid "Installation"
+#~ msgstr "Installation"

@@ -13,7 +13,11 @@ recording test events.
 -->
 
 <script>
+    import IconText        from "../basic/IconText.svelte";
+
     import {onMount}       from "svelte";
+    import testRunAPI      from "../../api/TestRun.svelte.js";
+    import backends        from "../../backends/index.js";
     import navigationState from "../../state/NavigationState.svelte.js";
     import i18n            from "../../state/i18n.svelte.js";
 
@@ -25,38 +29,253 @@ recording test events.
         navigationState.subPages       = [];
     });
 
-    let accessCode = $state("");
+    const STEP_VERIFY_ACCESS_CODE = 1;
+    const STEP_CREATE_TEST_RUN    = 2;
+    const START_APPLICATION_URL   = "#/index";
 
-    async function onSubmit(event) {
+    let currentStep     = $state(STEP_VERIFY_ACCESS_CODE);
+    let accessCode      = $state("");
+    let saveBackendInfo = $state(true);
+    let errorMessage    = $state("");
+
+    let testRunData = $state({
+        app_type:        "",
+        device_type:     "",
+        device_model:    "",
+        device_cpu:      "",
+        device_year:     0,
+        os_family:       "",
+        os_version:      "",
+        browser_family:  "",
+        browser_version: "",
+        remarks:         "",
+    });
+
+    async function verifyAccessCode(event) {
         event.preventDefault();
-        // TODO: Connect to backend
-        location.href = "#/index"
+        errorMessage = "";
+
+        if (!accessCode.trim()) {
+            location.href = START_APPLICATION_URL;
+            return;
+        }
+        
+        try {
+            await testRunAPI.connect(accessCode);
+            let previousTestRun = await testRunAPI.getPreviousTestRun();
+
+            if (previousTestRun) {
+                testRunData.app_type        = previousTestRun.app_type        || "";
+                testRunData.device_type     = previousTestRun.device_type     || "";
+                testRunData.device_model    = previousTestRun.device_model    || "";
+                testRunData.device_cpu      = previousTestRun.device_cpu      || "";
+                testRunData.device_year     = previousTestRun.device_year     || 0;
+                testRunData.os_family       = previousTestRun.os_family       || "";
+                testRunData.os_version      = previousTestRun.os_version      || "";
+                testRunData.browser_family  = previousTestRun.browser_family  || "";
+                testRunData.browser_version = previousTestRun.browser_version || "";
+                testRunData.remarks         = previousTestRun.remarks         || "";
+            }
+
+            currentStep = STEP_CREATE_TEST_RUN;
+        } catch (error) {
+            console.error(error);
+            errorMessage = error.message || error.toString();
+        }
+    }
+
+    async function createTestRun(event) {
+        event.preventDefault();
+        errorMessage = "";
+
+        if (!testRunData.app_type.trim() || !testRunData.device_type.trim() || !testRunData.device_model.trim()) {
+            errorMessage = i18n.text.welcomePage?.obligatoryFieldsMissing;
+            return;
+        }
+        
+        try {
+            await testRunAPI.startTestRun(testRunData);
+
+            if (saveBackendInfo) {
+                for (let backend of backends) {
+                    let lines  = [];
+                    let seqnr  = 0;
+
+                    try {
+                        for (let line of await backend.getInformation()) {
+                            lines.push({
+                                seqnr: ++seqnr,
+                                field: line.field,
+                                icon:  line.icon,
+                                label: line.label,
+                                value: line.text,
+                            });
+                        }
+                    } catch (error) {
+                        console.error(error);
+                        errorMessage = error.message || error.toString();
+
+                        let event = await testRunAPI.saveEvent("get_information", {
+                            status:      "ERROR",
+                            engine_id:   backend.id,
+                            engine_name: backend.name,
+                            lines:       lines,
+                        });
+
+                        await testRunAPI.saveEventException(event.id, error);
+                        continue;
+                    }
+
+                    await testRunAPI.saveEvent("get_information", {
+                        status:      "SUCCESS",
+                        engine_id:   backend.id,
+                        engine_name: backend.name,
+                        lines:       lines,
+                    });
+                }
+            }
+        } catch (error) {
+            console.error(error);
+            errorMessage = error.message || error.toString();
+            return;
+        }
+
+        location.href = START_APPLICATION_URL;
+    }
+
+    function cancel() {
+        errorMessage = "";
+
+        testRunData.app_type        = "";
+        testRunData.device_type     = "";
+        testRunData.device_model    = "";
+        testRunData.device_cpu      = "";
+        testRunData.device_year     = 0;
+        testRunData.os_family       = "";
+        testRunData.os_version      = "";
+        testRunData.browser_family  = "";
+        testRunData.browser_version = "";
+        testRunData.remarks         = "";
+
+        currentStep = STEP_VERIFY_ACCESS_CODE;
     }
 </script>
 
 <div id="page">
     <h1>{i18n.text.welcomePage?.title}</h1>
 
-    <form onsubmit={onSubmit}>
-        <div class="padding">
-            <label>
-                {i18n.text.welcomePage?.language}
-                <select bind:value={i18n.language}>
-                    {#each Object.keys(i18n.languages) as language}
-                        <option value={language}>{i18n.languages[language]}</option>
-                    {/each}
-                </select>
-            </label>
-    
-            <label>
-                {i18n.text.welcomePage?.accessCode}
-                <input bind:value={accessCode} style="margin-bottom: 0;"/>
-                <span class="hint">{i18n.text?.welcomePage?.hint}</span>
-            </label>
-        </div>
+    {#if currentStep === STEP_VERIFY_ACCESS_CODE}
+        <form class="mb4" onsubmit={verifyAccessCode}>
+            <div class="padding">
+                <label>
+                    {i18n.text.welcomePage?.language}
+                    <select bind:value={i18n.language}>
+                        {#each Object.keys(i18n.languages) as key}
+                            <option value={key}>{i18n.languages[key]}</option>
+                        {/each}
+                    </select>
+                </label>
+        
+                <label>
+                    {i18n.text.welcomePage?.accessCode}
+                    <input bind:value={accessCode}/>
+                    <small>{i18n.text?.welcomePage?.hint}</small>
+                </label>
 
-        <input type="submit" value={i18n.text.welcomePage?.start}/>
-    </form>
+                {#if errorMessage}
+                    <IconText type="error" text={errorMessage}/>
+                {/if}
+            </div>
+
+            {#if !accessCode.trim()}
+                <input type="submit" value={i18n.text.welcomePage?.startApplication}/>
+            {:else}
+                <input type="submit" value={i18n.text.welcomePage?.verifyAccessCode}/>
+            {/if}
+        </form>
+    {:else if currentStep === STEP_CREATE_TEST_RUN}
+        <form onsubmit={createTestRun}>
+            <div class="padding">
+                <div class="grid">
+                    <label class="obligatory" class:missing={!testRunData.app_type.trim()}>
+                        {i18n.text.welcomePage?.appType}
+                        <select bind:value={testRunData.app_type}>
+                            {#each Object.keys(i18n.text.welcomePage?.appTypes) as key}
+                                <option value={key}>{i18n.text.welcomePage.appTypes[key]}</option>
+                            {/each}
+                        </select>
+                    </label>
+                    <label class="obligatory" class:missing={!testRunData.device_type.trim()}>
+                        {i18n.text.welcomePage?.deviceType}
+                        <select bind:value={testRunData.device_type}>
+                            {#each Object.keys(i18n.text.welcomePage?.deviceTypes) as key}
+                                <option value={key}>{i18n.text.welcomePage.deviceTypes[key]}</option>
+                            {/each}
+                        </select>
+                    </label>
+                </div>
+                <div class="grid">
+                    <label class="obligatory" class:missing={!testRunData.device_model.trim()}>
+                        {i18n.text.welcomePage?.deviceModel}
+                        <input bind:value={testRunData.device_model}/>
+                    </label>
+                    <label>
+                        {i18n.text.welcomePage?.deviceYear}
+                        <input bind:value={testRunData.device_year}/>
+                    </label>
+                </div>
+                <div class="grid">
+                    <label>
+                        {i18n.text.welcomePage?.deviceCPU}
+                        <input bind:value={testRunData.device_cpu}/>
+                    </label>
+                </div>
+                <div class="grid">
+                    <label>
+                        {i18n.text.welcomePage?.osFamily}
+                        <select bind:value={testRunData.os_family}>
+                            {#each Object.keys(i18n.text.welcomePage?.operatingSystemFamilies) as key}
+                                <option value={key}>{i18n.text.welcomePage.operatingSystemFamilies[key]}</option>
+                            {/each}
+                        </select>
+                    </label>
+                    <label>
+                        {i18n.text.welcomePage?.osVersion}
+                        <input bind:value={testRunData.os_version}/>
+                    </label>
+                </div>
+                <div class="grid">
+                    <label>
+                        {i18n.text.welcomePage?.browserFamily}
+                        <select bind:value={testRunData.browser_family}>
+                            {#each Object.keys(i18n.text.welcomePage?.browserFamilies) as key}
+                                <option value={key}>{i18n.text.welcomePage.browserFamilies[key]}</option>
+                            {/each}
+                        </select>
+                    </label>
+                    <label>
+                        {i18n.text.welcomePage?.browserVersion}
+                        <input bind:value={testRunData.browser_version}/>
+                    </label>
+                </div>
+                <div class="grid">
+                    <label>
+                        <input type="checkbox" role="switch" bind:checked={saveBackendInfo}/>
+                        {i18n.text.welcomePage?.saveBackendInfo}
+                    </label>
+                </div>
+                
+                {#if errorMessage}
+                    <IconText type="error" text={errorMessage}/>
+                {/if}
+            </div>
+
+            <div role="group">
+                <input type="submit" value={i18n.text.welcomePage?.startTestRun}/>
+                <button class="secondary" onclick={cancel}>{i18n.text.welcomePage?.cancel}</button>
+            </div>
+        </form>
+    {/if}
 </div>
 
 <style>
@@ -83,22 +302,34 @@ recording test events.
         margin-top: 4em;
     }
 
+    .mb4 {
+        margin-bottom: 4em;
+    }
+
     form {
         background: white;
-        margin-bottom: 4em;
 
         .padding {
             padding: 1em;
         }
 
-        input[type="submit"] {
+        input[type="submit"], button {
             border-radius: 0;
             margin: 0;
         }
 
-        .hint {
-            font-size: 80%;
-            color: darkgrey;
+        [role="group"] {
+            margin: 0;
+        }
+
+        .obligatory {
+            font-weight: bold;
+        }
+
+        .missing::before {
+            content: "* ";
+            font-weight: normal;
+            color: red;
         }
     }
 </style>
