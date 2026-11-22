@@ -17,7 +17,7 @@ class TestRunAPI {
      * to display the currently used access code, but should not be changes by
      * the widget.
      */
-    accessCode = $state("");
+    accessCode = $state(window.localStorage.getItem("access_code") || "");
 
     /**
      * Recording enabled/disabled. No data will be sent to the server, when this
@@ -25,7 +25,31 @@ class TestRunAPI {
      * UI widget. However, the widget should not be shown when the access code
      * is empty, as this flag will have to effect then.
      */
-    recording = $state(false);
+    recording = $state(window.localStorage.getItem("recording") ? true : false);
+
+    /**
+     * URL prefix for the backend API.
+     */
+    #apiUrl = $state(window.localStorage.getItem("apiUrl") || "");
+
+    /**
+     * ID of the current test run.
+     */
+    #testRunId = $state(parseInt(window.localStorage.getItem("testRunId") || 0));
+
+    /**
+     * Persist state in the browser's local storage.
+     */
+    constructor() {
+        $effect.root(() => {
+            $effect(() => {
+                window.localStorage.setItem("access_code", this.accessCode);
+                window.localStorage.setItem("recording",   this.recording ? "true" : "");
+                window.localStorage.setItem("apiUrl",      this.#apiUrl);
+                window.localStorage.setItem("testRunId",   this.#testRunId);
+            });
+        });
+    }
 
     /**
      * Read-only flag to determine if event recording is enabled. For this to be
@@ -35,16 +59,6 @@ class TestRunAPI {
     get enabled() {
         return this.accessCode && this.recording;
     }
-
-    /**
-     * URL prefix for the backend API.
-     */
-    #apiUrl = "";
-
-    /**
-     * ID of the current test run.
-     */
-    #testRunId = 0;
 
     /**
      * Internal wrapper around the raw `fetch()`API. Makes sure that common options
