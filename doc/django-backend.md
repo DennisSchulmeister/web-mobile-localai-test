@@ -28,10 +28,11 @@ additional database driver is required for local development.
 
 ## Initialize and run
 
-Run database migrations and start Django's development server:
+Run database migrations, load fixtures and start Django's development server:
 
 ```sh
 poetry run python manage.py migrate
+poetry run python manage.py loaddata prompt_templates admin_interface_theme_foundation
 poetry run python manage.py runserver
 ```
 
@@ -41,6 +42,18 @@ account to access to admin interface at <http://127.0.0.1:8000/admin>:
 ```sh
 poetry run python manage.py createsuperuser
 ```
+
+## Customize the admin layout
+
+The admin pages can be made a little clearer by enabling tabbed views. For this,
+open the admin panel and edit the current theme. At the very end, below the headline
+”Change Form” there are two checkboxes:
+
+1. Fieldsets as tabs
+2. Inlines as tabs
+
+Especially the second one should be ticked, so that related entries move to
+separate tabs.
 
 ## Deployment-specific settings
 
