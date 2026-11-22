@@ -11,7 +11,7 @@ url: "https://github.com/DennisSchulmeister/web-mobile-localai-test"
 abstract: "A prototype exploring whether small AI language models can run locally in a web application on mobile devices with acceptable performance."
 license: "BSD-3-Clause"
 version: "1.0.0"
-date-released: "2026-11-22"
+date-released: "2026-11-23"
 keywords:
   - "local-ai"
   - "web"

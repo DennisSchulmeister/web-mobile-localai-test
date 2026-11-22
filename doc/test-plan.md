@@ -142,8 +142,8 @@ Semantic search can be tested with the following questions:
 
 1. Wie funktioniert ein Computer?
 2. How does a computer work?
-3. Was ist das Internet?
-4. What is the Internet?
+3. Was ist das WWW?
+4. What is the WWW?
 
 Notice how switching languages from English to German yields different results.
 Sometimes the English question returns German pages, too.
