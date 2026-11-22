@@ -242,7 +242,10 @@ class ReadOnlyEventAdmin(EventAdmin):
         return False
 
     def has_delete_permission(self, request, obj=None):
-        return False
+        # Must remain True, because otherwise test runs cannot be delete. Django would instead
+        # show the following error: "Delete would result in deleting related objects, but your
+        # account doesn't have permission to delete the following types of objects"
+        return True
 
 event_fieldsets = [
     (_("Event"), {
@@ -492,7 +495,10 @@ class GetInformationLineAdmin(admin.CustomModelAdmin):
         return False
 
     def has_delete_permission(self, request, obj=None):
-        return False
+        # Must remain True, because otherwise test runs cannot be delete. Django would instead
+        # show the following error: "Delete would result in deleting related objects, but your
+        # account doesn't have permission to delete the following types of objects"
+        return True
 
 class LoadModelEventAdmin(EventAdmin):
     model              = models.LoadModelEvent
