@@ -49,6 +49,7 @@ class SemanticSearchPageState {
             if (!modelState.loadedModel.task === "feature-extraction") return;
     
             this.working = true;
+            this.errorMessage = "";
             
             // Download the index files.
             this.stopWatchState.start(i18n.text.homePage?.search?.download, "bi-download");
