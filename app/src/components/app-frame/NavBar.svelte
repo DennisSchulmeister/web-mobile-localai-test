@@ -12,6 +12,7 @@ Top navigation bar
 -->
 
 <script>
+    import testRunAPI      from "../../api/TestRun.svelte.js";
     import navigationState from "../../state/NavigationState.svelte.js"
 
     function onBackClicked(event) {
@@ -21,15 +22,24 @@ Top navigation bar
 </script>
 
 <div id="navbar">
-    {#if navigationState.backLink}
-        <a href="#back" title="Zurück" onclick={onBackClicked}>
-            <i class="bi bi-arrow-left-square"></i>
-        </a>
-    {/if}
+    <div class="nav">
+        {#if navigationState.backLink}
+            <a href="#back" title="Zurück" onclick={onBackClicked}>
+                <i class="bi bi-arrow-left-square"></i>
+            </a>
+        {/if}
+    
+        <h1>
+            {navigationState.pageTitle}
+        </h1>
+    </div>
 
-    <h1>
-        {navigationState.pageTitle}
-    </h1>
+    {#if testRunAPI.accessCode}
+        <label>
+            <input type="checkbox" role="switch" bind:checked={testRunAPI.recording}/>
+            {testRunAPI.accessCode}
+        </label>
+    {/if}
 </div>
 
 <style>
@@ -43,10 +53,18 @@ Top navigation bar
 
         display: flex;
         flex-direction: row;
+        justify-content: space-between;
         align-items: center;
-        gap: 1em;
+        gap: 2em;
 
         font-size: 120%;
+    }
+
+    .nav {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 1em;
     }
 
     h1 {
@@ -59,5 +77,9 @@ Top navigation bar
     a, a:visited, a:hover {
         color: var(--color4);
         text-decoration: none;
+    }
+
+    label {
+        color: var(--color4);
     }
 </style>

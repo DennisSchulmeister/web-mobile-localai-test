@@ -54,15 +54,13 @@ class TestRunAPI {
      * @param {string} method Request method
      * @param {string} url URL suffix, e.g. "testlogs/test_runs"
      * @param {any} body Request body data (optional, will be JSON serialized)
-     * @param {boolean} keepAlive Finish request before unloading the page
      * @param {string} accessCode Access code (optional)
      * @returns Response from the raw `fetch()` call
      */
-    async #fetch(method, url, body, keepAlive, accessCode) {
+    async #fetch(method, url, body, accessCode) {
         let options = {
-            keepAlive: keepAlive,
-            method:    method.toUpperCase(),
-            headers:   {},
+            method:  method.toUpperCase(),
+            headers: {},
         };
 
         if (body) {
@@ -89,7 +87,7 @@ class TestRunAPI {
     async connect(accessCode) {
         // Check access code exists and is valid (actually checked by the server)
         this.#apiUrl = await (await fetch("api.url")).text();
-        let response = await this.#fetch("GET", "auth/access_codes", null, false, accessCode);
+        let response = await this.#fetch("GET", "auth/access_codes", null, accessCode);
 
         if (response.status !== 200) {
             throw new Error(i18n.text.api?.testRun?.invalidAccessCode);
@@ -139,6 +137,9 @@ class TestRunAPI {
 
         let savedTestRun = await response.json();
         this.#testRunId = savedTestRun.id;
+
+        await this.saveEvent("start_test_run", {status: "SUCCESS"});
+
         return savedTestRun;
     }
 
@@ -146,30 +147,18 @@ class TestRunAPI {
      * Save a new event. Has no effect if either `this.accessCode` is empty or
      * `this.recording` is `false`. `startTestRun()` must have been called before,
      * so that the test run ID is known.
-     * 
-     * The `keepAlive` parameter is meant for the "stop_test_run" event, which with this
-     * parameter can be automatically sent when the app is closed using the "visibilitychange"
-     * DOM event:
-     * 
-     * ```js
-     * document.addEventListener("visibilitychange", () => {
-     *     if (document.visibilityState !== "hidden") return;
-     *     // Send event
-     * });
-     * ```
-     * 
+     *
      * @param {string} event Event name in snake-case ("start_test_run", "stop_test_run", …)
      * @param {object} data Event data
-     * @param {boolean} keepAlive Finish request before unloading the page
      * @returns {object} Saved event data
      */
-    async saveEvent(event, data, keepAlive) {
+    async saveEvent(event, data) {
         if (!this.enabled) return;
 
         if (!data) data = {};
         data.testrun = this.#testRunId;
 
-        let response = await this.#fetch("POST", `testlogs/${event}_events/`, data, keepAlive);
+        let response = await this.#fetch("POST", `testlogs/${event}_events/`, data);
 
         if (response.status < 200 || response.status > 299) {
             throw new Error(`${i18n.text.api?.testRun?.saveFailed}`.replaceAll("$STATUS$", response.status.toString()));

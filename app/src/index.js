@@ -15,6 +15,7 @@ window.ALLOW_REMOTE_MODELS = Capacitor.isNativePlatform();
 import {mount}           from "svelte";
 import {Capacitor}       from "@capacitor/core";
 
+import testRunAPI        from "./api/TestRun.svelte.js";
 import ApplicationFrame  from "./components/app-frame/ApplicationFrame.svelte";
 import modelState        from "./state/ModelState.svelte.js";
 import textPageState     from "./state/TextPageState.svelte.js";
@@ -22,9 +23,12 @@ import textPageState     from "./state/TextPageState.svelte.js";
 import "@picocss/pico/css/pico.css";
 import "bootstrap-icons/font/bootstrap-icons.min.css";
 
+// Load configuration and app data
 await modelState.reloadModelConfiguration();
 await textPageState.reloadCategories();
 
+// Switch to full-screen mode in the Capacitor version
 document.documentElement.classList.toggle("native-app", Capacitor.isNativePlatform());
 
+// Mount the application frame to show the UI
 mount(ApplicationFrame, {target: document.body});

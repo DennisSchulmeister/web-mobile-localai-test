@@ -21,12 +21,14 @@ recording test events.
     import navigationState from "../../state/NavigationState.svelte.js";
     import i18n            from "../../state/i18n.svelte.js";
 
-    onMount(() => {
+    onMount(async () => {
         navigationState.pageTitle      = "";
         navigationState.header         = false;
         navigationState.backLink       = false;
         navigationState.currentSubPage = "";
         navigationState.subPages       = [];
+
+        await testRunAPI.saveEvent("stop_test_run", {status: "SUCCESS"});
     });
 
     const STEP_VERIFY_ACCESS_CODE = 1;
@@ -197,17 +199,17 @@ recording test events.
         <form onsubmit={createTestRun}>
             <div class="padding">
                 <div class="grid">
-                    <label class="obligatory" class:missing={!testRunData.app_type.trim()}>
+                    <label class="obligatory">
                         {i18n.text.welcomePage?.appType}
-                        <select bind:value={testRunData.app_type}>
+                        <select bind:value={testRunData.app_type} aria-invalid={!testRunData.app_type.trim() || null}>
                             {#each Object.keys(i18n.text.welcomePage?.appTypes) as key}
                                 <option value={key}>{i18n.text.welcomePage.appTypes[key]}</option>
                             {/each}
                         </select>
                     </label>
-                    <label class="obligatory" class:missing={!testRunData.device_type.trim()}>
+                    <label class="obligatory">
                         {i18n.text.welcomePage?.deviceType}
-                        <select bind:value={testRunData.device_type}>
+                        <select bind:value={testRunData.device_type} aria-invalid={!testRunData.device_type.trim() || null}>
                             {#each Object.keys(i18n.text.welcomePage?.deviceTypes) as key}
                                 <option value={key}>{i18n.text.welcomePage.deviceTypes[key]}</option>
                             {/each}
@@ -215,9 +217,9 @@ recording test events.
                     </label>
                 </div>
                 <div class="grid">
-                    <label class="obligatory" class:missing={!testRunData.device_model.trim()}>
+                    <label class="obligatory">
                         {i18n.text.welcomePage?.deviceModel}
-                        <input bind:value={testRunData.device_model}/>
+                        <input bind:value={testRunData.device_model} aria-invalid={!testRunData.device_model.trim() || null}/>
                     </label>
                     <label>
                         {i18n.text.welcomePage?.deviceYear}
@@ -324,12 +326,6 @@ recording test events.
 
         .obligatory {
             font-weight: bold;
-        }
-
-        .missing::before {
-            content: "* ";
-            font-weight: normal;
-            color: red;
         }
     }
 </style>

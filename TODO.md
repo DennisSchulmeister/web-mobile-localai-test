@@ -17,7 +17,7 @@ Web App
 -[x] New helper class for recording events
 -[x] Fetch the API URL from a fixed address (if navigation.host is not localhost, etc.)
 -[x] Copy device meta data from previous test run, otherwise ask user to enter the data; switch: send backend info
--[ ] Show the access code and recording status in the page header
+-[x] Show the access code and recording status in the page header
 -[ ] Save test events during app execution
 -[x] Enable localization and translate into English
 -[x] Translate the code into English as well

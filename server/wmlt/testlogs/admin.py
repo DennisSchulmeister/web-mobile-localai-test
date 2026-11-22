@@ -59,7 +59,7 @@ class TestRunAdmin(admin.CustomModelAdmin):
     inlines             = [TestRunEventInline]
     list_display       = ["start_date", "access_code", "app_type", "device_type", "device_model", "os_family", "os_version", "browser_family", "browser_version", "remarks"]
     list_display_links = ["start_date", "access_code", "app_type", "device_type", "device_model", "os_family", "os_version", "browser_family", "browser_version", "remarks"]
-    ordering           = ["start_date", "id"]
+    ordering           = ["-start_date", "id"]
     list_filter        = ["start_date", "app_type", "device_type", "os_family", "browser_family"]
     date_hierarchy     = "start_date"
 
