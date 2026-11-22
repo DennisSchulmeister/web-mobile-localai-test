@@ -31,19 +31,22 @@ The repository contains:
 
 ## Screenshots
 
+<!-- Note: Screenshot size in Firefox responsive mode: 530x900 -->
 <table>
     <tr>
-        <td><a href="./doc/img/screenshot1.png"><img src="./doc/img/screenshot1.png" width="200" alt="Select a text page"></a></td>
-        <td><a href="./doc/img/screenshot2.png"><img src="./doc/img/screenshot2.png" width="200" alt="View a text page"></a></td>
-        <td><a href="./doc/img/screenshot3.png"><img src="./doc/img/screenshot3.png" width="200" alt="Semantic search"></a></td>
+        <td><a href="./doc/img/welcome.png"><img src="./doc/img/welcome.png" width="200" alt="Welcome page"></a></td>
+        <td><a href="./doc/img/index.png"><img src="./doc/img/index.png" width="200" alt="Select a text page"></a></td>
+        <td><a href="./doc/img/text-page.png"><img src="./doc/img/text-page.png" width="200" alt="View a text page"></a></td>
+        <td><a href="./doc/img/semantic-search.png"><img src="./doc/img/semantic-search.png" width="200" alt="Semantic search"></a></td>
     </tr>
     <tr>
-        <td><a href="./doc/img/screenshot4.png"><img src="./doc/img/screenshot4.png" width="200" alt="Chat introduction"></a></td>
-        <td><a href="./doc/img/screenshot5.png"><img src="./doc/img/screenshot5.png" width="200" alt="Load a language model"></a></td>
-        <td><a href="./doc/img/screenshot6.png"><img src="./doc/img/screenshot6.png" width="200" alt="Ongoing chat"></a></td>
+        <td><a href="./doc/img/chat-new.png"><img src="./doc/img/chat-new.png" width="200" alt="Chat introduction"></a></td>
+        <td><a href="./doc/img/chat-load-model.png"><img src="./doc/img/chat-load-model.png" width="200" alt="Load a language model"></a></td>
+        <td><a href="./doc/img/chat-message.png"><img src="./doc/img/chat-message.png" width="200" alt="Ongoing chat"></a></td>
+        <td><a href="./doc/img/backend-info.png"><img src="./doc/img/backend-info.png" width="200" alt="System information"></a></td>
     </tr>
     <tr>
-        <td><a href="./doc/img/screenshot7.png"><img src="./doc/img/screenshot7.png" width="200" alt="System information"></a></td>
+        <td colspan="2"><a href="./doc/img/server-admin-testrun.png"><img src="./doc/img/server-admin-testrun.png" width="400" alt="Recorded test run in the server admin panel"></a></td>
         <td colspan="2"><a href="./doc/img/android-studio.png"><img src="./doc/img/android-studio.png" width="400" alt="App running in the Android Emulator"></a></td>
     </tr>
 </table>
