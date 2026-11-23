@@ -90,10 +90,10 @@ workspace paths or named volumes. For local, non-containerized development, see
 
 The Node and Django startup scripts pre-compress static files as Brotli, Zstandard,
 and gzip sidecars (skipping existing `.br`, `.zst`, and `.gz` sidecars). ONNX model
-files (`.onnx` and `.onnx_data`) are excluded: their sidecars are removed, and Caddy
-does not apply HTTP compression to them. The Apache example below skips their sidecars
-and excludes them from Apache's `mod_deflate` and `mod_brotli` output filters if those
-are enabled elsewhere in the site configuration.
+files (`.onnx`, `.onnx_data`, and split `.onnx_data_<number>` files) are excluded:
+their sidecars are removed, and Caddy does not apply HTTP compression to them. The
+Apache example below skips their sidecars and excludes them from Apache's `mod_deflate`
+and `mod_brotli` output filters if those are enabled elsewhere in the site configuration.
 
 Set `STATIC_PRECOMPRESS=false` in `.env` to disable pre-compression entirely. Pre-compression
 takes time on first startup and uses additional disk space; updated files are recompressed when
@@ -151,21 +151,21 @@ Alias /app/ /path/to/web-mobile-localai-test/app/static/
     RewriteEngine On
     RewriteBase /app/
 
-    RewriteCond %{REQUEST_FILENAME} !\.(onnx|onnx_data)$ [NC]
+    RewriteCond %{REQUEST_FILENAME} !\.(onnx|onnx_data(?:_[0-9]+)?)$ [NC]
     RewriteCond %{HTTP:Accept-Encoding} \bbr\b [NC]
     RewriteCond %{HTTP:Accept-Encoding} !\bbr\s*;\s*q=0(?:\.0*)?(?:\s*,|$) [NC]
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteCond %{REQUEST_FILENAME}.br -f
     RewriteRule ^(.+)$ $1.br [END]
 
-    RewriteCond %{REQUEST_FILENAME} !\.(onnx|onnx_data)$ [NC]
+    RewriteCond %{REQUEST_FILENAME} !\.(onnx|onnx_data(?:_[0-9]+)?)$ [NC]
     RewriteCond %{HTTP:Accept-Encoding} \bzstd\b [NC]
     RewriteCond %{HTTP:Accept-Encoding} !\bzstd\s*;\s*q=0(?:\.0*)?(?:\s*,|$) [NC]
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteCond %{REQUEST_FILENAME}.zst -f
     RewriteRule ^(.+)$ $1.zst [END]
 
-    RewriteCond %{REQUEST_FILENAME} !\.(onnx|onnx_data)$ [NC]
+    RewriteCond %{REQUEST_FILENAME} !\.(onnx|onnx_data(?:_[0-9]+)?)$ [NC]
     RewriteCond %{HTTP:Accept-Encoding} \bgzip\b [NC]
     RewriteCond %{HTTP:Accept-Encoding} !\bgzip\s*;\s*q=0(?:\.0*)?(?:\s*,|$) [NC]
     RewriteCond %{REQUEST_FILENAME} -f
@@ -189,21 +189,21 @@ Alias /srv/static/ /path/to/web-mobile-localai-test/server/static/
     RewriteEngine On
     RewriteBase /srv/static/
 
-    RewriteCond %{REQUEST_FILENAME} !\.(onnx|onnx_data)$ [NC]
+    RewriteCond %{REQUEST_FILENAME} !\.(onnx|onnx_data(?:_[0-9]+)?)$ [NC]
     RewriteCond %{HTTP:Accept-Encoding} \bbr\b [NC]
     RewriteCond %{HTTP:Accept-Encoding} !\bbr\s*;\s*q=0(?:\.0*)?(?:\s*,|$) [NC]
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteCond %{REQUEST_FILENAME}.br -f
     RewriteRule ^(.+)$ $1.br [END]
 
-    RewriteCond %{REQUEST_FILENAME} !\.(onnx|onnx_data)$ [NC]
+    RewriteCond %{REQUEST_FILENAME} !\.(onnx|onnx_data(?:_[0-9]+)?)$ [NC]
     RewriteCond %{HTTP:Accept-Encoding} \bzstd\b [NC]
     RewriteCond %{HTTP:Accept-Encoding} !\bzstd\s*;\s*q=0(?:\.0*)?(?:\s*,|$) [NC]
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteCond %{REQUEST_FILENAME}.zst -f
     RewriteRule ^(.+)$ $1.zst [END]
     
-    RewriteCond %{REQUEST_FILENAME} !\.(onnx|onnx_data)$ [NC]
+    RewriteCond %{REQUEST_FILENAME} !\.(onnx|onnx_data(?:_[0-9]+)?)$ [NC]
     RewriteCond %{HTTP:Accept-Encoding} \bgzip\b [NC]
     RewriteCond %{HTTP:Accept-Encoding} !\bgzip\s*;\s*q=0(?:\.0*)?(?:\s*,|$) [NC]
     RewriteCond %{REQUEST_FILENAME} -f
@@ -211,9 +211,9 @@ Alias /srv/static/ /path/to/web-mobile-localai-test/server/static/
     RewriteRule ^(.+)$ $1.gz [END]
 </Directory>
 
-SetEnvIfNoCase Request_URI \.(?:onnx|onnx_data)$ no-gzip no-brotli
+SetEnvIfNoCase Request_URI \.(?:onnx|onnx_data(?:_[0-9]+)?)$ no-gzip no-brotli
 
-<FilesMatch "\.(onnx|onnx_data)$">
+<FilesMatch "\.(onnx|onnx_data(?:_[0-9]+)?)$">
     Header set Cache-Control "public, max-age=604800"
 </FilesMatch>
 

@@ -6,16 +6,18 @@
 	redir /srv/admin /srv/admin/ 308
 	redir /admin /admin/ 308
 
-	@modelFiles path_regexp modelFiles \.(onnx|onnx_data)$
+	@modelFiles path_regexp modelFiles \.(onnx|onnx_data(?:_[0-9]+)?)$
 	header @modelFiles Cache-Control "public, max-age=604800"
+
 	@compressible {
-		not path_regexp \.(onnx|onnx_data)$
+		not path_regexp \.(onnx|onnx_data(?:_[0-9]+)?)$
 	}
 	encode @compressible zstd gzip
 
 	handle_path /app/* {
 		root * /workspace/app/static
 		try_files {path} {path}/ /index.html
+
 		file_server {
 			precompressed br zstd gzip
 		}
@@ -23,6 +25,7 @@
 
 	handle_path /srv/static/* {
 		root * /srv/staticfiles
+        
 		file_server {
 			precompressed br zstd gzip
 		}

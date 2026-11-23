@@ -19,12 +19,17 @@ if [ ! -d "$static_root" ]; then
 fi
 
 if [ "$precompress" = false ]; then
-    find "$static_root" -type f \( -name '*.onnx' -o -name '*.onnx_data' \) \
+    find "$static_root" -type f \( -name '*.onnx' -o -name '*.onnx_data' -o -name '*.onnx_data_*' \) \
         -exec sh -c '
         set -eu
 
         for file do
-            rm -f "$file.br" "$file.zst" "$file.gz"
+            for sidecar in "$file.br" "$file.zst" "$file.gz"; do
+                if [ -f "$sidecar" ]; then
+                    printf "Deleting %s...\n" "$sidecar"
+                    rm -f "$sidecar"
+                fi
+            done
         done
     ' sh {} +
 
@@ -42,8 +47,13 @@ find "$static_root" -type f \
 
     for file do
         case "$file" in
-            *.onnx|*.onnx_data)
-                rm -f "$file.br" "$file.zst" "$file.gz"
+            *.onnx|*.onnx_data|*.onnx_data_*)
+                for sidecar in "$file.br" "$file.zst" "$file.gz"; do
+                    if [ -f "$sidecar" ]; then
+                        printf "Deleting %s...\n" "$sidecar"
+                        rm -f "$sidecar"
+                    fi
+                done
                 continue
                 ;;
         esac
