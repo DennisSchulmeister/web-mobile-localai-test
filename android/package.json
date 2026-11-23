@@ -6,7 +6,7 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "android:add": "npx cap init 'Local AI Test' 'de.wpvs.localai_test' --web-dir ../.capacitor/www && npx cap add android",
+        "android:add": "npx cap init 'Local AI Test' 'de.wpvs.localai_test' --web-dir .capacitor/www && npx cap add android",
         "android:sync": "npm --prefix ../app run build && node bin/prepare.js && npx cap sync android",
         "android:open": "npx cap open android"
     },

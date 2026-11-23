@@ -7,15 +7,18 @@
  */
 
 import {cp, mkdir, rm} from "node:fs/promises";
-import path from "node:path";
-import * as utils from "../../app/bin/utils.js";
+import path            from "node:path";
+import * as utils      from "../../app/bin/utils.js";
 
-const webDir    = path.resolve("../app/static");
-const outputDir = path.resolve("../.capacitor/www");
-const config    = utils.readConfig({
+const webDir     = path.resolve("../app/static");
+const outputDir  = path.resolve(".capacitor/www");
+const overlayDir = path.resolve("overlay");
+
+const config = utils.readConfig({
     configFile: path.join(webDir, "config.json"),
     withModels: true,
 });
+
 const catalog = config.models.config;
 
 const bundledModels = new Set(
@@ -47,3 +50,6 @@ for (const modelId of bundledModels) {
     console.log(`Copy Language Model: ${modelId}`);
     await cp(path.join(modelDir, modelId), path.join(outputModelDir, modelId), {recursive: true});
 }
+
+// Copy overlay files (custom backend URL)
+await cp(overlayDir, outputDir, {recursive: true});

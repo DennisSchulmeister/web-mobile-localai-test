@@ -29,6 +29,7 @@ async function fixture(t, downloadDir = "_generated/models", catalogPath = "mode
     const root = await mkdtemp(path.join(os.tmpdir(), "localai-android-"));
     t.after(() => rm(root, {recursive: true, force: true}));
     await mkdir(path.join(root, "android"), {recursive: true});
+    await mkdir(path.join(root, "android/overlay"), {recursive: true});
     await write(root, "app/static/config.json", JSON.stringify({
         models: {downloadDir, config: catalogPath},
         data: {preprocessDir: "_generated/preprocessed", embeddingsDir: "_generated/embeddings"},
@@ -63,7 +64,7 @@ test("bundles only flagged models while preserving web assets and the full catal
     const result = prepare(root);
     assert.equal(result.status, 0, result.stderr);
 
-    const output = path.join(root, ".capacitor/www");
+    const output = path.join(root, "android/.capacitor/www");
     const models = path.join(output, "_generated/models");
     assert.deepEqual(await readdir(models), ["onnx-community"]);
     assert.deepEqual((await readdir(path.join(models, "onnx-community"))).sort(), [
@@ -86,12 +87,27 @@ test("bundles only flagged models while preserving web assets and the full catal
 
 test("uses the configured model directory and removes stale staged assets on each sync", async t => {
     const root = await fixture(t, "downloads");
-    await write(root, `.capacitor/www/downloads/${excluded}/config.json`, "stale model");
-    await write(root, ".capacitor/www/obsolete.js", "stale asset");
+    await write(root, `android/.capacitor/www/downloads/${excluded}/config.json`, "stale model");
+    await write(root, "android/.capacitor/www/obsolete.js", "stale asset");
     assert.equal(prepare(root).status, 0);
-    await assert.rejects(readFile(path.join(root, ".capacitor/www/obsolete.js")), {code: "ENOENT"});
-    await assert.rejects(readFile(path.join(root, `.capacitor/www/downloads/${excluded}/config.json`)), {code: "ENOENT"});
-    assert.equal(await readFile(path.join(root, `.capacitor/www/downloads/${qwen}/config.json`), "utf8"), qwen);
+    await assert.rejects(readFile(path.join(root, "android/.capacitor/www/obsolete.js")), {code: "ENOENT"});
+    await assert.rejects(readFile(path.join(root, `android/.capacitor/www/downloads/${excluded}/config.json`)), {code: "ENOENT"});
+    assert.equal(await readFile(path.join(root, `android/.capacitor/www/downloads/${qwen}/config.json`), "utf8"), qwen);
+});
+
+test("overlays custom assets onto the staged web app, replacing existing files", async t => {
+    const root = await fixture(t);
+    await write(root, "android/overlay/api.url", "https://backend.example.test/api");
+    await write(root, "android/overlay/config.json", "custom config");
+    await write(root, "android/overlay/custom/settings.json", "custom setting");
+
+    const result = prepare(root);
+    assert.equal(result.status, 0, result.stderr);
+
+    const output = path.join(root, "android/.capacitor/www");
+    assert.equal(await readFile(path.join(output, "api.url"), "utf8"), "https://backend.example.test/api");
+    assert.equal(await readFile(path.join(output, "config.json"), "utf8"), "custom config");
+    assert.equal(await readFile(path.join(output, "custom/settings.json"), "utf8"), "custom setting");
 });
 
 test("fails explicitly when a bundled model is missing", async t => {
@@ -119,8 +135,8 @@ test("reads the configured catalog, follows changed flags, and deduplicates mode
 
     const result = prepare(root);
     assert.equal(result.status, 0, result.stderr);
-    assert.equal(result.stdout.split(`Kopiere Android-Modell: ${excluded}`).length - 1, 1);
-    assert.deepEqual(await readdir(path.join(root, ".capacitor/www/downloads/onnx-community")), [
+    assert.equal(result.stdout.split(`Copy Language Model: ${excluded}`).length - 1, 1);
+    assert.deepEqual(await readdir(path.join(root, "android/.capacitor/www/downloads/onnx-community")), [
         "bart-german-ONNX",
     ]);
 });
@@ -135,5 +151,5 @@ test("allows a catalog with no models flagged for Android", async t => {
     }));
     const result = prepare(root);
     assert.equal(result.status, 0, result.stderr);
-    assert.deepEqual(await readdir(path.join(root, ".capacitor/www/_generated/models")), []);
+    assert.deepEqual(await readdir(path.join(root, "android/.capacitor/www/_generated/models")), []);
 });

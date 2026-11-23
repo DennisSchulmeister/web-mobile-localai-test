@@ -34,12 +34,17 @@ The sync script builds the web app, prepares the Android staging directory, and 
 change.
 
 To keep the APK within ZIP32 size limits, the script stages the web assets in
-`.capacitor/www/`. The directory is configured as `webDir` in
+`android/.capacitor/www/`. The directory is configured as `webDir` in
 [`android/capacitor.config.ts`](../android/capacitor.config.ts). It contains all web
 assets and only the pre-downloaded models marked
 `"engines": {"onnx-android": {"include": true}}` in
 [`app/static/models/index.json`](../app/static/models/index.json). The staging directory
 is recreated during every sync to avoid retaining outdated models.
+
+Files under [`android/overlay/`](../android/overlay/) are then copied over the staged
+assets, preserving any subdirectory structure and replacing files with matching paths.
+Use this to provide Android-specific assets such as a custom backend URL in
+[`android/overlay/api.url`](../android/overlay/api.url).
 
 Missing models can be downloaded by the Android app from the HuggingFace Hub. Disable
 the corresponding features in [`app/static/config.json`](../app/static/config.json)
