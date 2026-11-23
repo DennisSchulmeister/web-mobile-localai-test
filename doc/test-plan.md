@@ -144,9 +144,11 @@ Semantic search can be tested with the following questions:
 2. How does a computer work?
 3. Was ist das WWW?
 4. What is the WWW?
+5. Was ist das World Wide Web?
+6. What is the world wide web?
 
 Notice how switching languages from English to German yields different results.
-Sometimes the English question returns German pages, too.
+Sometimes the English question returns German pages, too, sometimes it doesn't.
 
 ### Context-Free Chat
 
