@@ -31,15 +31,20 @@ find "$static_root" -type f \
 
     for file do
         if [ ! -f "$file.br" ] || [ "$file" -nt "$file.br" ]; then
+            printf "Compressing %s with Brotli...\n" "$file"
             brotli -q 11 -k -f "$file"
         fi
 
         if [ ! -f "$file.zst" ] || [ "$file" -nt "$file.zst" ]; then
+            printf "Compressing %s with Zstandard...\n" "$file"
             zstd -19 -q -f "$file" -o "$file.zst"
         fi
 
         if [ ! -f "$file.gz" ] || [ "$file" -nt "$file.gz" ]; then
+            printf "Compressing %s with gzip...\n" "$file"
             gzip -9 -k -f "$file"
         fi
     done
 ' sh {} +
+
+echo "Precompression finished"
