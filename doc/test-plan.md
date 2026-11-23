@@ -20,6 +20,7 @@ codes for each tested device.
 
 1. Log into the administration UI
 2. Create new access code
+3. Put the device name into the remarks field
 
 Recording can be started by entering the access code during app startup. The collected
 test data can be analyzed in the administration backend of the server.
@@ -33,8 +34,12 @@ recorded on the development machine. In theory the machine type, runtime type, O
 and browser should make no difference. Thus, the reference dataset can also be included
 in the performance evaluation to avoid recording the same tests twice.
 
-1. Create a new access code for the reference dataset.
-2. Using the access code, perform all test cases on the development machine.
+For comparison another reference dataset is recorded on the development machine using
+unaccelerated WASM execution. This dataset is not necessarily included in the quality
+evaluation but helps to estimate the performance gain from WebGPU execution.
+
+1. Create a new access code for each reference dataset.
+2. Using each access code, perform all test cases on the development machine.
 3. Manually evaluate the response quality in the administration UI (human judge).
 4. Create additional LLM-assisted evaluations in the administration UI (AI judge).
 
@@ -113,8 +118,15 @@ for comparison.
 Where possible, different OS versions and devices with varying performance levels are
 tested, with a preference for older laptops and low- to mid-end mobile devices. When
 acceleration (e.g. through WebGPU) is available, it is sufficient to run only the tests
-with acceleration enabled. As a baseline reference, one test run can be performed
-without acceleration on the development machine.
+with acceleration enabled.
+
+When tests using one model are finished, the test run is finished (be going back to
+the welcome screen) and the browser or app is closed to release all memory. Afterwards
+the browser or app is restarted and a new test run in recorded for the next model.
+This prevents memory leaks (of which there seem to be plenty) to poison the test results.
+
+The first test after loading a new model is performed twice to compare cold-start
+and hot-start times.
 
 A broad selection of mobile devices can be rented at
 [Telekom Mobile Device Cloud](https://mobiledevice.cloud/) for about 100 € per 5 hours.
@@ -127,10 +139,6 @@ measurement value recorded with the relevant test events.
 
 ## Test Cases
 
-Each test should be run for each available language model and data type. Before
-loading a new model, the browser should be closed and reopened to prevent biases
-from memory bottlenecks.
-
 Only semantic search and chat-based interactions are tested, as the specialized
 language models for summarization, question answering and translation perform
 poorly on the test data. Hence, they have not been ported to the Android inference
@@ -138,55 +146,78 @@ backend. Default parameters are used unless stated otherwise.
 
 ### Semantic Search
 
-Semantic search can be tested with the following questions:
+Reopen the browser or app and start a new test run for each model.
+Remark: `Semantic Search: modelid`.
+
+Perform the following queries, searching keywords only:
 
 1. Wie funktioniert ein Computer?
-2. How does a computer work?
-3. Was ist das WWW?
-4. What is the WWW?
-5. Was ist das World Wide Web?
-6. What is the world wide web?
+2. Wie funktioniert ein Computer?
+3. How does a computer work?
+4. Was ist das WWW?
+5. What is the WWW?
+6. Was ist das World Wide Web?
+7. What is the world wide web?
 
 Notice how switching languages from English to German yields different results.
 Sometimes the English question returns German pages, too, sometimes it doesn't.
 
+Repeat questions two to seven with the "full-text search option" enabled.
+
 ### Context-Free Chat
 
-During the same chat, ask the following questions about web development:
+Reopen the browser or app and start a new test run for each model.
+Remark: `Context-Free Chat: modelid`
+
+In the first chat, ask the following questions about web development:
 
 1. What is HTML?
-2. What is CSS?
-3. What is JavaScript?
+2. What is HTML?
+3. What is CSS?
+4. What is JavaScript?
 
 Next, start a new chat and ask the following more detailed questions:
 
 1. What are parallel minor chords?
 2. Explain the 2-5-1 chord progression using an example.
 
-Notice all the hallucinations and nonsense the models will output here.
-
 And finally, again in a new chat:
 
 1. How are leap years calculated?
+2. When did humans first land on the moon?
+3. How did the Yamaha DX7 work?
+4. What happened to the rock band Dire Straits?
+
+Notice all the hallucinations and nonsense the models will output.
 
 ### Chat With Page
 
-Using the English "Internet of Things" page, start a new chat and enter the following
-prompts:
+Reopen the browser or app and start a new test run for each model.
+Remark: `Chat with Page: modelid`
 
-1. Please summarize.
-2. Are IoT devices and embedded devices the same?
+Visit the following text pages, start a new chat ask the following questions:
 
-On the English "Embedded Systems" page, ask:
+* English / Internet of Things:
+    1. Please summarize.
+    2. Are IoT devices and embedded devices the same?
 
-1. Translate to German.
+* English / Embedded Systems:
+    1. Translate to German.
+
+* English / What Makes Up a Computer?:
+    1. How does this relate to a generic laptop or PC?
+
+* English / The Idea Behind the World Wide Web:
+    1. Which HTML version was used for Beethoven's 5th symphony?
 
 ### Switching Models
 
-On the context-free chat page, a separate test can be performed to check if switching models
-without closing the web page, browser or app degenerates performance, e.g. due to memory leaks.
-For this test, which is recorded in a dedicated test run, each model is loaded and the same
-question is asked.
+Reopen the browser or app and start a new test run. Remark: `Memory Leaks`
+
+The purpose of this test is to measure the performance degradation due to memory leaks
+and memory consumption by loading and unloading different models in the same session.
+To this end, on the context-free chat page, load each model and ask the same question
+without closing the page:
 
 * Question: "Was Einstein good at math?"
 * Max Tokens: 100
