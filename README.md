@@ -21,6 +21,7 @@ The repository contains:
 * [Build and run the Capacitor Android app](doc/android-app.md)
 * [Build and run the Django backend](doc/django-backend.md)
 * [Docker Compose deployment](doc/docker-compose.md)
+* [Release management](doc/release-management.md)
 
 ### Findings and tests
 

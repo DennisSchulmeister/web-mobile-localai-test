@@ -1,7 +1,7 @@
 [project]
 name = "wmlt-server"
 version = "1.0.0"
-description = "Backend-Server zum Aufzeichnen der Testfälle"
+description = "Web/Mobile Test for Local AI: Server Backend"
 authors = [
     {name = "Dennis Schulmeister-Zimolong", email = "dennis@windows3.de"}
 ]
