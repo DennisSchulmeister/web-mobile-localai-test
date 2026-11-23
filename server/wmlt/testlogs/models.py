@@ -124,7 +124,7 @@ class EventException(models.Model):
     event   = models.ForeignKey(Event, on_delete=models.CASCADE)
     seqnr   = models.IntegerField(_("Sequence Number"))
     name    = models.CharField(_("Name"), max_length=50)
-    message = models.CharField(_("Message"), max_length=255, blank=True)
+    message = models.TextField(_("Message"), blank=True)
     stack   = models.TextField(_("Stack Trace"), blank=True)
 
     class Meta:

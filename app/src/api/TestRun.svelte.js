@@ -6,7 +6,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import i18n from "../state/i18n.svelte.js";
+import i18n                    from "../state/i18n.svelte.js";
+import { getLocalStorageItem } from "../utils/local-storage.js";
+import { setLocalStorageItem } from "../utils/local-storage.js";
 
 /**
  * Communication with the Django server API to record test events.
@@ -17,7 +19,7 @@ class TestRunAPI {
      * to display the currently used access code, but should not be changes by
      * the widget.
      */
-    accessCode = $state(window.localStorage.getItem("access_code") || "");
+    accessCode = $state(getLocalStorageItem("access_code"));
 
     /**
      * Recording enabled/disabled. No data will be sent to the server, when this
@@ -25,17 +27,17 @@ class TestRunAPI {
      * UI widget. However, the widget should not be shown when the access code
      * is empty, as this flag will have to effect then.
      */
-    recording = $state(window.localStorage.getItem("recording") ? true : false);
+    recording = $state(getLocalStorageItem("recording") ? true : false);
 
     /**
      * URL prefix for the backend API.
      */
-    #apiUrl = $state(window.localStorage.getItem("apiUrl") || "");
+    #apiUrl = $state(getLocalStorageItem("apiUrl"));
 
     /**
      * ID of the current test run.
      */
-    #testRunId = $state(parseInt(window.localStorage.getItem("testRunId") || 0));
+    #testRunId = $state(parseInt(getLocalStorageItem("testRunId", "0")));
 
     /**
      * Persist state in the browser's local storage.
@@ -43,10 +45,10 @@ class TestRunAPI {
     constructor() {
         $effect.root(() => {
             $effect(() => {
-                window.localStorage.setItem("access_code", this.accessCode);
-                window.localStorage.setItem("recording",   this.recording ? "true" : "");
-                window.localStorage.setItem("apiUrl",      this.#apiUrl);
-                window.localStorage.setItem("testRunId",   this.#testRunId);
+                setLocalStorageItem("access_code", this.accessCode);
+                setLocalStorageItem("recording", this.recording ? "true" : "");
+                setLocalStorageItem("apiUrl", this.#apiUrl);
+                setLocalStorageItem("testRunId", this.#testRunId);
             });
         });
     }
@@ -101,7 +103,7 @@ class TestRunAPI {
     async connect(accessCode) {
         // Check access code exists and is valid (actually checked by the server)
         this.#apiUrl = await (await fetch("api.url")).text();
-        let response = await this.#fetch("GET", "auth/access_codes", null, accessCode);
+        let response = await this.#fetch("GET", "auth/access_codes/", null, accessCode);
 
         if (response.status !== 200) {
             throw new Error(i18n.text.api?.testRun?.invalidAccessCode);
@@ -129,7 +131,7 @@ class TestRunAPI {
      * @returns Last test run or `null`
      */
     async getPreviousTestRun() {
-        let response = await this.#fetch("GET", "testlogs/test_runs/last");
+        let response = await this.#fetch("GET", "testlogs/test_runs/last/");
 
         if (response.headers.get("content-type")?.includes("json")) {
             return await response.json();

@@ -3,6 +3,8 @@
 	redir @root /app 302
 	redir /app /app/ 308
 	redir /srv /srv/ 308
+	redir /srv/admin /srv/admin/ 308
+	redir /admin /admin/ 308
 
 	handle_path /app/* {
 		root * /workspace/app/static
@@ -15,7 +17,11 @@
 		file_server
 	}
 
-	handle_path /srv/* {
-		reverse_proxy backend-full:8000
+	handle /srv/* {
+		reverse_proxy backend-postgres:8000
+	}
+
+	handle /admin/* {
+		reverse_proxy backend-postgres:8000
 	}
 }

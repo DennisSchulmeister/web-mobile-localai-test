@@ -77,10 +77,16 @@ if [ -n "$fixtures" ] && [ ! -f "$fixtures_marker" ]; then
     set -- $fixtures
     set +f
     IFS=$old_ifs
-    poetry run python manage.py loaddata "$@"
+    poetry run python manage.py loaddata $@
 
     touch "$fixtures_marker"
 fi
 
 poetry run python manage.py collectstatic --noinput
-exec poetry run daphne -b 0.0.0.0 -p 8000 wmlt.asgi:application
+
+set --
+if [ -n "${DJANGO_SCRIPT_NAME:-}" ]; then
+    set -- --root-path "$DJANGO_SCRIPT_NAME"
+fi
+
+exec poetry run daphne "$@" -b 0.0.0.0 -p 8000 wmlt.asgi:application

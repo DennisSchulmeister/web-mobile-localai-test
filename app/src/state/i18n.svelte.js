@@ -6,6 +6,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+import { getLocalStorageItem } from "../utils/local-storage.js";
+import { setLocalStorageItem } from "../utils/local-storage.js";
+
 /**
  * Language and translated texts.
  */
@@ -21,7 +24,7 @@ class I18N {
     /**
      * Current language
      */
-    language = $state(window.localStorage.getItem("language") || "en");
+    language = $state(getLocalStorageItem("language", "en"));
     
     /**
      * Shadow copy of the text catalogue to prevent flickering when the
@@ -34,7 +37,7 @@ class I18N {
      */
     text = $derived.by(() => {
         let result = this.#text;
-        window.localStorage.setItem("language", this.language);
+        setLocalStorageItem("language", this.language);
 
         import(`./i18n/${this.language}.js`).then(module => {
             for (let key of Object.keys(module.default)) {

@@ -6,6 +6,7 @@
 
 from django.urls            import include
 from django.urls            import path
+from django.http            import HttpResponse
 from rest_framework.routers import DefaultRouter as DRFDefaultRouter
 
 from .admin                 import admin_site
@@ -16,7 +17,11 @@ api_router = DRFDefaultRouter()
 register_auth_api_routes(api_router, "auth")
 register_testlogs_api_routes(api_router, "testlogs")
 
+def health_check(request):
+    return HttpResponse("OK", status=200)
+
 urlpatterns = [
+    path("health-check/", health_check),
     path("api/",      include(api_router.urls)),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     path("i18n/",     include("django.conf.urls.i18n")),

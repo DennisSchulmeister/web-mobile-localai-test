@@ -23,11 +23,22 @@ export function encodeEmbedding(embedding, dtype) {
                 view.setFloat32(i * 4, embedding[i], true);
                 break;
             default:
-                throw new Error(`Einbettung mit Datentyp ${dtype} kann nicht codiert werden.`);
+                throw new Error(`Embedding with data type ${dtype} cannot be encoded.`);
         }
     }
 
-    return bytes.toBase64();
+    if (bytes.toBase64) {
+        return bytes.toBase64();
+    } else {
+        // Older runtimes
+        let binary = "";
+
+        for (let i = 0; i < bytes.length; i++) {
+            binary += String.fromCharCode(bytes[i]);
+        }
+
+        return btoa(binary);
+    }
 }
 
 /**
@@ -54,7 +65,7 @@ export function decodeEmbedding(base64, dtype) {
                 return embedding;
             }
             default:
-                throw new Error(`Einbettung mit Datentyp ${dtype} kann nicht decodiert werden.`);
+                throw new Error(`Embedding with data type ${dtype} cannot be decoded.`);
         }
     } else {
         // Android WebView on devices released before 2026
@@ -77,7 +88,7 @@ export function decodeEmbedding(base64, dtype) {
                 return embedding;
             }
             default:
-                throw new Error(`Einbettung mit Datentyp ${dtype} kann nicht decodiert werden.`);
+                throw new Error(`Embedding with data type ${dtype} cannot be decoded.`);
         }
     }
 }

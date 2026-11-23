@@ -49,11 +49,15 @@ DATABASES = {
 }
 
 # E-Mail Settings
-# See: https://docs.djangoproject.com/en/5.0/ref/settings/#std-setting-EMAIL_BACKEND
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+# https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
+MAILERS = {
+    "default": {
+        "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+    },
+}
 
 # DEFAULT_FROM_EMAIL   = "noreply@example.com"
-# EMAIL_SUBJECT_PREFIX = "[OpenBook] "
+# EMAIL_SUBJECT_PREFIX = "[Local AI Test] "
 # EMAIL_HOST           = "localhost"
 # EMAIL_PORT           = 25
 # EMAIL_HOST_USER      = ""
@@ -62,6 +66,7 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
 # Static files
 # Run `manage.py collectstatic` to copy the files first!
+# Note: The pre-defined Docker container automatically runs the command on first start-up.
 STATIC_ROOT = os.environ.get("DJANGO_STATIC_ROOT", "/srv/static")
 STATIC_URL = os.environ.get("DJANGO_STATIC_URL", "/srv/static/")
 

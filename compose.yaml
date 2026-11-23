@@ -88,6 +88,8 @@ services:
         image: node:24-slim
         profiles: [node, full]
         working_dir: /workspace/app
+        environment:
+            API_PUBLIC_URL: ${API_PUBLIC_URL:-}
         volumes:
             - .:/workspace
             - node-dependencies:/workspace/app/node_modules
