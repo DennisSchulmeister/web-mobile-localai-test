@@ -27,7 +27,7 @@ class AIModel(models.Model):
     model_id    = models.CharField(_("Model ID"), max_length=100, unique=True, help_text=_("See https://python.useinstructor.com/integrations/#getting-started"))
     api_key     = models.CharField(_("API Key"), max_length=255, blank=True)
     base_url    = models.URLField(_("Base URL"), blank=True, help_text=_("When different from the default base URL."))
-    mode        = models.CharField(_("Call Mode"), blank=True, choices=Mode, help_text=_("Normally you shouldn't need to set this value."))
+    mode        = models.CharField(_("Call Mode"), max_length=25, blank=True, choices=Mode, help_text=_("Normally you shouldn't need to set this value."))
     cache_size  = models.IntegerField(_("Response Cache Size"), blank=True, null=True, help_text=_("Setting this value enables the built-in response cache."))
     max_retries = models.IntegerField(_("Maximum Retries"), blank=True, null=True, default=2)
     kwargs      = models.JSONField(_("Provider-specific Parameters"), blank=True, default=dict, validators=[is_dict])
