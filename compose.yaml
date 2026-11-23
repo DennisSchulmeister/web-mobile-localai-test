@@ -30,15 +30,15 @@ x-backend: &backend
     extra_hosts:
         - host.docker.internal:host-gateway
     ports:
-        - "${DJANGO_PORT:-8000}:8000"
+        - "${DJANGO_PORT:-127.0.0.1:8000}:8000"
     healthcheck:
         test:
             - CMD
             - python
             - -c
             - import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health-check/').close()
-        interval: 60s
-        timeout: 10s
+        interval: 5s
+        timeout: 5s
         retries: 6
         start_period: 10m
     networks:
@@ -106,7 +106,7 @@ services:
         image: caddy:2-alpine
         profiles: [caddy, full]
         ports:
-            - "${HTTP_PORT:-8080}:80"
+            - "${HTTP_PORT:-127.0.0.1:8080}:80"
         volumes:
             - ./docker/Caddyfile:/etc/caddy/Caddyfile:ro
             - ./app/static:/workspace/app/static:ro
