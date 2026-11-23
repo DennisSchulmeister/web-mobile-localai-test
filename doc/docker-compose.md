@@ -127,12 +127,18 @@ Alias /app/ /path/to/web-mobile-localai-test/app/static/
 <Directory /path/to/web-mobile-localai-test/app/static/>
     Require all granted
     FallbackResource /app/index.html
+    EnableSendfile On
 </Directory>
 
 Alias /srv/static/ /path/to/web-mobile-localai-test/server/static/
 <Directory /path/to/web-mobile-localai-test/server/static/>
     Require all granted
+    EnableSendfile On
 </Directory>
+
+<FilesMatch "\.(onnx|onnx_data)$">
+    Header set Cache-Control "public, max-age=604800"
+</FilesMatch>
 
 ProxyPreserveHost On
 ProxyPass /srv/static/ !
