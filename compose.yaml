@@ -41,6 +41,10 @@ x-backend: &backend
         timeout: 10s
         retries: 6
         start_period: 10m
+    networks:
+        default:
+            aliases:
+                - backend
 
 # Service definitions
 services:

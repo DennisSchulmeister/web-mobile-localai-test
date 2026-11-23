@@ -18,10 +18,10 @@
 	}
 
 	handle /srv/* {
-		reverse_proxy backend-postgres:8000
+		reverse_proxy backend:8000
 	}
 
 	handle /admin/* {
-		reverse_proxy backend-postgres:8000
+		reverse_proxy backend:8000
 	}
 }
