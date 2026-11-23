@@ -6,10 +6,7 @@ precompress="${STATIC_PRECOMPRESS:-true}"
 
 case "$precompress" in
     1|true|yes) ;;
-    0|false|no|"")
-        echo "Static asset precompression is disabled."
-        exit 0
-        ;;
+    0|false|no|"") precompress=false ;;
     *)
         echo "Unsupported STATIC_PRECOMPRESS value: $precompress (choose true or false)." >&2
         exit 1
@@ -21,6 +18,20 @@ if [ ! -d "$static_root" ]; then
     exit 1
 fi
 
+if [ "$precompress" = false ]; then
+    find "$static_root" -type f \( -name '*.onnx' -o -name '*.onnx_data' \) \
+        -exec sh -c '
+        set -eu
+
+        for file do
+            rm -f "$file.br" "$file.zst" "$file.gz"
+        done
+    ' sh {} +
+
+    echo "Static asset precompression is disabled."
+    exit 0
+fi
+
 # Skip compression sidecars so subsequent runs don't compress them again.
 find "$static_root" -type f \
     ! -name '*.br' \
@@ -30,6 +41,13 @@ find "$static_root" -type f \
     set -eu
 
     for file do
+        case "$file" in
+            *.onnx|*.onnx_data)
+                rm -f "$file.br" "$file.zst" "$file.gz"
+                continue
+                ;;
+        esac
+
         if [ ! -f "$file.br" ] || [ "$file" -nt "$file.br" ]; then
             printf "Compressing %s with Brotli...\n" "$file"
             brotli -q 11 -k -f "$file"

@@ -88,11 +88,16 @@ workspace paths or named volumes. For local, non-containerized development, see
 [Building and Running the Web App](web-app.md) and
 [Building and Running the Django Backend](django-backend.md).
 
-The Node and Django startup scripts pre-compress all static files as Brotli,
-Zstandard, and gzip sidecars (skipping existing `.br`, `.zst`, and `.gz` sidecars).
-Set `STATIC_PRECOMPRESS=false` in `.env` to disable this step. Pre-compression may
-take time on first startup and uses additional disk space; updated files are
-recompressed when their source is newer than the sidecar.
+The Node and Django startup scripts pre-compress static files as Brotli, Zstandard,
+and gzip sidecars (skipping existing `.br`, `.zst`, and `.gz` sidecars). ONNX model
+files (`.onnx` and `.onnx_data`) are excluded: their sidecars are removed, and Caddy
+does not apply HTTP compression to them. The Apache example below skips their sidecars
+and excludes them from Apache's `mod_deflate` and `mod_brotli` output filters if those
+are enabled elsewhere in the site configuration.
+
+Set `STATIC_PRECOMPRESS=false` in `.env` to disable pre-compression entirely. Pre-compression
+takes time on first startup and uses additional disk space; updated files are recompressed when
+their source is newer than the sidecar.
 
 ## Use Apache on the host instead of Caddy
 
@@ -118,10 +123,10 @@ DJANGO_SCRIPT_NAME=/srv
 ```
 
 Enable the Apache modules used by the example (`alias`, `dir`, `headers`, `mime`,
-`proxy`, `proxy_http`, and `rewrite`; on Debian, for example, run
-`sudo a2enmod alias dir headers mime proxy proxy_http rewrite`). Add the following inside the site's
-existing `<VirtualHost>` and replace the frontend and static-files paths with the
-absolute paths to this checkout:
+`proxy`, `proxy_http`, `rewrite`, and `setenvif`; on Debian, for example, run
+`sudo a2enmod alias dir headers mime proxy proxy_http rewrite setenvif`). Add the
+following inside the site's existing `<VirtualHost>` and replace the frontend and
+static-files paths with the absolute paths to this checkout:
 
 ```apache
 RedirectMatch 302 ^/$ /app/
@@ -146,18 +151,21 @@ Alias /app/ /path/to/web-mobile-localai-test/app/static/
     RewriteEngine On
     RewriteBase /app/
 
+    RewriteCond %{REQUEST_FILENAME} !\.(onnx|onnx_data)$ [NC]
     RewriteCond %{HTTP:Accept-Encoding} \bbr\b [NC]
     RewriteCond %{HTTP:Accept-Encoding} !\bbr\s*;\s*q=0(?:\.0*)?(?:\s*,|$) [NC]
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteCond %{REQUEST_FILENAME}.br -f
     RewriteRule ^(.+)$ $1.br [END]
 
+    RewriteCond %{REQUEST_FILENAME} !\.(onnx|onnx_data)$ [NC]
     RewriteCond %{HTTP:Accept-Encoding} \bzstd\b [NC]
     RewriteCond %{HTTP:Accept-Encoding} !\bzstd\s*;\s*q=0(?:\.0*)?(?:\s*,|$) [NC]
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteCond %{REQUEST_FILENAME}.zst -f
     RewriteRule ^(.+)$ $1.zst [END]
 
+    RewriteCond %{REQUEST_FILENAME} !\.(onnx|onnx_data)$ [NC]
     RewriteCond %{HTTP:Accept-Encoding} \bgzip\b [NC]
     RewriteCond %{HTTP:Accept-Encoding} !\bgzip\s*;\s*q=0(?:\.0*)?(?:\s*,|$) [NC]
     RewriteCond %{REQUEST_FILENAME} -f
@@ -181,24 +189,29 @@ Alias /srv/static/ /path/to/web-mobile-localai-test/server/static/
     RewriteEngine On
     RewriteBase /srv/static/
 
+    RewriteCond %{REQUEST_FILENAME} !\.(onnx|onnx_data)$ [NC]
     RewriteCond %{HTTP:Accept-Encoding} \bbr\b [NC]
     RewriteCond %{HTTP:Accept-Encoding} !\bbr\s*;\s*q=0(?:\.0*)?(?:\s*,|$) [NC]
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteCond %{REQUEST_FILENAME}.br -f
     RewriteRule ^(.+)$ $1.br [END]
 
+    RewriteCond %{REQUEST_FILENAME} !\.(onnx|onnx_data)$ [NC]
     RewriteCond %{HTTP:Accept-Encoding} \bzstd\b [NC]
     RewriteCond %{HTTP:Accept-Encoding} !\bzstd\s*;\s*q=0(?:\.0*)?(?:\s*,|$) [NC]
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteCond %{REQUEST_FILENAME}.zst -f
     RewriteRule ^(.+)$ $1.zst [END]
     
+    RewriteCond %{REQUEST_FILENAME} !\.(onnx|onnx_data)$ [NC]
     RewriteCond %{HTTP:Accept-Encoding} \bgzip\b [NC]
     RewriteCond %{HTTP:Accept-Encoding} !\bgzip\s*;\s*q=0(?:\.0*)?(?:\s*,|$) [NC]
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteCond %{REQUEST_FILENAME}.gz -f
     RewriteRule ^(.+)$ $1.gz [END]
 </Directory>
+
+SetEnvIfNoCase Request_URI \.(?:onnx|onnx_data)$ no-gzip no-brotli
 
 <FilesMatch "\.(onnx|onnx_data)$">
     Header set Cache-Control "public, max-age=604800"
