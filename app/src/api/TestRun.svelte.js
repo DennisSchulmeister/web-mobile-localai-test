@@ -59,7 +59,7 @@ class TestRunAPI {
      * be set to `true`.
      */
     get enabled() {
-        return this.accessCode && this.recording;
+        return (this.accessCode ? true : false) && (this.recording ? true : false);
     }
 
     /**

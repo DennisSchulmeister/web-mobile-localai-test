@@ -161,7 +161,7 @@ class SemanticSearchPageState {
         let seqnr        = 0;
         let measurements = {download: "", embedding: "", search: ""};
 
-        for (let searchResult of searchResults) {
+        for (let searchResult of searchResults || []) {
             for (let text of searchResult.texts) {
                 results.push({
                     seqnr: ++seqnr,
@@ -174,7 +174,7 @@ class SemanticSearchPageState {
             }
         }
 
-        for (let measurement of this.stopWatchState.measurements) {
+        for (let measurement of this.stopWatchState.measurements || []) {
             switch (measurement.name) {
                 case i18n.text.homePage?.search?.download:
                     measurements.download = formatDuration(measurement.runtime);

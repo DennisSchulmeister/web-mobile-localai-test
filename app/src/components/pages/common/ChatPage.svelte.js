@@ -130,12 +130,12 @@ class ChatPageState {
         // Log chat message event
         let measurements = {
             firstToken:      "",
-            runtime:         formatDuration(response.stopWatch.measurements[0].runtime),
+            runtime:         formatDuration(response.stopWatch?.measurements?.[0]?.runtime || 0.0),
             numberTokens:    0,
             tokensPerSecond: 0.0,
         }
 
-        for (let value of response?.stats.values) {
+        for (let value of response?.stats?.values || []) {
             switch (value.name) {
                 case i18n.text.textGenerationStats?.numberTokens:
                     measurements.numberTokens = value.value;
@@ -196,9 +196,9 @@ class ChatPageState {
         });
 
         if (this.textPage) {
-            this.#startChatEventIdTextPage = event.id;
+            this.#startChatEventIdTextPage = event?.id || 0;
         } else {
-            this.#startChatEventIdHome = event.id;
+            this.#startChatEventIdHome = event?.id || 0;
         }
     }
 }
