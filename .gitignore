@@ -17,6 +17,7 @@ db.sqlite3
 # Docker
 .env
 /server/static/
+compose.sh
 
 # Precompressed static files
 *.br
