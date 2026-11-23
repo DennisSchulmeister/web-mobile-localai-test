@@ -87,3 +87,61 @@ The frontend's generated files and Python/Node dependencies are stored in mounte
 workspace paths or named volumes. For local, non-containerized development, see
 [Building and Running the Web App](web-app.md) and
 [Building and Running the Django Backend](django-backend.md).
+
+## Use Apache on the host instead of Caddy
+
+If Apache is already serving the host, start the Compose services without the `full`
+or `caddy` profile. For example, with PostgreSQL:
+
+```sh
+docker compose --profile postgres --profile node up --build
+```
+
+Or, with a database outside Compose:
+
+```sh
+docker compose --profile external --profile node up --build
+```
+
+The `node` profile builds the frontend; neither command starts Caddy. In `.env`, bind
+the backend port to loopback so it is only reachable by host services:
+
+```dotenv
+DJANGO_PORT=127.0.0.1:8000
+DJANGO_SCRIPT_NAME=/srv
+```
+
+Enable the Apache modules used by the example (`alias`, `dir`, `proxy`, and
+`proxy_http`; on Debian, for example, run
+`sudo a2enmod alias dir proxy proxy_http`). Add the following inside the site's
+existing `<VirtualHost>` and replace the frontend and static-files paths with the
+absolute paths to this checkout:
+
+```apache
+RedirectMatch 302 ^/$ /app/
+RedirectMatch 308 ^/app$ /app/
+RedirectMatch 308 ^/srv$ /srv/
+RedirectMatch 308 ^/admin$ /admin/
+
+Alias /app/ /path/to/web-mobile-localai-test/app/static/
+<Directory /path/to/web-mobile-localai-test/app/static/>
+    Require all granted
+    FallbackResource /app/index.html
+</Directory>
+
+Alias /srv/static/ /path/to/web-mobile-localai-test/server/static/
+<Directory /path/to/web-mobile-localai-test/server/static/>
+    Require all granted
+</Directory>
+
+ProxyPreserveHost On
+ProxyPass /srv/static/ !
+ProxyPass /srv/ http://127.0.0.1:8000/srv/
+ProxyPassReverse /srv/ http://127.0.0.1:8000/srv/
+ProxyPass /admin/ http://127.0.0.1:8000/admin/
+ProxyPassReverse /admin/ http://127.0.0.1:8000/admin/
+```
+
+Keep any existing HTTPS configuration and place these directives in the virtual host
+that serves the application. If the backend port or paths differ, update the proxy
+target and aliases accordingly.
