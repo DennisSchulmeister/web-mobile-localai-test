@@ -58,6 +58,7 @@ recording test events.
         errorMessage = "";
 
         if (!accessCode.trim()) {
+            testRunAPI.disconnect();
             location.href = START_APPLICATION_URL;
             return;
         }
