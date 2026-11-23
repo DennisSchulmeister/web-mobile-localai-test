@@ -7,6 +7,7 @@ for every browser or device.
 * [Web platform](#web-platform)
 * [Android](#android)
 * [Browser and operating-system differences](#browser-and-operating-system-differences)
+* [Optimizing download times](#optimizing-download-times)
 * [General constraints and outlook](#general-constraints-and-outlook)
 
 ## Future Web APIs
@@ -82,6 +83,33 @@ locally. However, this could change in the future:
   seconds and semantic search about 1.5 seconds. Later requests were closer to Linux
   performance, but Qwen3 was slower at about six tokens/second. Chrome on Windows did
   not show the same cold-start issue and reached about ten tokens/second for Qwen3.
+
+## Optimizing download times
+
+For web applications, downloading the huge model data files is a real issue, even more
+so on mobile devices. The obvious elephant in the room is client and server bandwidth.
+Addition strategies to consider:
+
+1. Disable HTTP transport compression for ONXX data files: The bandwidth saving is
+   minimal (if any), but compression consumes lots of CPU cycles on both sides.
+
+2. Pre-compress all other static files: Most production web servers apply transport
+   level compression on the fly. By pre-compressing the files once the CPU cycles
+   can be saved at least on the server side.
+
+3. Enable client-side caching: Setting the HTTP cache control headers allows the
+   clients (browsers) to serve static files and models from their local cache, once
+   they have been downloaded.
+
+4. Serving large files from dedicated CDN servers: This helps to keep the bandwidth
+   toll away from the main web server, which is a good thing not only for performance
+   but also since most VM providers throttle bandwidth once their quote as exceeded.
+   CDNs may also serve the files from a location close to the end user.
+
+5. Setup dedicated caching proxies: Same rationale as for CDN servers, but self
+   maintained.
+
+Measures one to three are already applied in the included Docker Compose setup.
 
 ## General constraints and outlook
 

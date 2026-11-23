@@ -8,6 +8,8 @@ into an image.
 * [Configure the environment](#configure-the-environment)
 * [Start a profile](#start-a-profile)
 * [Profiles and services](#profiles-and-services)
+* [Optimize server throughput](#optimize-server-throughput)
+* [Use Apache on the host instead of Caddy](#use-apache-on-the-host-instead-of-caddy)
 
 ## Configure the environment
 
@@ -88,16 +90,26 @@ workspace paths or named volumes. For local, non-containerized development, see
 [Building and Running the Web App](web-app.md) and
 [Building and Running the Django Backend](django-backend.md).
 
+## Optimize server throughput
+
 The Node and Django startup scripts pre-compress static files as Brotli, Zstandard,
-and gzip sidecars (skipping existing `.br`, `.zst`, and `.gz` sidecars). ONNX model
-files (`.onnx`, `.onnx_data`, and split `.onnx_data_<number>` files) are excluded:
-their sidecars are removed, and Caddy does not apply HTTP compression to them. The
-Apache example below skips their sidecars and excludes them from Apache's `mod_deflate`
+and gzip sidecars (skipping existing `.br`, `.zst`, and `.gz` sidecars). Pre-compression
+takes time on first startup and uses additional disk space; Thus, files are only
+recompressed when their source is newer than the sidecar. The overall benefit
+is, that the web server doesn't need to apply compression on-the-fly, saving
+CPU cycles at runtime.
+
+ONNX model files (`.onnx`, `.onnx_data`, and split `.onnx_data_<number>` files) are
+excluded, since compression doesn't save much bandwidth (if at all), but consumes
+considerable CPU cycles on both server and client. Left-over sidecars for them are
+thus removed and Caddy does not apply on-the-fly HTTP compression to them, either.
+The Apache example below skips their sidecars and excludes them from Apache's `mod_deflate`
 and `mod_brotli` output filters if those are enabled elsewhere in the site configuration.
 
-Set `STATIC_PRECOMPRESS=false` in `.env` to disable pre-compression entirely. Pre-compression
-takes time on first startup and uses additional disk space; updated files are recompressed when
-their source is newer than the sidecar.
+Note, that upstream proxy servers might still compress the HTTP traffic. For this
+optimization to work best, disable HTTP compression for ONXX files there, too.
+
+Set `STATIC_PRECOMPRESS=false` in `.env` to disable pre-compression entirely.
 
 ## Use Apache on the host instead of Caddy
 
