@@ -88,6 +88,12 @@ workspace paths or named volumes. For local, non-containerized development, see
 [Building and Running the Web App](web-app.md) and
 [Building and Running the Django Backend](django-backend.md).
 
+The Node and Django startup scripts pre-compress all static files as Brotli,
+Zstandard, and gzip sidecars (skipping existing `.br`, `.zst`, and `.gz` sidecars).
+Set `STATIC_PRECOMPRESS=false` in `.env` to disable this step. Pre-compression may
+take time on first startup and uses additional disk space; updated files are
+recompressed when their source is newer than the sidecar.
+
 ## Use Apache on the host instead of Caddy
 
 If Apache is already serving the host, start the Compose services without the `full`
@@ -111,9 +117,9 @@ DJANGO_PORT=127.0.0.1:8000
 DJANGO_SCRIPT_NAME=/srv
 ```
 
-Enable the Apache modules used by the example (`alias`, `dir`, `proxy`, and
-`proxy_http`; on Debian, for example, run
-`sudo a2enmod alias dir proxy proxy_http`). Add the following inside the site's
+Enable the Apache modules used by the example (`alias`, `dir`, `headers`, `mime`,
+`proxy`, `proxy_http`, and `rewrite`; on Debian, for example, run
+`sudo a2enmod alias dir headers mime proxy proxy_http rewrite`). Add the following inside the site's
 existing `<VirtualHost>` and replace the frontend and static-files paths with the
 absolute paths to this checkout:
 
@@ -127,13 +133,71 @@ Alias /app/ /path/to/web-mobile-localai-test/app/static/
 <Directory /path/to/web-mobile-localai-test/app/static/>
     Require all granted
     FallbackResource /app/index.html
+
+    # Use UNIX sendfile to optmize throughput
     EnableSendfile On
+
+    # Serve pre-compressed files to optimize throughput
+    AddEncoding br .br
+    AddEncoding zstd .zst
+    AddEncoding gzip .gz
+    Header merge Vary Accept-Encoding
+
+    RewriteEngine On
+    RewriteBase /app/
+
+    RewriteCond %{HTTP:Accept-Encoding} \bbr\b [NC]
+    RewriteCond %{HTTP:Accept-Encoding} !\bbr\s*;\s*q=0(?:\.0*)?(?:\s*,|$) [NC]
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteCond %{REQUEST_FILENAME}.br -f
+    RewriteRule ^(.+)$ $1.br [END]
+
+    RewriteCond %{HTTP:Accept-Encoding} \bzstd\b [NC]
+    RewriteCond %{HTTP:Accept-Encoding} !\bzstd\s*;\s*q=0(?:\.0*)?(?:\s*,|$) [NC]
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteCond %{REQUEST_FILENAME}.zst -f
+    RewriteRule ^(.+)$ $1.zst [END]
+
+    RewriteCond %{HTTP:Accept-Encoding} \bgzip\b [NC]
+    RewriteCond %{HTTP:Accept-Encoding} !\bgzip\s*;\s*q=0(?:\.0*)?(?:\s*,|$) [NC]
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteCond %{REQUEST_FILENAME}.gz -f
+    RewriteRule ^(.+)$ $1.gz [END]
 </Directory>
 
 Alias /srv/static/ /path/to/web-mobile-localai-test/server/static/
 <Directory /path/to/web-mobile-localai-test/server/static/>
     Require all granted
+
+    # Use UNIX sendfile to optmize throughput
     EnableSendfile On
+
+    # Serve pre-compressed files to optimize throughput
+    AddEncoding br .br
+    AddEncoding zstd .zst
+    AddEncoding gzip .gz
+    Header merge Vary Accept-Encoding
+
+    RewriteEngine On
+    RewriteBase /srv/static/
+
+    RewriteCond %{HTTP:Accept-Encoding} \bbr\b [NC]
+    RewriteCond %{HTTP:Accept-Encoding} !\bbr\s*;\s*q=0(?:\.0*)?(?:\s*,|$) [NC]
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteCond %{REQUEST_FILENAME}.br -f
+    RewriteRule ^(.+)$ $1.br [END]
+
+    RewriteCond %{HTTP:Accept-Encoding} \bzstd\b [NC]
+    RewriteCond %{HTTP:Accept-Encoding} !\bzstd\s*;\s*q=0(?:\.0*)?(?:\s*,|$) [NC]
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteCond %{REQUEST_FILENAME}.zst -f
+    RewriteRule ^(.+)$ $1.zst [END]
+    
+    RewriteCond %{HTTP:Accept-Encoding} \bgzip\b [NC]
+    RewriteCond %{HTTP:Accept-Encoding} !\bgzip\s*;\s*q=0(?:\.0*)?(?:\s*,|$) [NC]
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteCond %{REQUEST_FILENAME}.gz -f
+    RewriteRule ^(.+)$ $1.gz [END]
 </Directory>
 
 <FilesMatch "\.(onnx|onnx_data)$">
@@ -150,4 +214,6 @@ ProxyPassReverse /admin/ http://127.0.0.1:8000/admin/
 
 Keep any existing HTTPS configuration and place these directives in the virtual host
 that serves the application. If the backend port or paths differ, update the proxy
-target and aliases accordingly.
+target and aliases accordingly. The rewrite rules serve the best available
+`.br`, `.zst`, or `.gz` sidecar when the client advertises that encoding; Apache's
+`AddEncoding` directives set the corresponding `Content-Encoding`.

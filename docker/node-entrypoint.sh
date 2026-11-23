@@ -34,3 +34,5 @@ if [ -n "${API_PUBLIC_URL:-}" ]; then
 fi
 
 npm run build
+
+precompress-static static

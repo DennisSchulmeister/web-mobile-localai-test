@@ -89,11 +89,14 @@ services:
     # Frontend (optional)
     # =================================================================
     frontend-init:
-        image: node:24-slim
+        build:
+            context: .
+            dockerfile: docker/node.Dockerfile
         profiles: [node, full]
         working_dir: /workspace/app
         environment:
             API_PUBLIC_URL: ${API_PUBLIC_URL:-}
+            STATIC_PRECOMPRESS: ${STATIC_PRECOMPRESS:-true}
         volumes:
             - .:/workspace
             - node-dependencies:/workspace/app/node_modules

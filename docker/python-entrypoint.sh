@@ -83,6 +83,7 @@ if [ -n "$fixtures" ] && [ ! -f "$fixtures_marker" ]; then
 fi
 
 poetry run python manage.py collectstatic --noinput
+precompress-static "${DJANGO_STATIC_ROOT:-/srv/static}"
 
 set --
 if [ -n "${DJANGO_SCRIPT_NAME:-}" ]; then
