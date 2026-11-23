@@ -23,6 +23,23 @@ details as needed. The available variables are documented in `.env.template`. Re
 the `SECRET_KEY` in `server/wmlt/local_settings.py`; adjust its other deployment settings
 if needed. Do not use the template's example secret key for a deployed instance.
 
+When using MariaDB on a Debian host, load MariaDB's time-zone tables. Django uses
+`USE_TZ = True` and the deployment settings default to `TIME_ZONE = "Europe/Berlin"`;
+without those tables, time-zone conversions can fail in the admin. On the database
+host, run:
+
+```sh
+sudo mariadb-tzinfo-to-sql /usr/share/zoneinfo | sudo mariadb mysql
+sudo systemctl restart mariadb
+```
+
+To check that the tables are available, this query should return
+`2026-01-01 13:00:00`, not `NULL`:
+
+```sh
+sudo mariadb -Nse "SELECT CONVERT_TZ('2026-01-01 12:00:00', 'UTC', 'Europe/Berlin');"
+```
+
 On the first startup, the backend imports the fixtures listed in `DJANGO_FIXTURES`
 (comma-separated; defaults to the bundled prompt templates). To create an admin
 account, set `DJANGO_CREATE_SUPERUSER=true` and provide
