@@ -17,3 +17,8 @@ db.sqlite3
 # Docker
 .env
 /server/static/
+
+# Precompressed static files
+*.br
+*.gz
+*.zst
