@@ -63,6 +63,7 @@ are installed and language models are downloaded.
 * `external`: backend configured for a database outside the Compose network.
 * `postgres`: backend and PostgreSQL database.
 * `node`: frontend initialization/build service.
+* `caddy`: frontend web server.
 * `full`: PostgreSQL, backend, frontend initialization/build, and Caddy.
 
 The frontend's generated files and Python/Node dependencies are stored in mounted
